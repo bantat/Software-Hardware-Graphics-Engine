@@ -9,6 +9,8 @@ Run the script like so  clang 020mainRasterizing.c 000pixel.o -lglfw -framework 
 #include <math.h>
 #include "000pixel.h"
 #include "030triangle.c"
+#include "030vector.c"
+#include "030matrix.c"
 
 
 /*

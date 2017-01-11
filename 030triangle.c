@@ -28,66 +28,66 @@ the triangle according to the equations of lines. It also has some cotrol logic 
 and situations.
 */
 
-void triRender(double a0,double a1,double b0,double b1,double c0,double c1,double r,double g,double b){
+void triRender(double a[2], double b[2], double c[2],double rgb[3]){
 	// initialising the normalised triangle coodinates
 	double xleft,yleft,xmid,ymid,xright,yright;
 
 	//Find the maximum x to figure out which is the right most coodinate
-	double  m = MAX(a0,b0,c0);
+	double  m = MAX(a[0],b[0],c[0]);
 
 	// debugging print statement: printf("this is m ======%f\n",m );
 
 	//Do the normalisation of the triangle by reassigning triangle coodinate values and attributes
-	if (m == c0){
+	if (m == c[0]){
 
 		//This case c0 is the right most point so reassign
-		xright = c0;
-		yright = c1;
+		xright = c[0];
+		yright = c[1];
 
 			//find the mid point and reassign
-			if (b0 == MAX(a0,b0,0)){
-				xmid = b0;
-				ymid = b1;
-				xleft = a0;
-				yleft = a1;
+			if (b[0] == MAX(a[0],b[0],0)){
+				xmid = b[0];
+				ymid = b[1];
+				xleft = a[0];
+				yleft = a[1];
 			}else{
-				xmid = a0;
-				ymid = a1;
-				xleft = b0;
-				yleft = b1;
+				xmid = a[0];
+				ymid = a[1];
+				xleft = b[0];
+				yleft = b[1];
 			}
 
-	}else if(m==b0){
+	}else if(m==b[0]){
 		//b0 is the right most point
-		xright = b0;
-		yright = b1;
+		xright = b[0];
+		yright = b[1];
 			//finding the mid and the left most
-			if (c0 ==MAX(a0,c0,0)){
-				xmid = c0;
-				ymid = c1;
-				xleft = a0;
-				yleft = a1;
+			if (c[0] ==MAX(a[0],c[0],0)){
+				xmid = c[0];
+				ymid = c[1];
+				xleft = a[0];
+				yleft = a[1];
 			}else{
-				xmid = a0;
-				ymid = a1;
-				xleft = c0;
-				yleft = c1;
+				xmid = a[0];
+				ymid = a[1];
+				xleft = c[0];
+				yleft = c[1];
 			}
 	}else{
 		//a0 is the right most x coodinate
-		xright = a0;
-		yright = a1;
+		xright = a[0];
+		yright = a[1];
 
-			if (b0 == MAX(b0,c0,0)){
-				xmid = b0;
-				ymid = b1;
-				xleft = c0;
-				yleft = c1;
+			if (b[0] == MAX(b[0],c[0],0)){
+				xmid = b[0];
+				ymid = b[1];
+				xleft = c[0];
+				yleft = c[1];
 			}else{
-				xmid = c0;
-				ymid = c1;
-				xleft = b0;
-				yleft = b1;
+				xmid = c[0];
+				ymid = c[1];
+				xleft = b[0];
+				yleft = b[1];
 			}
 	}
 
@@ -132,7 +132,7 @@ void triRender(double a0,double a1,double b0,double b1,double c0,double c1,doubl
 
 		//draw the triangle
 		for (int j=ceil(ylow);j <= floor(yhigh);j++){
-			pixSetRGB(i,j, r, g, b);
+			pixSetRGB(i,j, rgb[0], rgb[1], rgb[2]);
 		}
 
 	}
@@ -154,7 +154,7 @@ void triRender(double a0,double a1,double b0,double b1,double c0,double c1,doubl
 
 		for (int j=ceil(ylow);j <= floor(yhigh);j++){
 			//Debugg statement : printf("%d,%d,%f,%f\n",i,j,ylow,yhigh );
-			pixSetRGB(i,j, r, g, b);
+			pixSetRGB(i,j, rgb[0], rgb[1], rgb[2]);
 		}
 
 	}
