@@ -2,7 +2,7 @@
 @ Author:  Sabastian Mugazambi & Tore Banta
 @ Date: 01/07/2017
 This files includes the main function that test the 020triangle.c rasterizing script.
-Run the script like so  clang 020mainRasterizing.c 000pixel.o -lglfw -framework OpenGL
+Run the script like so  clang 030mainInterpolating.c 000pixel.o -lglfw -framework OpenGL
 */
 
 #include <stdio.h>
@@ -25,12 +25,15 @@ int main(void){
 		return 1;
 	else{
 		//calling trirender with the coodinates of the triangle
-		double a[2] = {100,400};
-		double b[2] = {100,100};
-		double c[2] = {250,450};
-		double rgb[3] = {0.0,0.0,1.0};
+		double a[2] = {400,50};
+		double b[2] = {50,100};
+		double c[2] = {200,450};
+		double rgb[3] = {1.0,1.0,1.0};
+		double alpha[3] = {0.0,0.0,1.0};
+		double beta[3] = {0.0,1.0,0.0};
+		double gamma[3] = {1.0,0.0,0.0};
 
-		triRender(a,b,c,rgb);
+		triRender(a,b,c,rgb,alpha,beta,gamma);
 		pixRun();
 		return 0;
 	}
