@@ -33,3 +33,8 @@ void vecScale(int dim, double c, double w[], double cTimesW[]) {
 		cTimesW[i] = c * w[i];
 	}
 }
+
+int main() {
+	
+	return 0;
+}
