@@ -1,4 +1,9 @@
-
+/*
+@ Author:  Sabastian Mugazambi & Tore Banta
+@ Date: 01/07/2017
+This files includes the function that renders a triangle by rasterisation. It also handles triangle coodinates
+given in any order.
+*/
 
 
 /*** 2 x 2 Matrices ***/
