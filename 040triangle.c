@@ -8,7 +8,7 @@ given in any order.
 #include <stdio.h>
 #include <math.h>
 #include "000pixel.h"
-#include "040texture.c"
+/*#include "040texture.c"
 
 
 void vecCopy(int dim, double v[], double copy[]);
@@ -19,7 +19,7 @@ void vecScale(int dim, double c, double w[], double cTimesW[]);
 void mat22Print(double m[2][2]);
 double mat22Invert(double m[2][2], double mInv[2][2]);
 void mat22Multiply(double m[2][2], double v[2], double mTimesV[2]);
-void mat22Columns(double col0[2], double col1[2], double m[2][2]);
+void mat22Columns(double col0[2], double col1[2], double m[2][2]);*/
 
 //int texInitializeFile(texTexture *tex, const char *path);
 //void texDestroy(texTexture *tex);

@@ -8,16 +8,17 @@ Run the script like so  clang 040mainTexturing.c 000pixel.o -lglfw -framework Op
 #include <stdio.h>
 #include <math.h>
 #include "000pixel.h"
-#include "040triangle.c"
 #include "030vector.c"
 #include "030matrix.c"
-//#include "040texture.c"
+#include "040texture.c"
+#include "040triangle.c"
+
 
 
 int filter = 0;
 texTexture tex;
 
-void handleKeyDown(int button, int shiftIsDown, int controlIsDown,
+void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
 		int altOptionIsDown, int superCommandIsDown) {
 	if (button == 257) {
 		//printf("filter: %d\n", filter);
@@ -31,19 +32,27 @@ void handleKeyDown(int button, int shiftIsDown, int controlIsDown,
 	}
 }
 
+
+void draw(){
+	double a[2] = {300,150};
+	double b[2] = {50,100};
+	double c[2] = {200,450};
+	double rgb[3] = {1.0,1.0,1.0};
+	double alpha[2] = {0.0,0.0};
+	double beta[2] = {0.5,0.0};
+	double gamma[2] = {0.8,0.75};
+	triRender(a,b,c,rgb,&tex,alpha,beta,gamma);
+}
+
+
+
 void handleTimeStep(double oldTime, double newTime) {
 	if (floor(newTime) - floor(oldTime) >= 1.0)
 		printf("handleTimeStep: %f frames/sec\n", 1.0 / (newTime - oldTime));
 
-		double a[2] = {400,50};
-		double b[2] = {50,100};
-		double c[2] = {200,450};
-		double rgb[3] = {1.0,1.0,1.0};
-		double alpha[2] = {0.0,0.0};
-		double beta[2] = {0.5,0.0};
-		double gamma[2] = {0.8,0.75};
-		triRender(a,b,c,rgb,&tex,alpha,beta,gamma);
+	draw();
 }
+
 
 /*
 @function main
@@ -56,9 +65,12 @@ int main(void){
 	if (pixInitialize(512, 512, "Pixel Graphics") != 0)
 		return 1;
 	else{
-		pixSetTimeStepHandler(handleTimeStep);
-		pixSetKeyDownHandler(handleKeyDown);
 		texInitializeFile(&tex, "wall.jpg");
+		draw();
+
+		pixSetTimeStepHandler(handleTimeStep);
+		pixSetKeyUpHandler(handleKeyUp);
+		//texInitializeFile(&tex, "wall.jpg");
 		texDestroy(&tex);
 		pixRun();
 		return 0;
