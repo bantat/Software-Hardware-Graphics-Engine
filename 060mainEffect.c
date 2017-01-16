@@ -3,7 +3,7 @@
 @ Date: 01/07/2017
 This files includes the main function that test the 020triangle.c rasterizing
 script.
-Run the script like so  clang 050mainAbstracted.c 000pixel.o -lglfw -framework OpenGL
+Run the script like so  clang 060mainEffect.c 000pixel.o -lglfw -framework OpenGL
 */
 
 #include <stdio.h>
@@ -31,21 +31,25 @@ Run the script like so  clang 050mainAbstracted.c 000pixel.o -lglfw -framework O
 #define renTEXG 1
 #define renTEXB 2
 
+double y_val = 0;
+
 /* Sets rgb, based on the other parameters, which are unaltered. attr is an
 interpolated attribute vector. */
 void colorPixel(renRenderer *ren, double unif[], texTexture *tex[],
                 double attr[], double rgb[]) {
   texSample(tex[0], attr[renATTRS], attr[renATTRT]);
-  rgb[0] = tex[0]->sample[renTEXR] * unif[renUNIFR] * attr[renATTRR];
-  rgb[1] = tex[0]->sample[renTEXG] * unif[renUNIFG] * attr[renATTRG];
-  rgb[2] = tex[0]->sample[renTEXB] * unif[renUNIFB] * attr[renATTRB];
+  texSample(tex[1], attr[renATTRS], attr[renATTRT] + y_val);
+  rgb[0] = tex[0]->sample[renTEXR] * unif[renUNIFR] * attr[renATTRR] * tex[1]->sample[renTEXR];
+  rgb[1] = tex[0]->sample[renTEXG] * unif[renUNIFG] * attr[renATTRG] * tex[1]->sample[renTEXR];
+  rgb[2] = tex[0]->sample[renTEXB] * unif[renUNIFB] * attr[renATTRB] * tex[1]->sample[renTEXR];
 }
 
 #include "050triangle.c"
 
 int filter = 0;
-texTexture *tex[1];
+texTexture *tex[2];
 renRenderer ren;
+
 
 void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
                  int altOptionIsDown, int superCommandIsDown) {
@@ -62,10 +66,10 @@ void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
 }
 
 void draw() {
-  double a[renATTRDIMBOUND] = {300,150,0,0,1.0,1.0,1.0};
-  double b[renATTRDIMBOUND] = {50,100,0.5,0.0,1.0,1.0,1.0};
-  double c[renATTRDIMBOUND] = {200,450,0.8,0.75,1.0,1.0,1.0};
-  double unif[3] = {1.0, 1.0, 1.0};
+  double a[renATTRDIMBOUND] = {0,512,0.0,1.0,1.0,1.0,1.0,1.0};
+  double b[renATTRDIMBOUND] = {512,0,1.0,0.0,1.0,1.0,1.0,1.0};
+  double c[renATTRDIMBOUND] = {512,512,1.0,1.0,1.0,1.0,1.0,0.8};
+  double unif[4] = {0.8, 1.0, 0.9, 1.0};
   /*
   double a[2] = {300, 150};
   double b[2] = {50, 100};
@@ -81,6 +85,7 @@ void draw() {
 void handleTimeStep(double oldTime, double newTime) {
   if (floor(newTime) - floor(oldTime) >= 1.0)
     printf("handleTimeStep: %f frames/sec\n", 1.0 / (newTime - oldTime));
+  y_val = y_val + 0.01;
   draw();
 }
 
@@ -98,11 +103,15 @@ int main(void) {
     return 1;
   else {
     texTexture texture;
-    texInitializeFile(&texture, "wall.jpg");
+    texTexture texture1;
+    texInitializeFile(&texture, "aliens.jpg");
+    texInitializeFile(&texture1, "static.jpg");
+    texSetTopBottom(&texture1, texREPEAT);
     tex[0] = &texture;
-    ren.attrDim = 7;
-    ren.texNum = 1;
-    ren.unifDim = 3;
+    tex[1] = &texture1;
+    ren.attrDim = 8;
+    ren.texNum = 2;
+    ren.unifDim = 4;
 
     draw();
 
@@ -110,6 +119,7 @@ int main(void) {
     pixSetKeyUpHandler(handleKeyUp);
     // texInitializeFile(&tex, "wall.jpg");
     texDestroy(tex[0]);
+    texDestroy(tex[1]);
     pixRun();
     return 0;
   }
