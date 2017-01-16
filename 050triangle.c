@@ -48,89 +48,94 @@ the triangle according to the equations of lines. It also has some cotrol logic
 for different triangle shapes
 and situations.
 */
-
+/*
 void triRender(double a[2], double b[2], double c[2], double rgb[3],
                texTexture *tex, double alpha[2], double beta[2],
                double gamma[2]) {
+*/
+
+void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
+        double b[], double c[]) {
+
   // initialising the normalised triangle coodinates
 
   double xleft, yleft, xmid, ymid, xright, yright;
-  double abgleft[3];
-  double abgmid[3];
-  double abgright[3];
+  double abgleft[renATTRDIMBOUND];
+  double abgmid[renATTRDIMBOUND];
+  double abgright[renATTRDIMBOUND];
   // Find the maximum x to figure out which is the right most coodinate
-  double m = MAX(a[0], b[0], c[0]);
+  double m = MAX(a[renATTRX], b[renATTRX], c[renATTRX]);
 
   // debugging print statement:
 
   // Do the normalisation of the triangle by reassigning triangle coodinate
   // values and attributes
-  if (m == c[0]) {
+  if (m == c[renATTRX]) {
 
     // This case c0 is the right most point so reassign
-    xright = c[0];
-    yright = c[1];
-    vecCopy(3, gamma, abgright);
+    xright = c[renATTRX];
+    yright = c[renATTRY];
+    vecCopy(renATTRDIMBOUND, c, abgright);
 
     // find the mid point and reassign
-    if (b[0] == MAX(a[0], b[0], 0)) {
-      xmid = b[0];
-      ymid = b[1];
-      xleft = a[0];
-      yleft = a[1];
-      vecCopy(3, beta, abgmid);
-      vecCopy(3, alpha, abgleft);
+    if (b[renATTRX] == MAX(a[renATTRX], b[renATTRX], 0)) {
+      xmid = b[renATTRX];
+      ymid = b[renATTRY];
+      xleft = a[renATTRX];
+      yleft = a[renATTRY];
+      vecCopy(renATTRDIMBOUND, b, abgmid);
+      vecCopy(renATTRDIMBOUND, a, abgleft);
     } else {
-      xmid = a[0];
-      ymid = a[1];
-      xleft = b[0];
-      yleft = b[1];
-      vecCopy(3, alpha, abgmid);
-      vecCopy(3, beta, abgleft);
+      xmid = a[renATTRX];
+      ymid = a[renATTRY];
+      xleft = b[renATTRX];
+      yleft = b[renATTRY];
+      vecCopy(renATTRDIMBOUND, a, abgmid);
+      vecCopy(renATTRDIMBOUND, b, abgleft);
     }
 
-  } else if (m == b[0]) {
+  } else if (m == b[renATTRX]) {
     // b0 is the right most point
-    xright = b[0];
-    yright = b[1];
-    vecCopy(3, beta, abgright);
+    xright = b[renATTRX];
+    yright = b[renATTRY];
+    vecCopy(renATTRDIMBOUND, b, abgright);
 
     // finding the mid and the left most
-    if (c[0] == MAX(a[0], c[0], 0)) {
-      xmid = c[0];
-      ymid = c[1];
-      xleft = a[0];
-      yleft = a[1];
-      vecCopy(3, gamma, abgmid);
-      vecCopy(3, alpha, abgleft);
+    if (c[renATTRX] == MAX(a[renATTRX], c[renATTRX], 0)) {
+      xmid = c[renATTRX];
+      ymid = c[renATTRY];
+      xleft = a[renATTRX];
+      yleft = a[renATTRY];
+      vecCopy(renATTRDIMBOUND, c, abgmid);
+      vecCopy(renATTRDIMBOUND, a, abgleft);
     } else {
-      xmid = a[0];
-      ymid = a[1];
-      xleft = c[0];
-      yleft = c[1];
-      vecCopy(3, alpha, abgmid);
-      vecCopy(3, gamma, abgleft);
+      xmid = a[renATTRX];
+      ymid = a[renATTRY];
+      xleft = c[renATTRX];
+      yleft = c[renATTRY];
+      vecCopy(renATTRDIMBOUND, a, abgmid);
+      vecCopy(renATTRDIMBOUND, c, abgleft);
     }
   } else {
     // a0 is the right most x coodinate
-    xright = a[0];
-    yright = a[1];
-    vecCopy(3, alpha, abgright);
+    xright = a[renATTRX];
+    yright = a[renATTRY];
+    vecCopy(renATTRDIMBOUND, a, abgright);
 
-    if (b[0] == MAX(b[0], c[0], 0)) {
-      xmid = b[0];
-      ymid = b[1];
-      xleft = c[0];
-      yleft = c[1];
-      vecCopy(3, beta, abgmid);
-      vecCopy(3, gamma, abgleft);
+    if (b[renATTRX] == MAX(b[renATTRX], c[renATTRX], 0)) {
+      xmid = b[renATTRX];
+      ymid = b[renATTRY];
+      xleft = c[renATTRX];
+      yleft = c[renATTRY];
+      vecCopy(renATTRDIMBOUND, b, abgmid);
+      vecCopy(renATTRDIMBOUND, c, abgleft);
     } else {
-      xmid = c[0];
-      ymid = c[1];
-      xleft = b[0];
-      yleft = b[1];
-      vecCopy(3, gamma, abgmid);
-      vecCopy(3, beta, abgleft);
+      xmid = c[renATTRX];
+      ymid = c[renATTRY];
+      xleft = b[renATTRX];
+      yleft = b[renATTRY];
+      vecCopy(renATTRDIMBOUND, c, abgmid);
+      vecCopy(renATTRDIMBOUND, b, abgleft);
     }
   }
 
@@ -161,15 +166,15 @@ void triRender(double a[2], double b[2], double c[2], double rgb[3],
 
   /*refactoring variables so that they match the converntional names we have
   been using in class*/
-  a[0] = xleft;
-  a[1] = yleft;
-  vecCopy(2, abgleft, alpha);
-  b[0] = xmid;
-  b[1] = ymid;
-  vecCopy(2, abgmid, beta);
-  c[0] = xright;
-  c[1] = yright;
-  vecCopy(2, abgright, gamma);
+  //a[renATTRX] = xleft;
+  //a[renATTRY] = yleft;
+  vecCopy(renATTRDIMBOUND, abgleft, a);
+  //b[renATTRX] = xmid;
+  //b[renATTRY] = ymid;
+  vecCopy(renATTRDIMBOUND, abgmid, b);
+  //c[renATTRX] = xright;
+  //c[renATTRY] = yright;
+  vecCopy(renATTRDIMBOUND, abgright, c);
 
   // Now draw the first half of the triangle
   // For every x coodinate between left most point to mid point
@@ -206,24 +211,31 @@ void triRender(double a[2], double b[2], double c[2], double rgb[3],
       double p = pq[0];
       double q = pq[1];
 
-      double betaminusalpha[2], gammaminusalpha[2], chi[2];
+      double betaminusalpha[renATTRDIMBOUND], gammaminusalpha[renATTRDIMBOUND], attr[renATTRDIMBOUND];
 
-      vecSubtract(2, beta, alpha, betaminusalpha);
-      vecSubtract(2, gamma, alpha, gammaminusalpha);
+      vecSubtract(renATTRDIMBOUND, b, a, betaminusalpha);
+      vecSubtract(renATTRDIMBOUND, c, a, gammaminusalpha);
 
-      double pvec[2], qvec[2], pplusqvec[2];
+      double pvec[renATTRDIMBOUND], qvec[renATTRDIMBOUND], pplusqvec[renATTRDIMBOUND];
 
-      vecScale(2, p, betaminusalpha, pvec);
-      vecScale(2, q, gammaminusalpha, qvec);
+      vecScale(renATTRDIMBOUND, p, betaminusalpha, pvec);
+      vecScale(renATTRDIMBOUND, q, gammaminusalpha, qvec);
 
-      vecAdd(2, pvec, qvec, pplusqvec);
-      vecAdd(2, pplusqvec, alpha, chi);
+      vecAdd(renATTRDIMBOUND, pvec, qvec, pplusqvec);
+      vecAdd(renATTRDIMBOUND, pplusqvec, a, attr);
 
-      texSample(tex, chi[0], chi[1]);
+      //texSample(tex, chi[0], chi[1]);
 
+      double rgb[3];
+
+      colorPixel(ren, unif, tex, attr, rgb);
+      pixSetRGB(i, j, rgb[0], rgb[1], rgb[2]);
+
+      /*
       // printf("[r=%f,b=%f,g=%f]\n",rgb[0],rgb[1],rgb[2]);
       pixSetRGB(i, j, tex->sample[0] * rgb[0], tex->sample[1] * rgb[1],
                 tex->sample[2] * rgb[2]);
+      */
     }
   }
 
@@ -247,8 +259,6 @@ void triRender(double a[2], double b[2], double c[2], double rgb[3],
       x[0] = i;
       x[1] = j;
 
-      // printf("[x= %d, y= %d]\n",i,j);
-
       vecSubtract(2, b, a, bminusa);
       vecSubtract(2, c, a, cminusa);
       vecSubtract(2, x, a, xminusa);
@@ -261,23 +271,31 @@ void triRender(double a[2], double b[2], double c[2], double rgb[3],
       double p = pq[0];
       double q = pq[1];
 
-      double betaminusalpha[2], gammaminusalpha[2], chi[2];
+      double betaminusalpha[renATTRDIMBOUND], gammaminusalpha[renATTRDIMBOUND], attr[renATTRDIMBOUND];
 
-      vecSubtract(2, beta, alpha, betaminusalpha);
-      vecSubtract(2, gamma, alpha, gammaminusalpha);
+      vecSubtract(renATTRDIMBOUND, b, a, betaminusalpha);
+      vecSubtract(renATTRDIMBOUND, c, a, gammaminusalpha);
 
-      double pvec[2], qvec[2], pplusqvec[2];
+      double pvec[renATTRDIMBOUND], qvec[renATTRDIMBOUND], pplusqvec[renATTRDIMBOUND];
 
-      vecScale(2, p, betaminusalpha, pvec);
-      vecScale(2, q, gammaminusalpha, qvec);
+      vecScale(renATTRDIMBOUND, p, betaminusalpha, pvec);
+      vecScale(renATTRDIMBOUND, q, gammaminusalpha, qvec);
 
-      vecAdd(2, pvec, qvec, pplusqvec);
-      vecAdd(2, pplusqvec, alpha, chi);
+      vecAdd(renATTRDIMBOUND, pvec, qvec, pplusqvec);
+      vecAdd(renATTRDIMBOUND, pplusqvec, a, attr);
+
+      /*
 
       // printf("[%f,%f,%f]\n",chi[0],chi[1],chi[2]);
       texSample(tex, chi[0], chi[1]);
       pixSetRGB(i, j, tex->sample[0] * rgb[0], tex->sample[1] * rgb[1],
                 tex->sample[2] * rgb[2]);
+      */
+
+      double rgb[3];
+
+      colorPixel(ren, unif, tex, attr, rgb);
+      pixSetRGB(i, j, rgb[0], rgb[1], rgb[2]);
     }
   }
 }

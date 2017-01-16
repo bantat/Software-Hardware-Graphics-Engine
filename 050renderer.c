@@ -4,11 +4,9 @@
 This file has a struct for rendering.
 */
 
-#include <stdio.h>
-
 typedef struct renRenderer renRenderer;
 
-struct Employee {
+struct renRenderer {
   int unifDim;
   int texNum;
   int attrDim;
