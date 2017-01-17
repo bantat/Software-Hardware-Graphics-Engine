@@ -9,22 +9,7 @@ given in any order.
 #include <stdio.h>
 #include <math.h>
 #include "000pixel.h"
-/*#include "040texture.c"
 
-
-void vecCopy(int dim, double v[], double copy[]);
-void vecAdd(int dim, double v[], double w[], double vPlusW[]);
-void vecSubtract(int dim, double v[], double w[], double vMinusW[]);
-void vecScale(int dim, double c, double w[], double cTimesW[]);
-
-void mat22Print(double m[2][2]);
-double mat22Invert(double m[2][2], double mInv[2][2]);
-void mat22Multiply(double m[2][2], double v[2], double mTimesV[2]);
-void mat22Columns(double col0[2], double col1[2], double m[2][2]);*/
-
-// int texInitializeFile(texTexture *tex, const char *path);
-// void texDestroy(texTexture *tex);
-// void texSample(texTexture *tex, double s, double t);
 
 /*
 @function MAX
@@ -48,11 +33,6 @@ the triangle according to the equations of lines. It also has some cotrol logic
 for different triangle shapes
 and situations.
 */
-/*
-void triRender(double a[2], double b[2], double c[2], double rgb[3],
-               texTexture *tex, double alpha[2], double beta[2],
-               double gamma[2]) {
-*/
 
 void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
         double b[], double c[]) {
@@ -60,9 +40,9 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
   // initialising the normalised triangle coodinates
 
   double xleft, yleft, xmid, ymid, xright, yright;
-  double abgleft[renATTRDIMBOUND];
-  double abgmid[renATTRDIMBOUND];
-  double abgright[renATTRDIMBOUND];
+  double abgleft[ren->attrDim];
+  double abgmid[ren->attrDim];
+  double abgright[ren->attrDim];
   // Find the maximum x to figure out which is the right most coodinate
   double m = MAX(a[renATTRX], b[renATTRX], c[renATTRX]);
 
@@ -75,7 +55,7 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
     // This case c0 is the right most point so reassign
     xright = c[renATTRX];
     yright = c[renATTRY];
-    vecCopy(renATTRDIMBOUND, c, abgright);
+    vecCopy(ren->attrDim, c, abgright);
 
     // find the mid point and reassign
     if (b[renATTRX] == MAX(a[renATTRX], b[renATTRX], 0)) {
@@ -83,22 +63,22 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
       ymid = b[renATTRY];
       xleft = a[renATTRX];
       yleft = a[renATTRY];
-      vecCopy(renATTRDIMBOUND, b, abgmid);
-      vecCopy(renATTRDIMBOUND, a, abgleft);
+      vecCopy(ren->attrDim, b, abgmid);
+      vecCopy(ren->attrDim, a, abgleft);
     } else {
       xmid = a[renATTRX];
       ymid = a[renATTRY];
       xleft = b[renATTRX];
       yleft = b[renATTRY];
-      vecCopy(renATTRDIMBOUND, a, abgmid);
-      vecCopy(renATTRDIMBOUND, b, abgleft);
+      vecCopy(ren->attrDim, a, abgmid);
+      vecCopy(ren->attrDim, b, abgleft);
     }
 
   } else if (m == b[renATTRX]) {
     // b0 is the right most point
     xright = b[renATTRX];
     yright = b[renATTRY];
-    vecCopy(renATTRDIMBOUND, b, abgright);
+    vecCopy(ren->attrDim, b, abgright);
 
     // finding the mid and the left most
     if (c[renATTRX] == MAX(a[renATTRX], c[renATTRX], 0)) {
@@ -106,36 +86,36 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
       ymid = c[renATTRY];
       xleft = a[renATTRX];
       yleft = a[renATTRY];
-      vecCopy(renATTRDIMBOUND, c, abgmid);
-      vecCopy(renATTRDIMBOUND, a, abgleft);
+      vecCopy(ren->attrDim, c, abgmid);
+      vecCopy(ren->attrDim, a, abgleft);
     } else {
       xmid = a[renATTRX];
       ymid = a[renATTRY];
       xleft = c[renATTRX];
       yleft = c[renATTRY];
-      vecCopy(renATTRDIMBOUND, a, abgmid);
-      vecCopy(renATTRDIMBOUND, c, abgleft);
+      vecCopy(ren->attrDim, a, abgmid);
+      vecCopy(ren->attrDim, c, abgleft);
     }
   } else {
     // a0 is the right most x coodinate
     xright = a[renATTRX];
     yright = a[renATTRY];
-    vecCopy(renATTRDIMBOUND, a, abgright);
+    vecCopy(ren->attrDim, a, abgright);
 
     if (b[renATTRX] == MAX(b[renATTRX], c[renATTRX], 0)) {
       xmid = b[renATTRX];
       ymid = b[renATTRY];
       xleft = c[renATTRX];
       yleft = c[renATTRY];
-      vecCopy(renATTRDIMBOUND, b, abgmid);
-      vecCopy(renATTRDIMBOUND, c, abgleft);
+      vecCopy(ren->attrDim, b, abgmid);
+      vecCopy(ren->attrDim, c, abgleft);
     } else {
       xmid = c[renATTRX];
       ymid = c[renATTRY];
       xleft = b[renATTRX];
       yleft = b[renATTRY];
-      vecCopy(renATTRDIMBOUND, c, abgmid);
-      vecCopy(renATTRDIMBOUND, b, abgleft);
+      vecCopy(ren->attrDim, c, abgmid);
+      vecCopy(ren->attrDim, b, abgleft);
     }
   }
 
@@ -166,15 +146,9 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
 
   /*refactoring variables so that they match the converntional names we have
   been using in class*/
-  //a[renATTRX] = xleft;
-  //a[renATTRY] = yleft;
-  vecCopy(renATTRDIMBOUND, abgleft, a);
-  //b[renATTRX] = xmid;
-  //b[renATTRY] = ymid;
-  vecCopy(renATTRDIMBOUND, abgmid, b);
-  //c[renATTRX] = xright;
-  //c[renATTRY] = yright;
-  vecCopy(renATTRDIMBOUND, abgright, c);
+  vecCopy(ren->attrDim, abgleft, a);
+  vecCopy(ren->attrDim, abgmid, b);
+  vecCopy(ren->attrDim, abgright, c);
 
   // Now draw the first half of the triangle
   // For every x coodinate between left most point to mid point
