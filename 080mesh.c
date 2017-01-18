@@ -67,6 +67,16 @@ double *meshGetVertexPointer(meshMesh *mesh, int vert) {
 		return NULL;
 }
 
+/* Returns a pointer to the vertth vertex. For example:
+	double *vertex13 = meshGetVertexPointer(&mesh, 13);
+	printf("x = %f, y = %f\n", vertex13[0], vertex13[1]); */
+double *meshGetVaryPointer(meshMesh *mesh, renRenderer *ren, int vert) {
+	if (0 <= vert && vert < mesh->vertNum)
+		return &varying[vert * ren->varyDim];
+	else
+		return NULL;
+}
+
 /* Deallocates the resources backing the mesh. This function must be called
 when you are finished using a mesh. */
 void meshDestroy(meshMesh *mesh) {
@@ -88,37 +98,43 @@ void meshRender(meshMesh *mesh, renRenderer *ren, double unif[],
 		return;
 	}
 	int *triangle;
-	double *a, *b, *c;
-	double var_a[ren->varyDim], var_b[ren->varyDim], var_c[ren->varyDim];
-	int vary_index = 0;
+	//double *a, *b, *c;
+	//double var_a[ren->varyDim], var_b[ren->varyDim], var_c[ren->varyDim];
+	//int vary_index = 0;
 
+	/*
 	for (int i = 0; i < mesh->triNum; i++) {
 		triangle = meshGetTrianglePointer(mesh, i);
 		a = meshGetVertexPointer(mesh, triangle[0]);
 		b = meshGetVertexPointer(mesh, triangle[1]);
 		c = meshGetVertexPointer(mesh, triangle[2]);
 
-		transformVertex(ren, unif, a, var_a);
-		transformVertex(ren, unif, b, var_b);
-		transformVertex(ren, unif, c, var_c);
+		transformVertex(ren, unif, a, &varying[triangle[0]*ren->varyDim]);
+		transformVertex(ren, unif, b, &varying[triangle[1]*ren->varyDim]);
+		transformVertex(ren, unif, c, &varying[triangle[2]*ren->varyDim]);
 
-		for (int x = 0; x < ren->attrDim; x++) {
+		for (int x = 0; x < ren->varyDim; x++) {
 			varying[vary_index] = var_a[x];
 			vary_index++;
 		}
-		for (int x = 0; x < ren->attrDim; x++) {
+		for (int x = 0; x < ren->varyDim; x++) {
 			varying[vary_index] = var_b[x];
 			vary_index++;
 		}
-		for (int x = 0; x < ren->attrDim; x++) {
+		for (int x = 0; x < ren->varyDim; x++) {
 			varying[vary_index] = var_c[x];
 			vary_index++;
 		}
-
-		//triRender(ren, unif, tex, var_a, var_b, var_c);
 	}
-	for (int i = 0; i < (mesh->triNum * 3); i += 3) {
-		triRender(ren, unif, tex, &varying[i], &varying[i+ren->varyDim], &varying[i+(ren->varyDim * 2)]);
+	*/
+
+	for (int i = 0; i < mesh->vertNum; i++) {
+		transformVertex(ren, unif, meshGetVertexPointer(mesh, i), meshGetVaryPointer(mesh, ren, i));
+	}
+
+	for (int i = 0; i < mesh->triNum; i++) {
+		triangle = meshGetTrianglePointer(mesh, i);
+		triRender(ren, unif, tex, meshGetVaryPointer(mesh, ren, triangle[0]), meshGetVaryPointer(mesh, ren, triangle[1]), meshGetVaryPointer(mesh, ren, triangle[2]));
 	}
 }
 

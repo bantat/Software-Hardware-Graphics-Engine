@@ -101,8 +101,8 @@ void draw() {
   double gamma[2] = {0.8, 0.75};
   */
 
-  //meshInitializeEllipse(&mesh, 256.0, 256.0, 50.0, 50.0, 20);
-  meshInitializeRectangle(&mesh, 50.0, 306.0, 50.0, 306.0);
+  meshInitializeEllipse(&mesh, 256.0, 256.0, 50.0, 50.0, 20);
+  //meshInitializeRectangle(&mesh, 50.0, 306.0, 50.0, 306.0);
   meshRender(&mesh, &ren, unif, tex);
 
   //triRender(&ren, unif, tex, a, b, c);

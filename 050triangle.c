@@ -149,7 +149,7 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
   vecCopy(ren->varyDim, abgleft, a);
   vecCopy(ren->varyDim, abgmid, b);
   vecCopy(ren->varyDim, abgright, c);
-
+/////////////////////////////////////////////////////ACTUAL TRIRENDER///////////
   // Now draw the first half of the triangle
   // For every x coodinate between left most point to mid point
   for (int i = ceil(xleft); i <= floor(xmid); i++) {
@@ -226,6 +226,8 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
       yhigh = yleft + (((yright - yleft) / (xright - xleft)) * (i - xleft));
       ylow = ymid + (((yright - ymid) / (xright - xmid)) * (i - xmid));
     }
+
+    // Where is rght == 1...
 
     for (int j = ceil(ylow); j <= floor(yhigh); j++) {
       double bminusa[2], cminusa[2], xminusa[2], m[2][2], mInv[2][2], pq[2],
