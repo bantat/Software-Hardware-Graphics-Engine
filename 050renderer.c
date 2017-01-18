@@ -9,5 +9,6 @@ typedef struct renRenderer renRenderer;
 struct renRenderer {
   int unifDim;
   int texNum;
+  int varyDim;
   int attrDim;
 };
