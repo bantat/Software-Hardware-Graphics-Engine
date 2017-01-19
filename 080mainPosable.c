@@ -56,9 +56,6 @@ void transformVertex(renRenderer *ren, double unif[], double attr[],
     double RtimesXYvec[2];
     double T[2];
 
-    //double colP0[2] = { 0.0, 1.0};
-    //double colP1[2] = { (-1)*1.0 , 0.0};
-
     double colP0[2] = { cos(unif[0]*degree) , sin(unif[0]*degree)};
     double colP1[2] = { (-1)*sin(unif[0]*degree) , cos(unif[0]*degree)};
 
@@ -106,7 +103,6 @@ meshMesh mesh;
 void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
                  int altOptionIsDown, int superCommandIsDown) {
   if (button == 257) {
-    // printf("filter: %d\n", filter);
     if (filter == 0) {
       texSetFiltering(tex[0], texQUADRATIC);
       filter = 1;
@@ -117,35 +113,20 @@ void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
   }
 }
 
-void draw(double ch) {
-  //double a[renVARYDIMBOUND] = {0,512,0.0,1.0,1.0,1.0,1.0,1.0};
-  //double b[renVARYDIMBOUND] = {512,0,1.0,0.0,1.0,1.0,1.0,1.0};
-  //double c[renVARYDIMBOUND] = {512,512,1.0,1.0,1.0,1.0,1.0,0.8};
-  double unif[3] = {57.0 + ch, 256.0, 256.0};
-  
-  /*
-  double a[2] = {300, 150};
-  double b[2] = {50, 100};
-  double c[2] = {200, 450};
-  double
-  double alpha[2] = {0.0, 0.0};
-  double beta[2] = {0.5, 0.0};
-  double gamma[2] = {0.8, 0.75};
-  */
 
-  meshInitializeEllipse(&mesh, 0.0, 0.0, 100.0, 200.0, 8);
-  //meshInitializeEllipse(&mesh, 0.0, 0.0, 200.0, 200.0, 45);
-  //meshInitializeRectangle(&mesh, 50.0, 306.0, 50.0, 306.0);
+void draw(double ch) {
+
+  double unif[3] = {57.0 + ch, 256.0, 256.0};
+  meshInitializeEllipse(&mesh, 0.0, 0.0, 100.0, 200.0, 20);
   meshRender(&mesh, &ren, unif, tex);
-  //triRender(&ren, unif, tex, a, b, c);
+
 }
 
 void handleTimeStep(double oldTime, double newTime) {
   if (floor(newTime) - floor(oldTime) >= 1.0)
     printf("handleTimeStep: %f frames/sec\n", 1.0 / (newTime - oldTime));
   y_val = y_val + 0.01;
-
-  ch = ch+1;
+  ch = ch+5;
   pixClearRGB(0.0, 0.0, 0.0);
   draw(ch);
 }
@@ -175,7 +156,7 @@ int main(void) {
 
     pixSetTimeStepHandler(handleTimeStep);
     pixSetKeyUpHandler(handleKeyUp);
-    // texInitializeFile(&tex, "wall.jpg");
+
     texDestroy(tex[0]);
     meshDestroy(&mesh);
     pixRun();
