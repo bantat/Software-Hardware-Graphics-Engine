@@ -130,10 +130,13 @@ void meshRender(meshMesh *mesh, renRenderer *ren, double unif[],
 
 	for (int i = 0; i < mesh->vertNum; i++) {
 		transformVertex(ren, unif, meshGetVertexPointer(mesh, i), meshGetVaryPointer(mesh, ren, i));
+		printf("attr : [%f , %f]\n",meshGetVertexPointer(mesh, i)[0],meshGetVertexPointer(mesh, i)[1]);
+		printf("vary : [%f , %f]\n",meshGetVaryPointer(mesh, ren, i)[0],meshGetVaryPointer(mesh, ren, i)[1]);
 	}
 
 	for (int i = 0; i < mesh->triNum; i++) {
 		triangle = meshGetTrianglePointer(mesh, i);
+		printf("Drawn triangel : %d\n",i);
 		triRender(ren, unif, tex, meshGetVaryPointer(mesh, ren, triangle[0]), meshGetVaryPointer(mesh, ren, triangle[1]), meshGetVaryPointer(mesh, ren, triangle[2]));
 	}
 }

@@ -41,16 +41,45 @@ Run the script like so  clang 080mainPosable.c 000pixel.o -lglfw -framework Open
 #define renATTRG 5
 #define renATTRB 6
 
+int tria = 0;
 double y_val = 0;
 
 /* Writes the vary vector, based on the other parameters. */
 void transformVertex(renRenderer *ren, double unif[], double attr[],
         double vary[]) {
     /* For now, just copy attr to varying. Baby steps. */
-    vary[renVARYX] = attr[renATTRX];
-    vary[renVARYY] = attr[renATTRY];
+
+    double R[2][2];
+    double attrXYvec [2];
+    double RtimesXYvec[2];
+    double T[2];
+
+    //double colP0[2] = { 0.0, 1.0};
+    //double colP1[2] = { (-1)*1.0 , 0.0};
+
+    double colP0[2] = { cos(unif[0]) , sin(unif[0])};
+    double colP1[2] = { (-1)*sin(unif[0]) , cos(unif[0])};
+
+    mat22Columns(colP0,colP1,R);
+    //mat22Print(R);
+
+    attrXYvec[0] = attr[renATTRX];
+    attrXYvec[1] = attr[renATTRY];
+
+    mat22Multiply(R,attrXYvec,RtimesXYvec);
+
+    T[0] = unif[1];
+    T[1] = unif[2];
+    vecAdd(2,T,RtimesXYvec,vary);
+
+
+    //printf("varyX: %f, varyY: %f,\n", vary[renVARYX],vary[renVARYY]);
+
+    //vary[renVARYX] = attr[renATTRX];
+    //vary[renVARYY] = attr[renATTRY];
     vary[renVARYS] = attr[renATTRS];
     vary[renVARYT] = attr[renATTRT];
+
 }
 
 /* Sets rgb, based on the other parameters, which are unaltered. attr is an
@@ -58,9 +87,9 @@ interpolated attribute vector. */
 void colorPixel(renRenderer *ren, double unif[], texTexture *tex[],
                 double vary[], double rgb[]) {
   texSample(tex[0], vary[renVARYS], vary[renVARYT]);
-  rgb[0] = tex[0]->sample[renTEXR] * unif[renUNIFR];
-  rgb[1] = tex[0]->sample[renTEXG] * unif[renUNIFG];
-  rgb[2] = tex[0]->sample[renTEXB] * unif[renUNIFB];
+  rgb[0] = tex[0]->sample[renTEXR];
+  rgb[1] = tex[0]->sample[renTEXG];
+  rgb[2] = tex[0]->sample[renTEXB];
 }
 
 #include "080triangle.c"
@@ -90,7 +119,7 @@ void draw() {
   //double a[renVARYDIMBOUND] = {0,512,0.0,1.0,1.0,1.0,1.0,1.0};
   //double b[renVARYDIMBOUND] = {512,0,1.0,0.0,1.0,1.0,1.0,1.0};
   //double c[renVARYDIMBOUND] = {512,512,1.0,1.0,1.0,1.0,1.0,0.8};
-  double unif[3] = {1.0, 1.0, 1.0};
+  double unif[3] = {1.0, 256.0, 256.0};
   /*
   double a[2] = {300, 150};
   double b[2] = {50, 100};
@@ -100,8 +129,8 @@ void draw() {
   double beta[2] = {0.5, 0.0};
   double gamma[2] = {0.8, 0.75};
   */
-
-  meshInitializeEllipse(&mesh, 256.0, 256.0, 50.0, 50.0, 20);
+  //meshInitializeEllipse(&mesh, 0.0, 0.0, 100.0, 200.0, 8);
+  meshInitializeEllipse(&mesh, 0.0, 0.0, 200.0, 200.0, 45);
   //meshInitializeRectangle(&mesh, 50.0, 306.0, 50.0, 306.0);
   meshRender(&mesh, &ren, unif, tex);
 
@@ -112,7 +141,7 @@ void handleTimeStep(double oldTime, double newTime) {
   if (floor(newTime) - floor(oldTime) >= 1.0)
     printf("handleTimeStep: %f frames/sec\n", 1.0 / (newTime - oldTime));
   y_val = y_val + 0.01;
-  draw();
+  //draw();
 }
 
 /*

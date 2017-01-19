@@ -11,15 +11,6 @@ given in any order.
 #include "000pixel.h"
 
 
-/*
-@function MAX
-@param (double,double,double)
-@purpose Finds the Maximum value of the three doubles given as parameters and
-returns it.
-*/
-double MAX(a, b, c) {
-  return ((a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c));
-}
 
 /*
 @function triRender
@@ -34,127 +25,75 @@ for different triangle shapes
 and situations.
 */
 
-void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
+void hiddenRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
         double b[], double c[]) {
-
-  // initialising the normalised triangle coodinates
-
+  printf("infucntion [%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
   double xleft, yleft, xmid, ymid, xright, yright;
-  double abgleft[ren->varyDim];
-  double abgmid[ren->varyDim];
-  double abgright[ren->varyDim];
-  // Find the maximum x to figure out which is the right most coodinate
-  double m = MAX(a[renVARYX], b[renVARYX], c[renVARYX]);
 
-  // debugging print statement:
+  xleft = a[renVARYX];
+  yleft = a[renVARYY];
 
-  // Do the normalisation of the triangle by reassigning triangle coodinate
-  // values and attributes
-  if (m == c[renVARYX]) {
+  xmid = b[renVARYX];
+  ymid = b[renVARYY];
 
-    // This case c0 is the right most point so reassign
-    xright = c[renVARYX];
-    yright = c[renVARYY];
-    vecCopy(ren->varyDim, c, abgright);
+  xright = c[renVARYX];
+  yright = c[renVARYY];
 
-    // find the mid point and reassign
-    if (b[renVARYX] == MAX(a[renVARYX], b[renVARYX], 0)) {
-      xmid = b[renVARYX];
-      ymid = b[renVARYY];
-      xleft = a[renVARYX];
-      yleft = a[renVARYY];
-      vecCopy(ren->varyDim, b, abgmid);
-      vecCopy(ren->varyDim, a, abgleft);
-    } else {
-      xmid = a[renVARYX];
-      ymid = a[renVARYY];
-      xleft = b[renVARYX];
-      yleft = b[renVARYY];
-      vecCopy(ren->varyDim, a, abgmid);
-      vecCopy(ren->varyDim, b, abgleft);
-    }
-
-  } else if (m == b[renVARYX]) {
-    // b0 is the right most point
-    xright = b[renVARYX];
-    yright = b[renVARYY];
-    vecCopy(ren->varyDim, b, abgright);
-
-    // finding the mid and the left most
-    if (c[renVARYX] == MAX(a[renVARYX], c[renVARYX], 0)) {
-      xmid = c[renVARYX];
-      ymid = c[renVARYY];
-      xleft = a[renVARYX];
-      yleft = a[renVARYY];
-      vecCopy(ren->varyDim, c, abgmid);
-      vecCopy(ren->varyDim, a, abgleft);
-    } else {
-      xmid = a[renVARYX];
-      ymid = a[renVARYY];
-      xleft = c[renVARYX];
-      yleft = c[renVARYY];
-      vecCopy(ren->varyDim, a, abgmid);
-      vecCopy(ren->varyDim, c, abgleft);
-    }
-  } else {
-    // a0 is the right most x coodinate
-    xright = a[renVARYX];
-    yright = a[renVARYY];
-    vecCopy(ren->varyDim, a, abgright);
-
-    if (b[renVARYX] == MAX(b[renVARYX], c[renVARYX], 0)) {
-      xmid = b[renVARYX];
-      ymid = b[renVARYY];
-      xleft = c[renVARYX];
-      yleft = c[renVARYY];
-      vecCopy(ren->varyDim, b, abgmid);
-      vecCopy(ren->varyDim, c, abgleft);
-    } else {
-      xmid = c[renVARYX];
-      ymid = c[renVARYY];
-      xleft = b[renVARYX];
-      yleft = b[renVARYY];
-      vecCopy(ren->varyDim, c, abgmid);
-      vecCopy(ren->varyDim, b, abgleft);
-    }
-  }
+  int shp = 1;
 
   // figure out if the mid point is above line (left most) ---> (right most),
   // teslls us the shape of triangle
-  int shp = (ymid < MAX(yleft, yright, 0) ? 1 : 2);
+  if (ymid <= yright && ymid <= yleft) {
+    shp = 1;
+  } else {
+    shp = 2;
+  }
+
+  //printf("shp = %d\n", shp);
+
+  //int shp = (ymid < MAX(yleft, yright, 0) ? 1 : 2);
 
   // this variable changes if the triangle is right angled so we dont devide by
   // zero
   int rght = 0;
   // Figuring out if the triangle is right angled
-  if (xleft == xmid) {
+  /*
+  printf("xleft - xmid: %f\n", xleft-xmid);
+  printf("xmid - xright: %f\n", xmid-xright);
+  if ((xleft - xmid) < 1) {
+    printf("xleft: %f, xmid: %f\n", xleft, xmid);
+  }
+  if ((xmid - xright) < 1) {
+    printf("xmid: %f, xright: %f\n", xmid, xright);
+  }
+*/
+
+
+  if (fabs(xleft - xmid) < 0.00001) {
     // straight line on the left side
+    //printf("Straight line left\n");
     rght = 1;
-  } else if (xmid == xright) {
+  } else if (fabs(xmid - xright) < 0.00001) {
     // straight line on the right side
+    //printf("Straight line right\n");
     rght = 2;
   }
 
-  // printf("[r=%f,b=%f,g=%f]\n",rgb[0],rgb[1],rgb[2]);
-
-  // check which one is the middle one
-  // debug and check if the the coodinates are correctly normalised, shape is
-  // correct and equal x-coodinates detected
-  // printf("xleft = %f, yleft= %f, xmid = %f,ymid= %f, xright = %f,yright =
-  // %f,shape = %d,right angled = %d\n"
-  //	,xleft,yleft,xmid,ymid,xright,yright,shp,rght);
+  printf("rght = %d, [%f,%f] ,[%f,%f] ,[%f,%f]\n", rght,xleft,yleft,xmid,ymid,xright,yright);
 
   /*refactoring variables so that they match the converntional names we have
   been using in class*/
-  vecCopy(ren->varyDim, abgleft, a);
-  vecCopy(ren->varyDim, abgmid, b);
-  vecCopy(ren->varyDim, abgright, c);
+  // vecCopy(ren->varyDim, abgleft, a);
+  // vecCopy(ren->varyDim, abgmid, b);
+  // vecCopy(ren->varyDim, abgright, c);
+
 
   // Now draw the first half of the triangle
   // For every x coodinate between left most point to mid point
   for (int i = ceil(xleft); i <= floor(xmid); i++) {
     double ylow, yhigh;
 
+    //printf("Drawn left side\n");
     // If the mid point is above and (xleft is not inline with xmid or xleft)
     if (shp == 2 && !(rght == 1)) {
       ylow = yleft + (((yright - yleft) / (xright - xleft)) * (i - xleft));
@@ -166,8 +105,9 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
       ylow = yleft + (((ymid - yleft) / (xmid - xleft)) * (i - xleft));
     }
 
+
     // draw the triangle
-    for (int j = ceil(ylow); j < floor(yhigh); j++) {
+    for (int j = ceil(ylow); j <= floor(yhigh); j++) {
       double bminusa[2], cminusa[2], xminusa[2], m[2][2], mInv[2][2], pq[2],
           x[2];
       x[0] = i;
@@ -214,9 +154,9 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
   }
 
   // from xmid to xright
-  for (int i = floor(xmid); i <= (floor(xright)); i++) {
+  for (int i = ceil(xmid); i <= floor(xright); i++) {
     double ylow, yhigh;
-
+    //printf("Drawn right side\n");
     // if mid point is above and xmid is not inline with xright
     if (shp == 2 && !(rght == 2)) {
       ylow = yleft + (((yright - yleft) / (xright - xleft)) * (i - xleft));
@@ -272,4 +212,84 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
       pixSetRGB(i, j, rgb[0], rgb[1], rgb[2]);
     }
   }
+}
+
+
+void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
+        double b[], double c[]) {
+
+
+      //printf("got into tri\n");
+      // Do the normalisation of the triangle by reassigning triangle coodinate
+      // values and attributes
+      //hiddenRender(ren, unif, tex, a, b, c);
+
+
+      printf("before [%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
+
+      if (a[0] > c[0]) {
+        //swap(a, c);
+        double *intM;
+        intM = a;
+        a = c;
+        c = intM;
+        printf("before [%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
+
+
+      }
+
+      if (a[0] > b[0]) {
+        double *intM;
+        //swap(a, b);
+        printf("before [%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
+        intM = a;
+        a = b;
+        b= intM;
+      }
+
+      if (b[0] > c[0]){
+        double *intM;
+        //swap(b, c);
+        intM = b;
+        b = c;
+        c = intM;
+      }
+
+      printf("after [%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
+      hiddenRender(ren, unif, tex, a, b, c);
+/*
+  if (a[0] <= b[0] && a[0] <= c[0]) {
+    if (b[0] <= c[0]) {
+      printf("render trinangle1\n");
+      printf("[%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
+      hiddenRender(ren, unif, tex, a, b, c);
+    } else {
+      printf("render trinangle2\n");
+      printf("[%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
+      hiddenRender(ren, unif, tex, a, c, b);
+    }
+  }
+  else if (b[0] <= a[0] && b[0] <= c[0]) {
+    if (a[0] <= c[0]) {
+      printf("render trinangle3\n");
+      printf("[%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
+      hiddenRender(ren, unif, tex, b, a, c);
+    } else {
+      printf("render trinangle4\n");
+      printf("[%.20lf,%.20lf] [%.20lf,%.20lf] [%.20lf,%.20lf]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
+      hiddenRender(ren, unif, tex, b, c, a);
+    }
+  }
+  else {
+    if (a[0] <= b[0]) {
+      printf("render trinangle5\n");
+      printf("[%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
+      hiddenRender(ren, unif, tex, c, a, b);
+    }
+    else {
+      printf("render trinangle6\n");
+      printf("[%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
+      hiddenRender(ren, unif, tex, c, b, a);
+    }
+  }*/
 }
