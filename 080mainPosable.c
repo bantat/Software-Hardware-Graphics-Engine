@@ -116,8 +116,8 @@ void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
 
 void draw(double ch) {
 
-  double unif[3] = {57.0 + ch, 256.0, 256.0};
-  meshInitializeEllipse(&mesh, 0.0, 0.0, 100.0, 200.0, 20);
+  double unif[3] = {57.0, 256.0, 256.0};
+  meshInitializeEllipse(&mesh, 0.0, 0.0, 100.0, 200.0, 8);
   meshRender(&mesh, &ren, unif, tex);
 
 }
@@ -127,8 +127,8 @@ void handleTimeStep(double oldTime, double newTime) {
     printf("handleTimeStep: %f frames/sec\n", 1.0 / (newTime - oldTime));
   y_val = y_val + 0.01;
   ch = ch+5;
-  pixClearRGB(0.0, 0.0, 0.0);
-  draw(ch);
+  //pixClearRGB(0.0, 0.0, 0.0);
+  //draw(ch);
 }
 
 /*

@@ -79,7 +79,7 @@ void hiddenRender(renRenderer *ren, double unif[], texTexture *tex[], double a[]
     rght = 2;
   }
 
-  printf("rght = %d, [%f,%f] ,[%f,%f] ,[%f,%f]\n", rght,xleft,yleft,xmid,ymid,xright,yright);
+  //printf("rght = %d, [%f,%f] ,[%f,%f] ,[%f,%f]\n", rght,xleft,yleft,xmid,ymid,xright,yright);
 
   /*refactoring variables so that they match the converntional names we have
   been using in class*/
@@ -90,7 +90,8 @@ void hiddenRender(renRenderer *ren, double unif[], texTexture *tex[], double a[]
 
   // Now draw the first half of the triangle
   // For every x coodinate between left most point to mid point
-  for (int i = ceil(xleft); i <= floor(xmid); i++) {
+  printf("ceil(xleft) = %d, floor(xmid) = %d\n", (int)ceil(xleft), (int)floor(xmid));
+  for (int i = (int)ceil(xleft); i <= (int)floor(xmid); i++) {
     double ylow, yhigh;
 
     //printf("Drawn left side\n");
@@ -154,7 +155,8 @@ void hiddenRender(renRenderer *ren, double unif[], texTexture *tex[], double a[]
   }
 
   // from xmid to xright
-  for (int i = ceil(xmid); i <= floor(xright); i++) {
+  printf("ceil(xmid) = %d, floor(xright) = %d\n", (int)ceil(xmid), (int)floor(xright));
+  for (int i = (int)ceil(xmid); i <= (int)floor(xright); i++) {
     double ylow, yhigh;
     //printf("Drawn right side\n");
     // if mid point is above and xmid is not inline with xright
@@ -225,7 +227,7 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
       //hiddenRender(ren, unif, tex, a, b, c);
 
 
-      printf("before [%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
+      //printf("before [%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
 
       if (a[0] > c[0]) {
         //swap(a, c);
@@ -233,7 +235,7 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
         intM = a;
         a = c;
         c = intM;
-        printf("before [%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
+        //printf("before [%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
 
 
       }
@@ -241,7 +243,7 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
       if (a[0] > b[0]) {
         double *intM;
         //swap(a, b);
-        printf("before [%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
+        //printf("before [%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
         intM = a;
         a = b;
         b= intM;
@@ -255,7 +257,7 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
         c = intM;
       }
 
-      printf("after [%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
+      //printf("after [%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
       hiddenRender(ren, unif, tex, a, b, c);
 /*
   if (a[0] <= b[0] && a[0] <= c[0]) {
