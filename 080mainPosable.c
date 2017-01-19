@@ -40,7 +40,9 @@ Run the script like so  clang 080mainPosable.c 000pixel.o -lglfw -framework Open
 #define renATTRR 4
 #define renATTRG 5
 #define renATTRB 6
+#define degree (M_PI/180)
 
+double ch = 0.0;
 int tria = 0;
 double y_val = 0;
 
@@ -57,8 +59,8 @@ void transformVertex(renRenderer *ren, double unif[], double attr[],
     //double colP0[2] = { 0.0, 1.0};
     //double colP1[2] = { (-1)*1.0 , 0.0};
 
-    double colP0[2] = { cos(unif[0]) , sin(unif[0])};
-    double colP1[2] = { (-1)*sin(unif[0]) , cos(unif[0])};
+    double colP0[2] = { cos(unif[0]*degree) , sin(unif[0]*degree)};
+    double colP1[2] = { (-1)*sin(unif[0]*degree) , cos(unif[0]*degree)};
 
     mat22Columns(colP0,colP1,R);
     //mat22Print(R);
@@ -115,11 +117,11 @@ void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
   }
 }
 
-void draw() {
+void draw(double ch) {
   //double a[renVARYDIMBOUND] = {0,512,0.0,1.0,1.0,1.0,1.0,1.0};
   //double b[renVARYDIMBOUND] = {512,0,1.0,0.0,1.0,1.0,1.0,1.0};
   //double c[renVARYDIMBOUND] = {512,512,1.0,1.0,1.0,1.0,1.0,0.8};
-  double unif[3] = {1.0, 256.0, 256.0};
+  double unif[3] = {57.0 + ch, 256.0, 256.0};
   /*
   double a[2] = {300, 150};
   double b[2] = {50, 100};
@@ -129,11 +131,10 @@ void draw() {
   double beta[2] = {0.5, 0.0};
   double gamma[2] = {0.8, 0.75};
   */
-  //meshInitializeEllipse(&mesh, 0.0, 0.0, 100.0, 200.0, 8);
-  meshInitializeEllipse(&mesh, 0.0, 0.0, 200.0, 200.0, 45);
+  meshInitializeEllipse(&mesh, 0.0, 0.0, 100.0, 200.0, 8);
+  //meshInitializeEllipse(&mesh, 0.0, 0.0, 200.0, 200.0, 45);
   //meshInitializeRectangle(&mesh, 50.0, 306.0, 50.0, 306.0);
   meshRender(&mesh, &ren, unif, tex);
-
   //triRender(&ren, unif, tex, a, b, c);
 }
 
@@ -141,7 +142,10 @@ void handleTimeStep(double oldTime, double newTime) {
   if (floor(newTime) - floor(oldTime) >= 1.0)
     printf("handleTimeStep: %f frames/sec\n", 1.0 / (newTime - oldTime));
   y_val = y_val + 0.01;
-  //draw();
+
+  ch = ch+1;
+  pixClearRGB(0.0, 0.0, 0.0);
+  draw(ch);
 }
 
 /*
@@ -165,7 +169,7 @@ int main(void) {
     ren.texNum = 1;
     ren.unifDim = 3;
 
-    draw();
+    draw(ch);
 
     pixSetTimeStepHandler(handleTimeStep);
     pixSetKeyUpHandler(handleKeyUp);
