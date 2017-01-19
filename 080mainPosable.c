@@ -122,6 +122,7 @@ void draw(double ch) {
   //double b[renVARYDIMBOUND] = {512,0,1.0,0.0,1.0,1.0,1.0,1.0};
   //double c[renVARYDIMBOUND] = {512,512,1.0,1.0,1.0,1.0,1.0,0.8};
   double unif[3] = {57.0 + ch, 256.0, 256.0};
+  
   /*
   double a[2] = {300, 150};
   double b[2] = {50, 100};
@@ -131,6 +132,7 @@ void draw(double ch) {
   double beta[2] = {0.5, 0.0};
   double gamma[2] = {0.8, 0.75};
   */
+
   meshInitializeEllipse(&mesh, 0.0, 0.0, 100.0, 200.0, 8);
   //meshInitializeEllipse(&mesh, 0.0, 0.0, 200.0, 200.0, 45);
   //meshInitializeRectangle(&mesh, 50.0, 306.0, 50.0, 306.0);
