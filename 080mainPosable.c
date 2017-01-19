@@ -115,10 +115,26 @@ void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
 
 
 void draw(double ch) {
-
-  double unif[3] = {57.0, 256.0, 256.0};
+// [88.265886,364.927807] [98.882275,273.720626] [256.000000, 256.000000]
+/*
+  double a[4] = {88.265886,364.927807,0.0,0.0};
+  double b[4] = {98.882275,273.720626,0.0,1.0};
+  double c[4] = {256.000000, 256.000000, 1.0, 1.0};
+*/
+/*
+double a[4] = {78.265886,374.927807,0.0,0.0};
+double b[4] = {108.882275,263.720626,0.0,1.0};
+double c[4] = {266.000000, 266.000000, 1.0, 1.0};
+*/
+/*
+  double a[4] = {100.0, 100.0,0.0,0.0};
+  double b[4] = {256.0,256.0,0.0,1.0};
+  double c[4] = {300.0,300.0,1.0,1.0};
+*/
+  double unif[3] = {57.0, 266.0, 266.0};
   meshInitializeEllipse(&mesh, 0.0, 0.0, 100.0, 200.0, 8);
   meshRender(&mesh, &ren, unif, tex);
+  //triRender(&ren, unif, tex, a, b, c);
 
 }
 

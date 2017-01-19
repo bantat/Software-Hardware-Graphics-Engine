@@ -224,10 +224,9 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
       //printf("got into tri\n");
       // Do the normalisation of the triangle by reassigning triangle coodinate
       // values and attributes
-      //hiddenRender(ren, unif, tex, a, b, c);
 
 
-      //printf("before [%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
+      printf("before [%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
 
       if (a[0] > c[0]) {
         //swap(a, c);
@@ -257,41 +256,8 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
         c = intM;
       }
 
-      //printf("after [%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
+      printf("after [%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
       hiddenRender(ren, unif, tex, a, b, c);
-/*
-  if (a[0] <= b[0] && a[0] <= c[0]) {
-    if (b[0] <= c[0]) {
-      printf("render trinangle1\n");
-      printf("[%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
-      hiddenRender(ren, unif, tex, a, b, c);
-    } else {
-      printf("render trinangle2\n");
-      printf("[%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
-      hiddenRender(ren, unif, tex, a, c, b);
-    }
+
   }
-  else if (b[0] <= a[0] && b[0] <= c[0]) {
-    if (a[0] <= c[0]) {
-      printf("render trinangle3\n");
-      printf("[%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
-      hiddenRender(ren, unif, tex, b, a, c);
-    } else {
-      printf("render trinangle4\n");
-      printf("[%.20lf,%.20lf] [%.20lf,%.20lf] [%.20lf,%.20lf]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
-      hiddenRender(ren, unif, tex, b, c, a);
-    }
-  }
-  else {
-    if (a[0] <= b[0]) {
-      printf("render trinangle5\n");
-      printf("[%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
-      hiddenRender(ren, unif, tex, c, a, b);
-    }
-    else {
-      printf("render trinangle6\n");
-      printf("[%f,%f] [%f,%f] [%f, %f]\n", a[0],a[1],b[0],b[1],c[0],c[1]);
-      hiddenRender(ren, unif, tex, c, b, a);
-    }
-  }*/
 }
