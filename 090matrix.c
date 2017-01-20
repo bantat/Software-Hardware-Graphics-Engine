@@ -49,8 +49,8 @@ void mat22Columns(double col0[2], double col1[2], double m[2][2]) {
 /* Multiplies the 3x3 matrix m by the 3x3 matrix n. */
 void mat333Multiply(double m[3][3], double n[3][3], double mTimesN[3][3]) {
 
-	for(int i; i < 3; i++) {
-		for(int j; j < 3; j++) {
+	for(int i = 0; i < 3; i++) {
+		for(int j = 0; j < 3; j++) {
 			mTimesN[i][j] = m[i][0]*n[0][j] + m[i][1]*n[1][j] + m[i][2]*n[2][j];
 		}
 	}
@@ -68,11 +68,16 @@ coordinates. More precisely, the transformation first rotates through the angle
 theta (in radians, counterclockwise), and then translates by the vector (x, y).
 */
 void mat33Isometry(double theta, double x, double y, double isom[3][3]) {
-	double R[3][3] = {{cos(theta),-sin(theta),0},
-										{sin(theta),cos(theta),0},
-										{0,0,1}};
-	double T[3][3] = {{1,0,x},
-										{0,1,y},
-										{0,0,1}};
-	mat333Multiply(T,R,isom);
+	double s = sin(theta);
+	double c = cos(theta);
+
+	isom[0][0]=c;
+	isom[0][1]= (-1)*s;
+	isom[0][2]=x;
+	isom[1][0]=s;
+	isom[1][1]=c;
+	isom[1][2]=y;
+	isom[2][0]=0;
+	isom[2][1]=0;
+	isom[2][2]=1;
 }

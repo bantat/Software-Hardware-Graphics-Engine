@@ -39,7 +39,7 @@ void hiddenRender(renRenderer *ren, double unif[], texTexture *tex[], double a[]
   xright = c[renVARYX];
   yright = c[renVARYY];
 
-
+  //printf("[%f ; %f] , [%f ; %f] , [%f ; %f]\n",xleft,yleft,xmid,ymid,xright,yright);
   // this variable changes if the triangle is right angled so we dont devide by
   // zero
   int rght = 0;
@@ -195,6 +195,5 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
       if (b[0] > c[0]){
         double *intM; intM = b; b = c; c = intM;
       }
-
       hiddenRender(ren, unif, tex, a, b, c);
 }

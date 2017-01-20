@@ -37,7 +37,7 @@ Run the script like so  clang 090mainScene.c 000pixel.o -lglfw -framework OpenGL
 #define renUNIFTRANSY 2
 #define renUNIFISOMETRY 3
 
-
+double x_val = 0.0;
 #define renATTRX 0
 #define renATTRY 1
 #define renATTRS 2
@@ -45,41 +45,33 @@ Run the script like so  clang 090mainScene.c 000pixel.o -lglfw -framework OpenGL
 #define renATTRR 4
 #define renATTRG 5
 #define renATTRB 6
-#define degree (M_PI/180)
 
 //double unif[3] = { 0, 100, 100 };
-double unif[12];
+double unif[12] = {0.0,0.0,0.0};
 
 /* Writes the vary vector, based on the other parameters. */
 void transformVertex(renRenderer *ren, double unif[], double attr[],
         double vary[]) {
     /* For now, just copy attr to varying. Baby steps. */
+    double attrXYvec [3];
+    double RtimesXYvec[3];
 
-    double R[2][2];
-    double attrXYvec [2];
-    double RtimesXYvec[2];
-    double T[2];
-
-    double colP0[2] = { cos(unif[0]) , sin(unif[0])};
-    double colP1[2] = { (-1)*sin(unif[0]) , cos(unif[0])};
-
-    mat22Columns(colP0,colP1,R);
-    //mat22Print(R);
 
     attrXYvec[0] = attr[renATTRX];
     attrXYvec[1] = attr[renATTRY];
+    attrXYvec[2] = 1;
 
-    mat22Multiply(R,attrXYvec,RtimesXYvec);
+    double TR[3][3] = {{unif[renUNIFISOMETRY],unif[renUNIFISOMETRY+1],unif[renUNIFISOMETRY+2]},
+                      {unif[renUNIFISOMETRY+3],unif[renUNIFISOMETRY+4],unif[renUNIFISOMETRY+5]},
+                    {unif[renUNIFISOMETRY+6],unif[renUNIFISOMETRY+7],unif[renUNIFISOMETRY+8]}};
 
-    T[0] = unif[1];
-    T[1] = unif[2];
-    vecAdd(2,T,RtimesXYvec,vary);
 
-    //vary[renVARYX] = attr[renATTRX];
-    //vary[renVARYY] = attr[renATTRY];
+    mat331Multiply(TR,attrXYvec,RtimesXYvec);
+
+    vary[renVARYX] = RtimesXYvec[0];
+    vary[renVARYY] = RtimesXYvec[1];
     vary[renVARYS] = attr[renATTRS];
     vary[renVARYT] = attr[renATTRT];
-
 }
 
 /* If unifParent is NULL, then sets the uniform matrix to the
@@ -87,16 +79,19 @@ rotation-translation M described by the other uniforms. If unifParent is not
 NULL, but instead contains a rotation-translation P, then sets the uniform
 matrix to the matrix product P * M. */
 void updateUniform(renRenderer *ren, double unif[], double unifParent[]) {
-    if (unifParent == NULL)
+    if (unifParent == NULL){
         /* The nine uniforms for storing the matrix start at index
         renUNIFISOMETRY. So &unif[renUNIFISOMETRY] is an array containing those
         nine numbers. We use '(double(*)[3])' to cast it to a 3x3 matrix. */
         mat33Isometry(unif[renUNIFTHETA], unif[renUNIFTRANSX],
             unif[renUNIFTRANSY], (double(*)[3])(&unif[renUNIFISOMETRY]));
-    else {
+    } else {
         double m[3][3];
         mat33Isometry(unif[renUNIFTHETA], unif[renUNIFTRANSX],
             unif[renUNIFTRANSY], m);
+
+        //printf("{%f,%f,%f} {%f}\n",m[0][0],m[0][1],m[0][2],unif[renUNIFTHETA]);
+        //printf("before : {%f,%f,%f}\n",unif[renUNIFISOMETRY],unif[renUNIFISOMETRY+1],unif[renUNIFISOMETRY+2]);
         mat333Multiply((double(*)[3])(&unifParent[renUNIFISOMETRY]), m,
             (double(*)[3])(&unif[renUNIFISOMETRY]));
     }
@@ -106,7 +101,7 @@ void updateUniform(renRenderer *ren, double unif[], double unifParent[]) {
 interpolated attribute vector. */
 void colorPixel(renRenderer *ren, double unif[], texTexture *tex[],
                 double vary[], double rgb[]) {
-  texSample(tex[0], vary[renVARYS], vary[renVARYT]);
+  texSample(tex[0], vary[renVARYS]+x_val, vary[renVARYT]);
   rgb[0] = tex[0]->sample[renTEXR];
   rgb[1] = tex[0]->sample[renTEXG];
   rgb[2] = tex[0]->sample[renTEXB];
@@ -114,11 +109,16 @@ void colorPixel(renRenderer *ren, double unif[], texTexture *tex[],
 
 #include "090triangle.c"
 #include "090mesh.c"
+#include "090scene.c"
 
 int filter = 0;
-texTexture *tex[1];
+texTexture * tex[2];
 renRenderer ren;
-meshMesh mesh;
+sceneNode scen0;
+sceneNode scen1;
+meshMesh mesh0;
+meshMesh mesh1;
+
 
 
 void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
@@ -136,15 +136,17 @@ void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
 
 
 void draw() {
+
   pixClearRGB(0,0,0);
-  meshRender(&mesh, &ren, unif, tex);
+  //meshRender(&mesh, &ren, unif, tex);
+  sceneRender(&scen0,&ren,NULL);
   //triRender(&ren, unif, tex, a, b, c);
 }
 
 void handleTimeStep(double oldTime, double newTime) {
   if (floor(newTime) - floor(oldTime) >= 1.0)
     printf("handleTimeStep: %f frames/sec\n", 1.0 / (newTime - oldTime));
-  unif[0] += 3*(newTime - oldTime);
+  x_val += 0.02;
   draw();
 }
 
@@ -161,25 +163,47 @@ int main(void) {
   if (pixInitialize(512, 512, "Pixel Graphics") != 0)
     return 1;
   else {
-    texTexture texture;
-    texInitializeFile(&texture, "aliens.jpg");
-    tex[0] = &texture;
+
+    texTexture texture0;
+    texTexture texture1;
+    texTexture texture2;
+    texInitializeFile(&texture0, "ocean.png");
+    texInitializeFile(&texture1, "wall.jpg");
+    tex[0] = &texture0;
+    tex[1] = &texture1;
+
     ren.attrDim = 4;
     ren.varyDim = 4;
-    ren.texNum = 1;
-    ren.unifDim = 3;
-
+    ren.texNum = 2;
+    ren.unifDim = 12;
     ren.colorPixel = colorPixel;
     ren.transformVertex = transformVertex;
+    ren.updateUniform = updateUniform;
+    texSetLeftRight(&texture0, texREPEAT);
 
     pixSetTimeStepHandler(handleTimeStep);
     pixSetKeyUpHandler(handleKeyUp);
-    meshInitializeEllipse(&mesh, 0.0, 0.0, 100.0, 200.0, 40);
+    //meshInitializeEllipse(&mesh0, 20.0, 20.0, 80.0, 80.0, 40);
+    meshInitializeRectangle(&mesh0,0.0,512.0,0.0,512.0);
+    //meshInitializeRectangle(&mesh1,100.0,200.0,100.0,200.0);
+    meshInitializeEllipse(&mesh1, 20.0, 20.0, 80.0, 80.0, 40);
+
+    sceneInitialize(&scen0,&ren,unif,tex,&mesh0,NULL,NULL);
+    sceneInitialize(&scen1,&ren,unif,tex,&mesh1,NULL,NULL);
+    //sceneSetTexture(&scen1,&ren,0,tex[1]);
+    //sceneAddChild(&scen0,&scen1);
+
+
     draw();
     pixRun();
 
     texDestroy(tex[0]);
-    meshDestroy(&mesh);
+    meshDestroy(&mesh0);
+    texDestroy(tex[1]);
+    meshDestroy(&mesh1);
+    sceneDestroyRecursively(&scen0);
+
+
 
     return 0;
   }

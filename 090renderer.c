@@ -13,4 +13,5 @@ struct renRenderer {
   int attrDim;
   void (*colorPixel)(renRenderer *, double[], texTexture *[], double[], double[]);
   void (*transformVertex)(renRenderer *, double[], double[], double[]);
+  void (*updateUniform)(renRenderer *,double[],double[]);
 };

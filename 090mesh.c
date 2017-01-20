@@ -71,10 +71,11 @@ double *meshGetVertexPointer(meshMesh *mesh, int vert) {
 	double *vertex13 = meshGetVertexPointer(&mesh, 13);
 	printf("x = %f, y = %f\n", vertex13[0], vertex13[1]); */
 double *meshGetVaryPointer(meshMesh *mesh, renRenderer *ren, int vert) {
-	if (0 <= vert && vert < mesh->vertNum)
-		return &varying[vert * ren->varyDim];
-	else
-		return NULL;
+
+	if (0 <= vert && vert < mesh->vertNum){
+		return &(varying[vert * ren->varyDim]);
+	} else {
+		return NULL;}
 }
 
 /* Deallocates the resources backing the mesh. This function must be called
@@ -104,9 +105,15 @@ void meshRender(meshMesh *mesh, renRenderer *ren, double unif[],
 		ren->transformVertex(ren, unif, meshGetVertexPointer(mesh, i), meshGetVaryPointer(mesh, ren, i));
 	}
 
+
 	for (int i = 0; i < mesh->triNum; i++) {
-		triangle = meshGetTrianglePointer(mesh, i);
-		triRender(ren, unif, tex, meshGetVaryPointer(mesh, ren, triangle[0]), meshGetVaryPointer(mesh, ren, triangle[1]), meshGetVaryPointer(mesh, ren, triangle[2]));
+		int *triangle = meshGetTrianglePointer(mesh,i);
+		double * a = meshGetVaryPointer(mesh, ren, triangle[0]);
+		double * b = meshGetVaryPointer(mesh, ren, triangle[1]);
+		double * c =  meshGetVaryPointer(mesh, ren, triangle[2]);
+
+		triRender(ren, unif, tex,a,b,c);
+
 	}
 }
 

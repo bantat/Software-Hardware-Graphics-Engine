@@ -110,7 +110,7 @@ void hiddenRender(renRenderer *ren, double unif[], texTexture *tex[], double a[]
       vecAdd(ren->varyDim, pplusqvec, a, vary);
 
       double rgb[3];
-      colorPixel(ren, unif, tex, vary, rgb);
+      ren->colorPixel(ren, unif, tex, vary, rgb);
       pixSetRGB(i, j, rgb[0], rgb[1], rgb[2]);
     }
   }
@@ -169,7 +169,7 @@ void hiddenRender(renRenderer *ren, double unif[], texTexture *tex[], double a[]
 
 
       double rgb[3];
-      colorPixel(ren, unif, tex, vary, rgb);
+      ren->colorPixel(ren, unif, tex, vary, rgb);
       pixSetRGB(i, j, rgb[0], rgb[1], rgb[2]);
     }
   }
@@ -181,6 +181,7 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
       // Do the normalisation of the triangle by reassigning triangle coodinate
       // values and attributes
 
+      
       //swap(a, c);
       if (a[0] > c[0]) {
         double *intM; intM = a; a = c; c = intM;

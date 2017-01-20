@@ -145,6 +145,7 @@ int main(void) {
 
     pixSetTimeStepHandler(handleTimeStep);
     pixSetKeyUpHandler(handleKeyUp);
+    //meshInitializeRectangle(&mesh,100.0,200.0,100.0,200.0);
     meshInitializeEllipse(&mesh, 0.0, 0.0, 100.0, 200.0, 40);
     draw();
     pixRun();
