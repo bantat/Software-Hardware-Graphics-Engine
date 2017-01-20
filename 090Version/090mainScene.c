@@ -37,7 +37,7 @@ Run the script like so  clang 090mainScene.c 000pixel.o -lglfw -framework OpenGL
 #define renUNIFTRANSY 2
 #define renUNIFISOMETRY 3
 
-double x_val = 0.0;
+double x_val = 1;
 #define renATTRX 0
 #define renATTRY 1
 #define renATTRS 2
@@ -130,8 +130,10 @@ void draw() {
 void handleTimeStep(double oldTime, double newTime) {
   if (floor(newTime) - floor(oldTime) >= 1.0)
     printf("handleTimeStep: %f frames/sec\n", 1.0 / (newTime - oldTime));
-  x_val += 0.02;
-  draw();
+    x_val += 0.01;
+    //unif[1] = unif[1] - 0.2;
+    //sceneSetUniform(&scen0,&ren,unif);
+    draw();
 }
 
 /*
@@ -158,7 +160,6 @@ int main(void) {
     ren.colorPixel = colorPixel;
     ren.transformVertex = transformVertex;
     ren.updateUniform = updateUniform;
-
     texSetLeftRight(&texture0, texREPEAT);
 
     pixSetTimeStepHandler(handleTimeStep);
@@ -167,7 +168,7 @@ int main(void) {
 
 
     meshInitializeRectangle(&mesh0,0.0,512.0,0.0,512.0);
-    meshInitializeEllipse(&mesh1, 300.0, 300.0, 80.0, 80.0, 50);
+    meshInitializeEllipse(&mesh1, 300.0, 300.0, 30.0, 30.0, 50);
 
     sceneInitialize(&scen0,&ren,unif,tex,&mesh0,NULL,NULL);
     sceneInitialize(&scen1,&ren,unif,tex,&mesh1,NULL,NULL);
@@ -175,6 +176,7 @@ int main(void) {
     //sceneSetTexture(&scen0,&ren,0,tex[0]);
     sceneSetTexture(&scen1,&ren,0,tex[1]);
     sceneAddChild(&scen0,&scen1);
+
 
 
     draw();
