@@ -101,7 +101,7 @@ void meshRender(meshMesh *mesh, renRenderer *ren, double unif[],
 
 	int *triangle;
 	for (int i = 0; i < mesh->vertNum; i++) {
-		transformVertex(ren, unif, meshGetVertexPointer(mesh, i), meshGetVaryPointer(mesh, ren, i));
+		ren->transformVertex(ren, unif, meshGetVertexPointer(mesh, i), meshGetVaryPointer(mesh, ren, i));
 	}
 
 	for (int i = 0; i < mesh->triNum; i++) {

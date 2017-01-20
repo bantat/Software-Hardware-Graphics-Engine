@@ -3,7 +3,7 @@
 @ Date: 01/07/2017
 This files includes the main function that test the 020triangle.c rasterizing
 script.
-Run the script like so  clang 080mainPosable.c 000pixel.o -lglfw -framework OpenGL
+Run the script like so  clang 090mainScene.c 000pixel.o -lglfw -framework OpenGL
 */
 
 #include <stdio.h>
@@ -11,13 +11,13 @@ Run the script like so  clang 080mainPosable.c 000pixel.o -lglfw -framework Open
 #include <stdarg.h>
 #include "000pixel.h"
 #include "070vector.c"
-#include "030matrix.c"
+#include "090matrix.c"
 #include "040texture.c"
 
 #define renVARYDIMBOUND 16
 #define renVERTNUMBOUND 300
 
-#include "050renderer.c"
+#include "090renderer.c"
 
 #define renVARYX 0
 #define renVARYY 1
@@ -32,6 +32,11 @@ Run the script like so  clang 080mainPosable.c 000pixel.o -lglfw -framework Open
 #define renTEXR 0
 #define renTEXG 1
 #define renTEXB 2
+#define renUNIFTHETA 0
+#define renUNIFTRANSX 1
+#define renUNIFTRANSY 2
+#define renUNIFISOMETRY 3
+
 
 #define renATTRX 0
 #define renATTRY 1
@@ -42,7 +47,8 @@ Run the script like so  clang 080mainPosable.c 000pixel.o -lglfw -framework Open
 #define renATTRB 6
 #define degree (M_PI/180)
 
-double unif[3] = { 0, 100, 100 };
+//double unif[3] = { 0, 100, 100 };
+double unif[12];
 
 /* Writes the vary vector, based on the other parameters. */
 void transformVertex(renRenderer *ren, double unif[], double attr[],
@@ -76,6 +82,26 @@ void transformVertex(renRenderer *ren, double unif[], double attr[],
 
 }
 
+/* If unifParent is NULL, then sets the uniform matrix to the
+rotation-translation M described by the other uniforms. If unifParent is not
+NULL, but instead contains a rotation-translation P, then sets the uniform
+matrix to the matrix product P * M. */
+void updateUniform(renRenderer *ren, double unif[], double unifParent[]) {
+    if (unifParent == NULL)
+        /* The nine uniforms for storing the matrix start at index
+        renUNIFISOMETRY. So &unif[renUNIFISOMETRY] is an array containing those
+        nine numbers. We use '(double(*)[3])' to cast it to a 3x3 matrix. */
+        mat33Isometry(unif[renUNIFTHETA], unif[renUNIFTRANSX],
+            unif[renUNIFTRANSY], (double(*)[3])(&unif[renUNIFISOMETRY]));
+    else {
+        double m[3][3];
+        mat33Isometry(unif[renUNIFTHETA], unif[renUNIFTRANSX],
+            unif[renUNIFTRANSY], m);
+        mat333Multiply((double(*)[3])(&unifParent[renUNIFISOMETRY]), m,
+            (double(*)[3])(&unif[renUNIFISOMETRY]));
+    }
+}
+
 /* Sets rgb, based on the other parameters, which are unaltered. attr is an
 interpolated attribute vector. */
 void colorPixel(renRenderer *ren, double unif[], texTexture *tex[],
@@ -86,8 +112,8 @@ void colorPixel(renRenderer *ren, double unif[], texTexture *tex[],
   rgb[2] = tex[0]->sample[renTEXB];
 }
 
-#include "080triangle.c"
-#include "080mesh.c"
+#include "090triangle.c"
+#include "090mesh.c"
 
 int filter = 0;
 texTexture *tex[1];
@@ -142,6 +168,9 @@ int main(void) {
     ren.varyDim = 4;
     ren.texNum = 1;
     ren.unifDim = 3;
+
+    ren.colorPixel = colorPixel;
+    ren.transformVertex = transformVertex;
 
     pixSetTimeStepHandler(handleTimeStep);
     pixSetKeyUpHandler(handleKeyUp);
