@@ -71,9 +71,10 @@ has no parent, then unifParent is NULL. Otherwise, unifParent is the parent
 node's uniform vector. */
 void sceneRender(sceneNode *node, renRenderer *ren, double *unifParent) {
 	/* Your job is to implement this function!! */
-
 	ren->updateUniform(ren,node->unif,unifParent);
+		    //printf("done\n");
 	meshRender(node->mesh,ren,node->unif,node->tex);
+
 
 
 	if (node->firstChild != NULL){

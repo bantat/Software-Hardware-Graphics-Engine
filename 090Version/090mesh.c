@@ -93,12 +93,14 @@ attrDim, then prints an error message and does not render anything. */
 void meshRender(meshMesh *mesh, renRenderer *ren, double unif[],
 		texTexture *tex[]) {
 
+
 	if (ren->attrDim != mesh->attrDim) {
 		printf("Renderer attribute dimension does not match mesh!\n");
 		//printf("Renderer attrDim: %d\n",ren->varyDim);
 		//printf("Mesh attrDim: %d\n",mesh->varyDim);
 		return;
 	}
+
 
 	int *triangle;
 	for (int i = 0; i < mesh->vertNum; i++) {
@@ -113,7 +115,7 @@ void meshRender(meshMesh *mesh, renRenderer *ren, double unif[],
 		double * c =  meshGetVaryPointer(mesh, ren, triangle[2]);
 
 		triRender(ren, unif, tex,a,b,c);
-
+//printf("done\n");
 	}
 }
 

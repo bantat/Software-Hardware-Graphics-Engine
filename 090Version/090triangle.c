@@ -195,5 +195,6 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
       if (b[0] > c[0]){
         double *intM; intM = b; b = c; c = intM;
       }
+
       hiddenRender(ren, unif, tex, a, b, c);
 }

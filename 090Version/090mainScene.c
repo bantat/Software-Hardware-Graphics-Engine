@@ -53,21 +53,9 @@ double unif[12] = {0.0,0.0,0.0};
 void transformVertex(renRenderer *ren, double unif[], double attr[],
         double vary[]) {
     /* For now, just copy attr to varying. Baby steps. */
-    double attrXYvec [3];
+    double attrXYvec [3] = {attr[renATTRX],attr[renATTRY],1};
     double RtimesXYvec[3];
-
-
-    attrXYvec[0] = attr[renATTRX];
-    attrXYvec[1] = attr[renATTRY];
-    attrXYvec[2] = 1;
-
-    double TR[3][3] = {{unif[renUNIFISOMETRY],unif[renUNIFISOMETRY+1],unif[renUNIFISOMETRY+2]},
-                      {unif[renUNIFISOMETRY+3],unif[renUNIFISOMETRY+4],unif[renUNIFISOMETRY+5]},
-                    {unif[renUNIFISOMETRY+6],unif[renUNIFISOMETRY+7],unif[renUNIFISOMETRY+8]}};
-
-
-    mat331Multiply(TR,attrXYvec,RtimesXYvec);
-
+    mat331Multiply((double(*)[3])(&unif[renUNIFISOMETRY]),attrXYvec,RtimesXYvec);
     vary[renVARYX] = RtimesXYvec[0];
     vary[renVARYY] = RtimesXYvec[1];
     vary[renVARYS] = attr[renATTRS];
@@ -89,9 +77,6 @@ void updateUniform(renRenderer *ren, double unif[], double unifParent[]) {
         double m[3][3];
         mat33Isometry(unif[renUNIFTHETA], unif[renUNIFTRANSX],
             unif[renUNIFTRANSY], m);
-
-        //printf("{%f,%f,%f} {%f}\n",m[0][0],m[0][1],m[0][2],unif[renUNIFTHETA]);
-        //printf("before : {%f,%f,%f}\n",unif[renUNIFISOMETRY],unif[renUNIFISOMETRY+1],unif[renUNIFISOMETRY+2]);
         mat333Multiply((double(*)[3])(&unifParent[renUNIFISOMETRY]), m,
             (double(*)[3])(&unif[renUNIFISOMETRY]));
     }
@@ -102,9 +87,11 @@ interpolated attribute vector. */
 void colorPixel(renRenderer *ren, double unif[], texTexture *tex[],
                 double vary[], double rgb[]) {
   texSample(tex[0], vary[renVARYS]+x_val, vary[renVARYT]);
+  //printf("done\n");
   rgb[0] = tex[0]->sample[renTEXR];
   rgb[1] = tex[0]->sample[renTEXG];
   rgb[2] = tex[0]->sample[renTEXB];
+
 }
 
 #include "090triangle.c"
@@ -171,18 +158,23 @@ int main(void) {
     ren.colorPixel = colorPixel;
     ren.transformVertex = transformVertex;
     ren.updateUniform = updateUniform;
+
     texSetLeftRight(&texture0, texREPEAT);
 
     pixSetTimeStepHandler(handleTimeStep);
     pixSetKeyUpHandler(handleKeyUp);
 
+
+
     meshInitializeRectangle(&mesh0,0.0,512.0,0.0,512.0);
-    meshInitializeEllipse(&mesh1, 20.0, 20.0, 80.0, 80.0, 40);
+    meshInitializeEllipse(&mesh1, 300.0, 300.0, 80.0, 80.0, 50);
 
     sceneInitialize(&scen0,&ren,unif,tex,&mesh0,NULL,NULL);
     sceneInitialize(&scen1,&ren,unif,tex,&mesh1,NULL,NULL);
-    //sceneSetTexture(&scen1,&ren,0,tex[1]);
-    //sceneAddChild(&scen0,&scen1);
+
+    //sceneSetTexture(&scen0,&ren,0,tex[0]);
+    sceneSetTexture(&scen1,&ren,0,tex[1]);
+    sceneAddChild(&scen0,&scen1);
 
 
     draw();
