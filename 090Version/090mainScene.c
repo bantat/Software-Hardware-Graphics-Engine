@@ -134,8 +134,6 @@ void handleTimeStep(double oldTime, double newTime) {
     printf("handleTimeStep: %f frames/sec\n", 1.0 / (newTime - oldTime));
     x_val += 0.01;
     unif[0] = unif[0] + 0.1;
-    unif[1] = 100.0;
-    unif[2] = 200.0;
     sceneSetUniform(&scen2,&ren,unif);
 
     draw();
