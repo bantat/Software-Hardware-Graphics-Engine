@@ -86,7 +86,7 @@ void updateUniform(renRenderer *ren, double unif[], double unifParent[]) {
 interpolated attribute vector. */
 void colorPixel(renRenderer *ren, double unif[], texTexture *tex[],
                 double vary[], double rgb[]) {
-  texSample(tex[0], vary[renVARYS]+x_val, vary[renVARYT]);
+  texSample(tex[0], vary[renVARYS], vary[renVARYT]);
   //printf("done\n");
   rgb[0] = tex[0]->sample[renTEXR];
   rgb[1] = tex[0]->sample[renTEXG];
@@ -125,7 +125,7 @@ void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
 
 
 void draw() {
-  pixClearRGB(0,0,0);
+  pixClearRGB(1,1,1);
   sceneRender(&scen0,&ren,NULL);
 }
 
@@ -134,7 +134,11 @@ void handleTimeStep(double oldTime, double newTime) {
     printf("handleTimeStep: %f frames/sec\n", 1.0 / (newTime - oldTime));
     x_val += 0.01;
     unif[0] = unif[0] + 0.1;
+    unif[1] = 100;
+    unif[2] = 200;
+
     sceneSetUniform(&scen2,&ren,unif);
+    //sceneSetUniform(&scen0,&ren,unif)
 
     draw();
 }
