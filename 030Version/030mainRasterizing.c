@@ -1,8 +1,8 @@
 /*
 @ Author:  Sabastian Mugazambi & Tore Banta
 @ Date: 01/07/2017
-This files includes the main function that test the 020triangle.c rasterizing script.
-Run the script like so  clang 020mainRasterizing.c 000pixel.o -lglfw -framework OpenGL
+This files includes the main function that test the 030triangle.c rasterizing script.
+Run the script like so  clang 030mainRasterizing.c 000pixel.o -lglfw -framework OpenGL
 */
 
 #include <stdio.h>

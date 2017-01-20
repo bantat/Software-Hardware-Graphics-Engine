@@ -136,11 +136,8 @@ void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
 
 
 void draw() {
-
   pixClearRGB(0,0,0);
-  //meshRender(&mesh, &ren, unif, tex);
   sceneRender(&scen0,&ren,NULL);
-  //triRender(&ren, unif, tex, a, b, c);
 }
 
 void handleTimeStep(double oldTime, double newTime) {
@@ -159,18 +156,13 @@ triRender function in 020triangle.c . This is being used to test if triRender
 works fine.
 */
 int main(void) {
-
   if (pixInitialize(512, 512, "Pixel Graphics") != 0)
     return 1;
   else {
-
-    texTexture texture0;
-    texTexture texture1;
-    texTexture texture2;
+    texTexture texture0, texture1, texture2;
     texInitializeFile(&texture0, "ocean.png");
     texInitializeFile(&texture1, "wall.jpg");
-    tex[0] = &texture0;
-    tex[1] = &texture1;
+    tex[0] = &texture0, tex[1] = &texture1;
 
     ren.attrDim = 4;
     ren.varyDim = 4;
@@ -183,9 +175,8 @@ int main(void) {
 
     pixSetTimeStepHandler(handleTimeStep);
     pixSetKeyUpHandler(handleKeyUp);
-    //meshInitializeEllipse(&mesh0, 20.0, 20.0, 80.0, 80.0, 40);
+
     meshInitializeRectangle(&mesh0,0.0,512.0,0.0,512.0);
-    //meshInitializeRectangle(&mesh1,100.0,200.0,100.0,200.0);
     meshInitializeEllipse(&mesh1, 20.0, 20.0, 80.0, 80.0, 40);
 
     sceneInitialize(&scen0,&ren,unif,tex,&mesh0,NULL,NULL);

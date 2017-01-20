@@ -8,7 +8,7 @@ Run the script like so  clang 020mainRasterizing.c 000pixel.o -lglfw -framework 
 #include <stdio.h>
 #include <math.h>
 #include "000pixel.h"
-#include "030triangle.c"
+#include "020triangle.c"
 
 
 /*
@@ -28,7 +28,7 @@ int main(void){
 		double c[2] = {250,450};
 		double rgb[3] = {0.0,0.0,1.0};
 
-		triRender(a,b,c,rgb);
+		triRender(a[0], a[1], b[0], b[1], c[0], c[1], rgb[0], rgb[1], rgb[2]);
 		pixRun();
 		return 0;
 	}
