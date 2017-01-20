@@ -37,7 +37,7 @@ Run the script like so  clang 090mainScene.c 000pixel.o -lglfw -framework OpenGL
 #define renUNIFTRANSY 2
 #define renUNIFISOMETRY 3
 
-double x_val = 1;
+double x_val = 0.0;
 #define renATTRX 0
 #define renATTRY 1
 #define renATTRS 2
@@ -91,7 +91,7 @@ void colorPixel(renRenderer *ren, double unif[], texTexture *tex[],
   rgb[0] = tex[0]->sample[renTEXR];
   rgb[1] = tex[0]->sample[renTEXG];
   rgb[2] = tex[0]->sample[renTEXB];
-
+    //printf("here we are\n");
 }
 
 #include "090triangle.c"
@@ -99,12 +99,14 @@ void colorPixel(renRenderer *ren, double unif[], texTexture *tex[],
 #include "090scene.c"
 
 int filter = 0;
-texTexture * tex[2];
+texTexture * tex[3];
 renRenderer ren;
 sceneNode scen0;
 sceneNode scen1;
+sceneNode scen2;
 meshMesh mesh0;
 meshMesh mesh1;
+meshMesh mesh2;
 
 
 
@@ -131,8 +133,8 @@ void handleTimeStep(double oldTime, double newTime) {
   if (floor(newTime) - floor(oldTime) >= 1.0)
     printf("handleTimeStep: %f frames/sec\n", 1.0 / (newTime - oldTime));
     x_val += 0.01;
-    //unif[1] = unif[1] - 0.2;
-    //sceneSetUniform(&scen0,&ren,unif);
+    unif[0] = unif[0] + 0.5;
+    sceneSetUniform(&scen2,&ren,unif);
     draw();
 }
 
@@ -151,11 +153,12 @@ int main(void) {
     texTexture texture0, texture1, texture2;
     texInitializeFile(&texture0, "ocean.png");
     texInitializeFile(&texture1, "wall.jpg");
-    tex[0] = &texture0, tex[1] = &texture1;
+    texInitializeFile(&texture2, "sun.png");
+    tex[0] = &texture0, tex[1] = &texture1, tex[2] = &texture2;
 
     ren.attrDim = 4;
     ren.varyDim = 4;
-    ren.texNum = 2;
+    ren.texNum = 1;
     ren.unifDim = 12;
     ren.colorPixel = colorPixel;
     ren.transformVertex = transformVertex;
@@ -169,13 +172,17 @@ int main(void) {
 
     meshInitializeRectangle(&mesh0,0.0,512.0,0.0,512.0);
     meshInitializeEllipse(&mesh1, 300.0, 300.0, 30.0, 30.0, 50);
+    meshInitializeEllipse(&mesh2, 100.0, 400.0, 50.0, 50.0, 50);
 
     sceneInitialize(&scen0,&ren,unif,tex,&mesh0,NULL,NULL);
     sceneInitialize(&scen1,&ren,unif,tex,&mesh1,NULL,NULL);
+    sceneInitialize(&scen2,&ren,unif,tex,&mesh2,NULL,NULL);
 
-    //sceneSetTexture(&scen0,&ren,0,tex[0]);
+    // sceneSetTexture(&scen0,&ren,0,tex[0]);
     sceneSetTexture(&scen1,&ren,0,tex[1]);
+    sceneSetTexture(&scen2,&ren,0,tex[2]);
     sceneAddChild(&scen0,&scen1);
+    sceneAddChild(&scen1,&scen2);
 
 
 
@@ -186,6 +193,8 @@ int main(void) {
     meshDestroy(&mesh0);
     texDestroy(tex[1]);
     meshDestroy(&mesh1);
+    texDestroy(tex[2]);
+    meshDestroy(&mesh2);
     sceneDestroyRecursively(&scen0);
 
 

@@ -83,7 +83,6 @@ void sceneRender(sceneNode *node, renRenderer *ren, double *unifParent) {
 	while(node->nextSibling != NULL){
 		sceneRender(node->nextSibling,ren,node->unif);
 	}
-	return;
 }
 
 /* Deallocates the resources backing this scene node. Does not destroy the
