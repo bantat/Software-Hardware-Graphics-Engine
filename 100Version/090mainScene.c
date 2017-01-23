@@ -11,8 +11,8 @@ Run the script like so  clang 090mainScene.c 000pixel.o 090triangle.o -lglfw -fr
 #include <stdarg.h>
 #include "000pixel.h"
 
-#include "070vector.c"
-#include "090matrix.c"
+#include "100vector.c"
+#include "100matrix.c"
 #include "040texture.c"
 
 #define renVARYDIMBOUND 16
