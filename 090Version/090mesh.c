@@ -92,8 +92,6 @@ void meshDestroy(meshMesh *mesh) {
 attrDim, then prints an error message and does not render anything. */
 void meshRender(meshMesh *mesh, renRenderer *ren, double unif[],
 		texTexture *tex[]) {
-
-
 	if (ren->attrDim != mesh->attrDim) {
 		printf("Renderer attribute dimension does not match mesh!\n");
 		//printf("Renderer attrDim: %d\n",ren->varyDim);
@@ -114,7 +112,6 @@ void meshRender(meshMesh *mesh, renRenderer *ren, double unif[],
 		double * b = meshGetVaryPointer(mesh, ren, triangle[1]);
 		double * c =  meshGetVaryPointer(mesh, ren, triangle[2]);
 		triRender(ren, unif, tex,a,b,c);
-//printf("done\n");
 	}
 }
 

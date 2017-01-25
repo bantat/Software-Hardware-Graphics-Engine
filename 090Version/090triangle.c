@@ -28,6 +28,8 @@ and situations.
 void hiddenRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
         double b[], double c[]) {
 
+  printf("start render\n");
+
   double xleft, yleft, xmid, ymid, xright, yright;
 
   xleft = a[renVARYX];
@@ -135,8 +137,12 @@ void hiddenRender(renRenderer *ren, double unif[], texTexture *tex[], double a[]
       y_Bottom= ceil(fmin(ylow,yhigh));
       y_Top = floor(fmax(yhigh,ylow));
     }
+    printf("made it here\n");
+
+    printf("y_bottom = %d, y_top = %d\n",y_Bottom, y_Top);
 
     for (int j = y_Bottom ; j <= y_Top; j++) {
+      //printf("hanging in here\n");
       double bminusa[2], cminusa[2], xminusa[2], m[2][2], mInv[2][2], pq[2],
           x[2];
       x[0] = i;

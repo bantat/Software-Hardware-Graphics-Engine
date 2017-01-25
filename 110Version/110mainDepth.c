@@ -53,12 +53,12 @@ double x_val = 0.0;
 #define renATTRG 6
 #define renATTRB 7
 
-double unif[22] = {0.3,0.3,2.3,0.0,0.0,0.0, 1.0,0.0,0.0,0.0,
+double unif[22] = {1.0,0.3,2.3,0.0,0.0,0.0, 1.0,0.0,0.0,0.0,
                                              0.0,1.0,0.0,0.0,
                                              0.0,0.0,1.0,0.0,
                                              0.0,0.0,0.0,1.0};
 
-double unif2[22] = {0.0,0.0,0.0,250.0,250.0,0.0, 1.0,0.0,0.0,0.0,
+double unif2[22] = {1.0,0.0,0.0,250.0,250.0,0.0, 1.0,0.0,0.0,0.0,
                                             0.0,1.0,0.0,0.0,
                                             0.0,0.0,1.0,0.0,
                                             0.0,0.0,0.0,1.0};
@@ -84,7 +84,7 @@ void updateUniform(renRenderer *ren, double unif[], double unifParent[]) {
   double u[3];
   double rot[3][3];
 
-  vec3Spherical(unif[renUNIFRHO],unif[renUNIFPHI],unif[renUNIFTHETA],u);
+  vec3Spherical(1.0,unif[renUNIFPHI],unif[renUNIFTHETA],u);
   mat33AngleAxisRotation(unif[renUNIFRHO],u,rot);
 
   if (unifParent == NULL) {
@@ -157,9 +157,8 @@ void draw() {
 }
 
 void handleRotation() {
-  scen0.unif[renUNIFTHETA] = scen0.unif[renUNIFTHETA] + 0.05;
-  //scen0.unif[renUNIFRHO] = scen0.unif[renUNIFRHO] + 0.05;
-  scen0.unif[renUNIFPHI] = scen0.unif[renUNIFPHI] + 0.05;
+  scen0.unif[renUNIFRHO] = scen0.unif[renUNIFRHO] + 0.05;
+  //scen0.unif[renUNIFPHI] = scen0.unif[renUNIFPHI] + 0.05;
 
 }
 
