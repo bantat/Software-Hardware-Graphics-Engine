@@ -28,29 +28,33 @@ and situations.
 void hiddenRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
         double b[], double c[]) {
 
+  //do shiftIsDown
+  double bminusa[2], cminusa[2], m[2][2], mInv[2][2], pq[2];
+  vecSubtract(2, b, a, bminusa);
+  vecSubtract(2, c, a, cminusa);
+  mat22Columns(bminusa, cminusa, m);
+  mat22Columns(bminusa, cminusa, mInv);
+  if (mat22Invert(m, mInv) < 0.0) {
+    return;
+  }
+
   double xleft, yleft, xmid, ymid, xright, yright;
-
-
 
   xleft = a[renVARYX];
   yleft = a[renVARYY];
 
-  xmid = b[renVARYX];
-  ymid = b[renVARYY];
+  if (b[0] <= c[0]) {
+    xmid = b[renVARYX];
+    ymid = b[renVARYY];
 
-  xright = c[renVARYX];
-  yright = c[renVARYY];
+    xright = c[renVARYX];
+    yright = c[renVARYY];
+  } else {
+    xmid = c[renVARYX];
+    ymid = c[renVARYY];
 
-  //printf("[%f ; %f] , [%f ; %f] , [%f ; %f]\n",xleft,yleft,xmid,ymid,xright,yright);
-  // this variable changes if the triangle is right angled so we dont devide by
-  // zero
-  int rght = 0;
-  if (fabs(xleft - xmid) < 0.00001) {
-    // straight line on the left side
-    rght = 1;
-  } else if (fabs(xmid - xright) < 0.00001) {
-    // straight line on the right side
-    rght = 2;
+    xright = b[renVARYX];
+    yright = b[renVARYY];
   }
 
   // Now draw the first half of the triangle
@@ -60,39 +64,19 @@ void hiddenRender(renRenderer *ren, double unif[], texTexture *tex[], double a[]
     double ylow, yhigh;
     int y_Top,y_Bottom;
 
-
-    // If the mid point is above and (xleft is not inline with xmid or xleft)
-    if (!(rght == 1)) {
-
-      ylow = yleft + (((yright - yleft) / (xright - xleft)) * (i - xleft));
-      yhigh = yleft + (((ymid - yleft) / (xmid - xleft)) * (i - xleft));
-      y_Bottom= ceil(fmin(ylow,yhigh));
-      y_Top = floor(fmax(yhigh,ylow));
-
-      // If the mid point is below and xleft is not inline with xmid
-    } else if (!(rght == 1)) {
-      yhigh = yleft + (((yright - yleft) / (xright - xleft)) * (i - xleft));
-      ylow = yleft + (((ymid - yleft) / (xmid - xleft)) * (i - xleft));
-      y_Bottom= ceil(fmin(ylow,yhigh));
-      y_Top = floor(fmax(yhigh,ylow));
-    }
+    ylow = yleft + (((yright - yleft) / (xright - xleft)) * (i - xleft));
+    yhigh = yleft + (((ymid - yleft) / (xmid - xleft)) * (i - xleft));
+    y_Bottom= ceil(fmin(ylow,yhigh));
+    y_Top = floor(fmax(yhigh,ylow));
 
 
     // draw the triangle
     for (int j = y_Bottom; j <= y_Top; j++) {
-      double bminusa[2], cminusa[2], xminusa[2], m[2][2], mInv[2][2], pq[2],
-          x[2];
+      double xminusa[2], x[2];
       x[0] = i;
       x[1] = j;
 
-
-      vecSubtract(2, b, a, bminusa);
-      vecSubtract(2, c, a, cminusa);
       vecSubtract(2, x, a, xminusa);
-
-      mat22Columns(bminusa, cminusa, m);
-      mat22Columns(bminusa, cminusa, mInv);
-      mat22Invert(m, mInv);
 
       mat221Multiply(mInv, xminusa, pq);
       double p = pq[0];
@@ -123,34 +107,18 @@ void hiddenRender(renRenderer *ren, double unif[], texTexture *tex[], double a[]
     double ylow, yhigh;
     int y_Top,y_Bottom;
 
-    // if mid point is above and xmid is not inline with xright
-    if (!(rght == 2)) {
-      ylow = yleft + (((yright - yleft) / (xright - xleft)) * (i - xleft));
-      yhigh = ymid + (((yright - ymid) / (xright - xmid)) * (i - xmid));
-      y_Bottom= ceil(fmin(ylow,yhigh));
-      y_Top = floor(fmax(yhigh,ylow));
+    ylow = yleft + (((yright - yleft) / (xright - xleft)) * (i - xleft));
+    yhigh = ymid + (((yright - ymid) / (xright - xmid)) * (i - xmid));
+    y_Bottom= ceil(fmin(ylow,yhigh));
+    y_Top = floor(fmax(yhigh,ylow));
 
-      // if mid point is below and xmid is not inline with xright
-    } else if (!(rght == 2)) {
-      yhigh = yleft + (((yright - yleft) / (xright - xleft)) * (i - xleft));
-      ylow = ymid + (((yright - ymid) / (xright - xmid)) * (i - xmid));
-      y_Bottom= ceil(fmin(ylow,yhigh));
-      y_Top = floor(fmax(yhigh,ylow));
-    }
+    double xminusa[2], x[2];
 
     for (int j = y_Bottom ; j <= y_Top; j++) {
-      double bminusa[2], cminusa[2], xminusa[2], m[2][2], mInv[2][2], pq[2],
-          x[2];
       x[0] = i;
       x[1] = j;
 
-      vecSubtract(2, b, a, bminusa);
-      vecSubtract(2, c, a, cminusa);
       vecSubtract(2, x, a, xminusa);
-
-      mat22Columns(bminusa, cminusa, m);
-      mat22Columns(bminusa, cminusa, mInv);
-      mat22Invert(m, mInv);
 
       mat221Multiply(mInv, xminusa, pq);
       double p = pq[0];
@@ -194,25 +162,4 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
       else if (c[0] <= b[0] && c[0] <= a[0]) {
         hiddenRender(ren, unif, tex, c, a, b);
       }
-
-      /*
-
-
-      //swap(a, c);
-      if (a[0] > c[0]) {
-        double *intM; intM = a; a = c; c = intM;
-      }
-
-      //swap(a, b);
-      if (a[0] > b[0]) {
-        double *intM; intM = a; a = b; b= intM;
-      }
-
-      //swap(b, c);
-      if (b[0] > c[0]){
-        double *intM; intM = b; b = c; c = intM;
-      }
-
-      hiddenRender(ren, unif, tex, a, b, c);
-      */
 }

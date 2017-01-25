@@ -3,7 +3,7 @@
 @ Date: 01/07/2017
 This files includes the main function that test the 020triangle.c rasterizing
 script.
-Run the script like so  clang 100main3D.c 000pixel.o -lglfw -framework OpenGL
+Run the script like so  clang 110mainDepth.c 000pixel.o -lglfw -framework OpenGL
 */
 
 #include <stdio.h>
@@ -18,7 +18,7 @@ Run the script like so  clang 100main3D.c 000pixel.o -lglfw -framework OpenGL
 #define renVARYDIMBOUND 16
 #define renVERTNUMBOUND 300
 
-#include "090renderer.c"
+#include "110renderer.c"
 
 #define renVARYX 0
 #define renVARYY 1
@@ -123,17 +123,18 @@ void updateUniform(renRenderer *ren, double unif[], double unifParent[]) {
 /* Sets rgb, based on the other parameters, which are unaltered. attr is an
 interpolated attribute vector. */
 void colorPixel(renRenderer *ren, double unif[], texTexture *tex[],
-                double vary[], double rgb[]) {
+                double vary[], double rgbz[]) {
   texSample(tex[0], vary[renVARYS], vary[renVARYT]);
   //printf("done\n");
-  rgb[0] = tex[0]->sample[renTEXR];
-  rgb[1] = tex[0]->sample[renTEXG];
-  rgb[2] = tex[0]->sample[renTEXB];
+  rgbz[0] = tex[0]->sample[renTEXR];
+  rgbz[1] = tex[0]->sample[renTEXG];
+  rgbz[2] = tex[0]->sample[renTEXB];
+  rgbz[3] = depthGetZ(ren->depth, vary[renVARYX], vary[renVARYY]);
     //printf("here we are\n");
 }
 
 //#include "090triangle.c"
-#include "091triangle.c"
+#include "110triangle.c"
 #include "100mesh.c"
 #include "090scene.c"
 
