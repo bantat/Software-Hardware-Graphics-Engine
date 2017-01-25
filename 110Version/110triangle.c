@@ -95,18 +95,14 @@ void hiddenRender(renRenderer *ren, double unif[], texTexture *tex[], double a[]
       vecAdd(ren->varyDim, pvec, qvec, pplusqvec);
       vecAdd(ren->varyDim, pplusqvec, a, vary);
 
-      double rgb[3];
-
-      if(attr[renATTRZ] > depthGetZ(ren->depth,i,j)){
+      double rgbz[4];
+      if(vary[renVARYZ] > depthGetZ(ren->depth,i,j)){
         ren->colorPixel(ren, unif, tex, vary, rgbz);
-        pixSetRGB(i, j, rgb[0], rgb[1], rgb[2]);
-        depthSetZ(depthBuffer *buf, int i, int j, double z);
-      }else{
-        ren->colorPixel(ren, unif, tex, vary, rgbz);
-        pixSetRGB(i, j, rgb[0], rgb[1], rgb[2]);
+        pixSetRGB(i, j, rgbz[0], rgbz[1], rgbz[2]);
+        depthSetZ(ren->depth,i,j,vary[renVARYZ]);
+      }
     }
-    }
-  }
+}
 
   // from xmid to xright
   //printf("ceil(xmid) = %d, floor(xright) = %d\n", (int)ceil(xmid), (int)floor(xright));
@@ -145,9 +141,14 @@ void hiddenRender(renRenderer *ren, double unif[], texTexture *tex[], double a[]
       vecAdd(ren->varyDim, pplusqvec, a, vary);
 
 
-      double rgb[3];
-      ren->colorPixel(ren, unif, tex, vary, rgb);
-      pixSetRGB(i, j, rgb[0], rgb[1], rgb[2]);
+      double rgbz[4];
+
+      if(vary[renVARYZ] > depthGetZ(ren->depth,i,j)){
+        ren->colorPixel(ren, unif, tex, vary, rgbz);
+        pixSetRGB(i, j, rgbz[0], rgbz[1], rgbz[2]);
+        depthSetZ(ren->depth,i,j,vary[renVARYZ]);
+      }
+
     }
   }
 }

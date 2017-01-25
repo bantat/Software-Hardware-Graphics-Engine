@@ -14,6 +14,7 @@ Run the script like so  clang 110mainDepth.c 000pixel.o -lglfw -framework OpenGL
 #include "100vector.c"
 #include "100matrix.c"
 #include "040texture.c"
+#include "110depth.c"
 
 #define renVARYDIMBOUND 16
 #define renVERTNUMBOUND 300
@@ -22,11 +23,12 @@ Run the script like so  clang 110mainDepth.c 000pixel.o -lglfw -framework OpenGL
 
 #define renVARYX 0
 #define renVARYY 1
-#define renVARYS 2
-#define renVARYT 3
-#define renVARYR 4
-#define renVARYG 5
-#define renVARYB 6
+#define renVARYZ 2
+#define renVARYS 3
+#define renVARYT 4
+#define renVARYR 5
+#define renVARYG 6
+#define renVARYB 7
 //#define renUNIFR 0
 //#define renUNIFG 1
 //#define renUNIFB 2
@@ -51,7 +53,7 @@ double x_val = 0.0;
 #define renATTRG 6
 #define renATTRB 7
 
-double unif[22] = {0.5,0.6,0.7,0.0,0.0,0.0, 1.0,0.0,0.0,0.0,
+double unif[22] = {0.3,0.3,2.3,0.0,0.0,0.0, 1.0,0.0,0.0,0.0,
                                              0.0,1.0,0.0,0.0,
                                              0.0,0.0,1.0,0.0,
                                              0.0,0.0,0.0,1.0};
@@ -69,6 +71,7 @@ void transformVertex(renRenderer *ren, double unif[], double attr[],
     mat441Multiply((double(*)[4])(&unif[renUNIFISOMETRY]),attrXYZvec,RtimesXYZvec);
     vary[renVARYX] = RtimesXYZvec[0];
     vary[renVARYY] = RtimesXYZvec[1];
+    vary[renVARYZ] = RtimesXYZvec[2];
     vary[renVARYS] = attr[renATTRS];
     vary[renVARYT] = attr[renATTRT];
 }
@@ -89,34 +92,16 @@ void updateUniform(renRenderer *ren, double unif[], double unifParent[]) {
       /* The nine uniforms for storing the matrix start at index
       renUNIFISOMETRY. So &unif[renUNIFISOMETRY] is an array containing those
       nine numbers. We use '(double(*)[3])' to cast it to a 3x3 matrix. */
-
-
-
       double trans[3] = {unif[renUNIFTRANSX], unif[renUNIFTRANSY], unif[renUNIFTRANSZ]};
-
       mat44Isometry(rot, trans, (double(*)[4])(&unif[renUNIFISOMETRY]));
 
-      //double trans[3] = {unif[renUNIFTRANSX],unif[renUNIFTRANSY],unif[renUNIFTRANSZ]};
-      //mat44Isometry((double(*)[4])(&unif[renUNIFISOMETRY]), trans,
-        //(double(*)[4])(&unif[renUNIFISOMETRY]));
   } else {
 
     double m[4][4];
-
     double trans[3] = {unif[renUNIFTRANSX], unif[renUNIFTRANSY], unif[renUNIFTRANSZ]};
-
     mat44Isometry(rot, trans, m);
-
     mat444Multiply((double(*)[4])(&unifParent[renUNIFISOMETRY]), m,
         (double(*)[4])(&unif[renUNIFISOMETRY]));
-
-    /*
-      double m[4][4];
-      mat44Isometry(unif[renUNIFTHETA], unif[renUNIFTRANSX],
-          unif[renUNIFTRANSY], m);
-      mat333Multiply((double(*)[4])(&unifParent[renUNIFISOMETRY]), m,
-          (double(*)[4])(&unif[renUNIFISOMETRY]));
-          */
   }
 }
 
@@ -147,6 +132,7 @@ sceneNode scen2;
 meshMesh mesh0;
 meshMesh mesh1;
 meshMesh mesh2;
+depthBuffer dep;
 
 
 
@@ -165,23 +151,21 @@ void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
 
 
 void draw() {
-
+  depthClearZs(&dep,-1000);
   pixClearRGB(0.0,0.0,0.0);
   sceneRender(&scen0,&ren,NULL);
 }
 
 void handleRotation() {
-  //scen0.unif[renUNIFTHETA] = scen0.unif[renUNIFTHETA] + 0.05;
   scen0.unif[renUNIFTHETA] = scen0.unif[renUNIFTHETA] + 0.05;
+  //scen0.unif[renUNIFRHO] = scen0.unif[renUNIFRHO] + 0.05;
+  scen0.unif[renUNIFPHI] = scen0.unif[renUNIFPHI] + 0.05;
 
 }
 
 void handleTimeStep(double oldTime, double newTime) {
   if (floor(newTime) - floor(oldTime) >= 1.0)
     printf("handleTimeStep: %f frames/sec\n", 1.0 / (newTime - oldTime));
-
-    // change rho
-
     handleRotation();
     draw();
 }
@@ -199,9 +183,10 @@ int main(void) {
     return 1;
   else {
     texTexture texture0, texture1, texture2;
-    texInitializeFile(&texture0, "ocean.png");
-    texInitializeFile(&texture1, "wall.jpg");
+    texInitializeFile(&texture0, "box.jpg");
+    texInitializeFile(&texture1, "beachball.jpg");
     texInitializeFile(&texture2, "sun.png");
+    depthInitialize(&dep,512,512);
     tex[0] = &texture0, tex[1] = &texture1, tex[2] = &texture2;
 
     ren.attrDim = 8;
@@ -211,13 +196,14 @@ int main(void) {
     ren.colorPixel = colorPixel;
     ren.transformVertex = transformVertex;
     ren.updateUniform = updateUniform;
+    ren.depth = &dep;
     //texSetLeftRight(&texture0, texREPEAT);
 
     pixSetTimeStepHandler(handleTimeStep);
     pixSetKeyUpHandler(handleKeyUp);
 
-    texSetLeftRight(&texture1, texREPEAT);
-    texSetTopBottom(&texture1, texREPEAT);
+    //texSetLeftRight(&texture1, texREPEAT);
+    //texSetTopBottom(&texture1, texREPEAT);
 
 
 
@@ -246,8 +232,9 @@ int main(void) {
 
     texDestroy(tex[0]);
     meshDestroy(&mesh0);
-    //texDestroy(tex[1]);
-    //meshDestroy(&mesh1);
+    depthDestroy(&dep);
+    texDestroy(tex[1]);
+    meshDestroy(&mesh1);
     //texDestroy(tex[2]);
     //meshDestroy(&mesh2);
     sceneDestroyRecursively(&scen0);

@@ -3,7 +3,7 @@
 
 /*** Creating and destroying ***/
 
-/* Feel free to read the struct's members, but don't write them, except through 
+/* Feel free to read the struct's members, but don't write them, except through
 the accessors below such as depthSetZ, etc. */
 typedef struct depthBuffer depthBuffer;
 struct depthBuffer {
@@ -11,7 +11,7 @@ struct depthBuffer {
 	double *z;			/* width * height doubles */
 };
 
-/* Initializes a depth buffer. When you are finished with the buffer, you must 
+/* Initializes a depth buffer. When you are finished with the buffer, you must
 call depthDestroy to deallocate its backing resources. */
 int depthInitialize(depthBuffer *buf, int width, int height) {
 	buf->z = (double *)malloc(width * height * sizeof(double));
@@ -22,7 +22,7 @@ int depthInitialize(depthBuffer *buf, int width, int height) {
 	return (buf->z == NULL);
 }
 
-/* Sets every Z-value to the given z. Typically you use this function at the 
+/* Sets every Z-value to the given z. Typically you use this function at the
 start of each frame, passing a large negative value for z. */
 void depthClearZs(depthBuffer *buf, double z) {
 	int i, j;
@@ -46,12 +46,10 @@ double depthGetZ(depthBuffer *buf, int i, int j) {
 		return 0.0;
 }
 
-/* Deallocates the resources backing the buffer. This function must be called 
+/* Deallocates the resources backing the buffer. This function must be called
 when you are finished using a buffer. */
 void depthDestroy(depthBuffer *buf) {
 	if (buf->z != NULL)
 		free(buf->z);
 	buf->z = NULL;
 }
-
-
