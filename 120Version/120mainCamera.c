@@ -3,7 +3,7 @@
 @ Date: 01/07/2017
 This files includes the main function that test the 020triangle.c rasterizing
 script.
-Run the script like so  clang 110mainDepth.c 000pixel.o -lglfw -framework OpenGL
+Run the script like so  clang 120mainCamera.c 000pixel.o -lglfw -framework OpenGL
 */
 
 #include <stdio.h>
@@ -16,10 +16,16 @@ Run the script like so  clang 110mainDepth.c 000pixel.o -lglfw -framework OpenGL
 #include "040texture.c"
 #include "110depth.c"
 
+#define GLFW_KEY_ENTER 257
+#define GLFW_KEY_RIGHT 262
+#define GLFW_KEY_LEFT 263
+#define GLFW_KEY_DOWN 264
+#define GLFW_KEY_UP 265
+
 #define renVARYDIMBOUND 16
 #define renVERTNUMBOUND 300
 
-#include "110renderer.c"
+#include "120renderer.c"
 
 #define renVARYX 0
 #define renVARYY 1
@@ -42,6 +48,7 @@ Run the script like so  clang 110mainDepth.c 000pixel.o -lglfw -framework OpenGL
 #define renUNIFTRANSY 4
 #define renUNIFTRANSZ 5
 #define renUNIFISOMETRY 6
+#define renUNIFVIEWING 22
 
 double x_val = 0.0;
 #define renATTRX 0
@@ -53,25 +60,37 @@ double x_val = 0.0;
 #define renATTRG 6
 #define renATTRB 7
 
-double unif[22] = {0.0,1.0,1.6,250.0,250.0,0.0, 1.0,0.0,0.0,0.0,
-                                             0.0,1.0,0.0,0.0,
-                                             0.0,0.0,1.0,0.0,
-                                             0.0,0.0,0.0,1.0};
+double cam[2] = {M_PI/2,-1*M_PI/2};
 
-double unif2[22] = {0.0,0.0,0.0,0.0,0.0,50.0, 1.0,0.0,0.0,0.0,
-                                            0.0,1.0,0.0,0.0,
-                                            0.0,0.0,1.0,0.0,
-                                            0.0,0.0,0.0,1.0};
+double target[3] = {-100.0, -100.0, -100.0};
+
+double unif[38] = {0.0,1.0,1.6,0.0,0.0,0.0,     1.0,0.0,0.0,0.0,
+                                                0.0,1.0,0.0,0.0,
+                                                0.0,0.0,1.0,0.0,
+                                                0.0,0.0,0.0,1.0, 0.0,0.0,0.0,0.0,
+                                                                 0.0,0.0,0.0,0.0,
+                                                                 0.0,0.0,0.0,0.0,
+                                                                 0.0,0.0,0.0,0.0};
+
+double unif2[38] = {0.0,0.0,0.0,0.0,0.0,50.0, 1.0,0.0,0.0,0.0,
+                                              0.0,1.0,0.0,0.0,
+                                              0.0,0.0,1.0,0.0,
+                                              0.0,0.0,0.0,1.0, 0.0,0.0,0.0,0.0,
+                                                               0.0,0.0,0.0,0.0,
+                                                               0.0,0.0,0.0,0.0,
+                                                               0.0,0.0,0.0,0.0};
 /* Writes the vary vector, based on the other parameters. */
 void transformVertex(renRenderer *ren, double unif[], double attr[],
         double vary[]) {
     /* For now, just copy attr to varying. Baby steps. */
     double attrXYZvec[4] = {attr[renATTRX],attr[renATTRY],attr[renATTRZ],1};
     double RtimesXYZvec[4];
+    double MtimesRvec[4];
     mat441Multiply((double(*)[4])(&unif[renUNIFISOMETRY]),attrXYZvec,RtimesXYZvec);
-    vary[renVARYX] = RtimesXYZvec[0];
-    vary[renVARYY] = RtimesXYZvec[1];
-    vary[renVARYZ] = RtimesXYZvec[2];
+    mat441Multiply((double(*)[4])(&unif[renUNIFVIEWING]),RtimesXYZvec,MtimesRvec);
+    vary[renVARYX] = MtimesRvec[0];
+    vary[renVARYY] = MtimesRvec[1];
+    vary[renVARYZ] = MtimesRvec[2];
     vary[renVARYS] = attr[renATTRS];
     vary[renVARYT] = attr[renATTRT];
 }
@@ -87,6 +106,8 @@ void updateUniform(renRenderer *ren, double unif[], double unifParent[]) {
 
   vec3Spherical(1.0,unif[renUNIFPHI],unif[renUNIFTHETA],u);
   mat33AngleAxisRotation(unif[renUNIFRHO],u,rot);
+
+  mat44Copy(ren->viewing, (double(*)[4])(&unif[renUNIFVIEWING]));
 
   if (unifParent == NULL) {
 
@@ -139,7 +160,7 @@ depthBuffer dep;
 
 void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
                  int altOptionIsDown, int superCommandIsDown) {
-  if (button == 257) {
+  if (button == GLFW_KEY_ENTER) {
     if (filter == 0) {
       texSetFiltering(tex[0], texQUADRATIC);
       filter = 1;
@@ -147,11 +168,36 @@ void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
       texSetFiltering(tex[0], texNEAREST);
       filter = 0;
     }
+  } else if (button == GLFW_KEY_UP) {
+    if (cam[0] + 0.05 > M_PI) {
+      cam[0] = 0.05;
+    } else {
+      cam[0] = cam[0] + 0.05;
+    }
+  } else if (button == GLFW_KEY_DOWN) {
+    if (cam[0] - 0.05 < 0.0) {
+      cam[0] = M_PI - 0.05;
+    } else {
+      cam[0] = cam[0] - 0.05;
+    }
+  } else if (button == GLFW_KEY_LEFT) {
+    if (cam[1] - 0.05 < (-1*M_PI)) {
+      cam[1] = M_PI - 0.05;
+    } else {
+      cam[1] = cam[1] - 0.05;
+    }
+  } else if (button == GLFW_KEY_RIGHT) {
+    if (cam[1] + 0.05 > M_PI) {
+      cam[1] = (-1*M_PI) + 0.05;
+    } else {
+      cam[1] = cam[1] + 0.05;
+    }
   }
 }
 
 
 void draw() {
+  renUpdateViewing(&ren);
   depthClearZs(&dep,-1000);
   pixClearRGB(0.0,0.0,0.0);
   sceneRender(&scen0,&ren,NULL);
@@ -161,6 +207,7 @@ void handleRotation() {
   //scen0.unif[renUNIFRHO] = scen0.unif[renUNIFRHO] + 0.05;
   //scen0.unif[renUNIFPHI] = scen0.unif[renUNIFPHI] + 0.05;
   scen0.unif[renUNIFRHO] = scen0.unif[renUNIFRHO] + 0.05;
+  renLookAt(&ren, target, 150.0, cam[0], cam[1]);
   //vec3Spherical(1.0,unif[renUNIFPHI],unif[renUNIFTHETA],u);
   //mat33AngleAxisRotation(unif[renUNIFRHO],u,rot);
 
@@ -169,6 +216,7 @@ void handleRotation() {
 void handleTimeStep(double oldTime, double newTime) {
   if (floor(newTime) - floor(oldTime) >= 1.0)
     printf("handleTimeStep: %f frames/sec\n", 1.0 / (newTime - oldTime));
+    //printf("[%f, %f]\n", cam[0], cam[1]);
     handleRotation();
     draw();
 }
@@ -195,7 +243,7 @@ int main(void) {
     ren.attrDim = 8;
     ren.varyDim = 4;
     ren.texNum = 1;
-    ren.unifDim = 22;
+    ren.unifDim = 38;
     ren.colorPixel = colorPixel;
     ren.transformVertex = transformVertex;
     ren.updateUniform = updateUniform;
@@ -207,7 +255,7 @@ int main(void) {
     pixSetTimeStepHandler(handleTimeStep);
     pixSetKeyUpHandler(handleKeyUp);
 
-    meshInitializeBox(&mesh0, 0.0, 150.0, 0.0, 150.0, 50.0, 150.0);
+    meshInitializeBox(&mesh0, 0.0, 150.0, 0.0, 150.0, 0.0, 50.0);
     meshInitializeSphere(&mesh1, 40, 20, 20);
 
     sceneInitialize(&scen0,&ren,unif,tex,&mesh0,NULL,NULL);
@@ -218,7 +266,7 @@ int main(void) {
     sceneSetUniform(&scen1,&ren,unif2);
     sceneAddChild(&scen0,&scen1);
 
-
+    renLookAt(&ren, target, 150.0, cam[0], cam[1]);
 
     draw();
     pixRun();
