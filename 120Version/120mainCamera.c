@@ -235,13 +235,13 @@ int main(void) {
   else {
     texTexture texture0, texture1, texture2, texture3;
     texInitializeFile(&texture0, "box.jpg");
-    texInitializeFile(&texture1, "static.jpg");
+    texInitializeFile(&texture1, "beachball.jpg");
 
     depthInitialize(&dep,512,512);
     tex[0] = &texture0, tex[1] = &texture1;
 
     ren.attrDim = 8;
-    ren.varyDim = 4;
+    ren.varyDim = 5;
     ren.texNum = 1;
     ren.unifDim = 38;
     ren.colorPixel = colorPixel;

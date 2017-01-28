@@ -193,7 +193,7 @@ int main(void) {
     tex[0] = &texture0, tex[1] = &texture1;
 
     ren.attrDim = 8;
-    ren.varyDim = 4;
+    ren.varyDim = 5;
     ren.texNum = 1;
     ren.unifDim = 22;
     ren.colorPixel = colorPixel;
