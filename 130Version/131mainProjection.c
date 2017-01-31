@@ -3,7 +3,7 @@
 @ Date: 01/07/2017
 This files includes the main function that test the 020triangle.c rasterizing
 script.
-Run the script like so  clang 130mainProjection.c 000pixel.o -lglfw -framework OpenGL
+Run the script like so  clang 131mainProjection.c 000pixel.o -lglfw -framework OpenGL
 */
 
 #include <stdio.h>
@@ -50,7 +50,6 @@ Run the script like so  clang 130mainProjection.c 000pixel.o -lglfw -framework O
 #define renUNIFISOMETRY 6
 #define renUNIFVIEWING 22
 
-double x_val = 0.0;
 #define renATTRX 0
 #define renATTRY 1
 #define renATTRZ 2
@@ -61,41 +60,46 @@ double x_val = 0.0;
 #define renATTRB 7
 
 //double cam[2] = {M_PI/2,-1*M_PI/2};
-//double cam[2] = {M_PI/2,0.0};
 double cam[2] = {M_PI/2,0.0};
 
 double target[3] = {0.0, 0.0, 0.0};
 ///////////////////////1.0,1.6
-double unif[38] = {0.0,0.0,0.0,0.0,0.0,0.0,     1.0,0.0,0.0,0.0,
+double unif[38] = {1.0,0.0,M_PI/2,0.0,0.0,0.0,   1.0,0.0,0.0,0.0,
                                                 0.0,1.0,0.0,0.0,
                                                 0.0,0.0,1.0,0.0,
-                                                0.0,0.0,0.0,1.0, 	0.0,0.0,0.0,0.0,
-                                                                 	0.0,0.0,0.0,0.0,
-                                                                 	0.0,0.0,0.0,0.0,
-                                                                 	0.0,0.0,0.0,0.0};
+                                                0.0,0.0,0.0,1.0, 0.0,0.0,0.0,0.0,
+                                                                 0.0,0.0,0.0,0.0,
+                                                                 0.0,0.0,0.0,0.0,
+                                                                 0.0,0.0,0.0,0.0};
 
+double unif2[38] = {0.0,0.0,0.0,0.0,0.0,0.0, 1.0,0.0,0.0,0.0,
+                                              0.0,1.0,0.0,0.0,
+                                              0.0,0.0,1.0,0.0,
+                                              0.0,0.0,0.0,1.0, 0.0,0.0,0.0,0.0,
+                                                               0.0,0.0,0.0,0.0,
+                                                               0.0,0.0,0.0,0.0,
+                                                               0.0,0.0,0.0,0.0};
 /* Writes the vary vector, based on the other parameters. */
 void transformVertex(renRenderer *ren, double unif[], double attr[],
         double vary[]) {
+
     /* For now, just copy attr to varying. Baby steps. */
     double attrXYZvec[4] = {attr[renATTRX],attr[renATTRY],attr[renATTRZ],1};
     double RtimesXYZvec[4];
     double MtimesRvec[4];
-
-    mat441Multiply((double(*)[4])(&unif[renUNIFISOMETRY]),attrXYZvec,RtimesXYZvec);
-    mat441Multiply((double(*)[4])(&unif[renUNIFVIEWING]),RtimesXYZvec,MtimesRvec);
-
     double transVec[4];
     double scaleVec[4];
     double finalScreen[4];
 
-	//printf("[%f, %f, %f, %f]\n",MtimesRvec[0], MtimesRvec[1], MtimesRvec[2], MtimesRvec[3]);
-    vecScale(ren->attrDim, 1.0/MtimesRvec[3], MtimesRvec, scaleVec);
+    mat441Multiply((double(*)[4])(&unif[renUNIFISOMETRY]),attrXYZvec,RtimesXYZvec);
+    mat441Multiply((double(*)[4])(&unif[renUNIFVIEWING]),RtimesXYZvec,MtimesRvec);
 
-	//printf("[%f,%f,%f]\n",scaleVec[0],scaleVec[1],scaleVec[2]);
+
+    mat441Multiply(ren->viewing,MtimesRvec, transVec);
+    vecScale(ren->attrDim, 1.0/transVec[3], transVec, scaleVec);
     mat441Multiply(ren->viewport, scaleVec, finalScreen);
 
-    //printf("[%f,%f,%f]\n",finalScreen[0],finalScreen[1],finalScreen[2]);
+
     vary[renVARYX] = finalScreen[0];
     vary[renVARYY] = finalScreen[1];
     vary[renVARYZ] = finalScreen[2];
@@ -110,11 +114,14 @@ matrix to the matrix product P * M. */
 void updateUniform(renRenderer *ren, double unif[], double unifParent[]) {
   double u[3];
   double rot[3][3];
+  //double rot[3][3] = {{1.0,0.0,0.0},{0.0,1.0,0.0},{0.0,0.0,1.0}};
+
+  vec3Spherical(unif[renUNIFRHO],unif[renUNIFPHI],unif[renUNIFTHETA],u);
+
+  printf("%f %f %f\n",u[0],u[1],u[2]);
+  mat33AngleAxisRotation(unif[renUNIFRHO],u,rot);
 
   mat44Copy(ren->viewing, (double(*)[4])(&unif[renUNIFVIEWING]));
-
-  vec3Spherical(1.0,unif[renUNIFPHI],unif[renUNIFTHETA],u);
-  mat33AngleAxisRotation(unif[renUNIFRHO],u,rot);
 
   if (unifParent == NULL) {
 
@@ -147,7 +154,7 @@ void colorPixel(renRenderer *ren, double unif[], texTexture *tex[],
     //printf("here we are\n");
 }
 
-
+//#include "090triangle.c"
 #include "110triangle.c"
 #include "100mesh.c"
 #include "090scene.c"
@@ -175,31 +182,29 @@ void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
       texSetFiltering(tex[0], texNEAREST);
       filter = 0;
     }
-
   } else if (button == GLFW_KEY_UP) {
-    if (cam[0] - 0.05 < 0.0) {
-      cam[0] = M_PI;
-    } else {
-      cam[0] = cam[0] - 0.05;
-    }
-  } else if (button == GLFW_KEY_DOWN) {
     if (cam[0] + 0.05 > M_PI) {
-      cam[0] = 0.0;
+      cam[0] = 0.05;
     } else {
       cam[0] = cam[0] + 0.05;
     }
-
+  } else if (button == GLFW_KEY_DOWN) {
+    if (cam[0] - 0.05 < 0.0) {
+      cam[0] = M_PI - 0.05;
+    } else {
+      cam[0] = cam[0] - 0.05;
+    }
   } else if (button == GLFW_KEY_LEFT) {
     if (cam[1] - 0.05 < (-1*M_PI)) {
-      cam[1] = M_PI - 0.05;
+      cam[1] = M_PI - 1.571;
     } else {
-      cam[1] = cam[1] - 0.05;
+      cam[1] = cam[1] - 1.571;
     }
   } else if (button == GLFW_KEY_RIGHT) {
     if (cam[1] + 0.05 > M_PI) {
-      cam[1] = (-1*M_PI) + 0.05;
+      cam[1] = (-1*M_PI) + 1.571;
     } else {
-      cam[1] = cam[1] + 0.05;
+      cam[1] = cam[1] + 1.571;
     }
   }
 }
@@ -209,12 +214,17 @@ void draw() {
   renUpdateViewing(&ren);
   depthClearZs(&dep,-1000);
   pixClearRGB(0.0,0.0,0.0);
+  printf("%f\n", cam[1]);
   sceneRender(&scen0,&ren,NULL);
 }
 
 void handleRotation() {
-
-  renLookAt(&ren, target, 10.0, cam[0], cam[1]);
+  //scen0.unif[renUNIFRHO] = scen0.unif[renUNIFRHO] + 0.05;
+  //scen0.unif[renUNIFPHI] = scen0.unif[renUNIFPHI] + 0.05;
+  //scen0.unif[renUNIFRHO] = scen0.unif[renUNIFRHO] + 0.05;
+  renLookAt(&ren, target, 150.0, cam[0], cam[1]);
+  // vec3Spherical(1.0,unif[renUNIFPHI],unif[renUNIFTHETA],u);
+  // mat33AngleAxisRotation(unif[renUNIFRHO],u,rot);
 
 }
 
@@ -238,10 +248,8 @@ int main(void) {
   if (pixInitialize(512, 512, "Pixel Graphics") != 0)
     return 1;
   else {
-
-    texTexture texture0, texture1, texture2, texture3;
+    texTexture texture0;
     texInitializeFile(&texture0, "box.jpg");
-
 
     depthInitialize(&dep,512,512);
     tex[0] = &texture0;
@@ -262,13 +270,12 @@ int main(void) {
     pixSetKeyUpHandler(handleKeyUp);
 
     /////////////////////////left , right, bottom, top,base, lid
-    meshInitializeBox(&mesh0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+    meshInitializeBox(&mesh0, 0.0, 150.0, 0.0, 150.0, 0.0, 50.0);
     sceneInitialize(&scen0,&ren,unif,tex,&mesh0,NULL,NULL);
 
-    renLookAt(&ren, target, 100.0, cam[0], cam[1]);
-    //renSetFrustum(&ren, renORTHOGRAPHIC, M_PI/6.0, 10.0, 10.0);
-    renSetFrustum(&ren, renPERSPECTIVE, M_PI/6.0, 10.0, 10.0);
-    //printf("pi is: %f\n",M_PI);
+    renLookAt(&ren, target, 20.0, cam[0], cam[1]);
+    renSetFrustum(&ren, renORTHOGRAPHIC, M_PI/6.0, 10.0, 10.0);
+    printf("%d\n", 3%2);
 
     draw();
     pixRun();
@@ -277,12 +284,8 @@ int main(void) {
     texDestroy(tex[0]);
     meshDestroy(&mesh0);
     depthDestroy(&dep);
-    //texDestroy(tex[1]);
-    //meshDestroy(&mesh1);
+
     sceneDestroyRecursively(&scen0);
-
-
-
     return 0;
   }
 }

@@ -41,8 +41,8 @@ as close to it as possible. */
 void renLookAt(renRenderer *ren, double target[3], double rho, double phi,
         double theta) {
     double z[3], y[3], yStd[3] = {0.0, 1.0, 0.0}, zStd[3] = {0.0, 0.0, 1.0};
-    vec3Spherical(1.0, phi, theta, z);
-    vec3Spherical(1.0, M_PI / 2.0 - phi, theta + M_PI, y);
+    vec3Spherical(1.0, phi, theta, z);  /// z = 0.0, 0.0, 0.1
+    vec3Spherical(1.0, M_PI / 2.0 - phi, theta + M_PI, y); // y = 0.0 , 0.0, -0.5 
     mat33BasisRotation(yStd, zStd, y, z, ren->cameraRotation);
     vecScale(3, rho, z, ren->cameraTranslation);
     vecAdd(3, target, ren->cameraTranslation, ren->cameraTranslation);
@@ -69,14 +69,17 @@ void renUpdateViewing(renRenderer *ren) {
   double C_Inv_M[4][4];
   double P[4][4];
 
+  //double I[3][3] = {{1.0, 0.0, 0.0 }, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}};
+  //mat33Print((double(*)[3])ren->cameraRotation);
   mat44InverseIsometry(ren->cameraRotation, ren->cameraTranslation, C_Inv_M);
+
+  
 
   if (ren->projectionType == renORTHOGRAPHIC) {
 
     mat44Orthographic(ren->projection[renPROJL],ren->projection[renPROJR],ren->projection[renPROJB],
                     ren->projection[renPROJT],ren->projection[renPROJF],ren->projection[renPROJN],P);
 
-    P[2][3] =  P[2][3] - 1;
     mat444Multiply(P,C_Inv_M,ren->viewing);
 
   } else if (ren->projectionType == renPERSPECTIVE) {

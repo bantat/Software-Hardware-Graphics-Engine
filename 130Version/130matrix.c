@@ -154,8 +154,8 @@ void mat33BasisRotation(double u[3], double v[3], double a[3], double b[3],
 
 	double R_T[3][3];
 
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
 			R_T[i][j] = R[j][i];
 		}
 	}
@@ -205,6 +205,12 @@ void mat44Print(double m[4][4]) {
 		printf("%f    %f		%f		%f\n", m[i][0], m[i][1], m[i][2], m[i][3]);
 }
 
+void mat33Print(double m[3][3]) {
+	printf("**************\n");
+	for (int i = 0; i < 3; i += 1)
+		printf("%f    %f		%f\n", m[i][0], m[i][1], m[i][2]);
+	printf("**************\n");
+}
 /* Given a rotation and translation, forms the 4x4 homogeneous matrix
 representing the inverse translation followed in time by the inverse rotation.
 That is, the isom produced by this function is the inverse to the isom
