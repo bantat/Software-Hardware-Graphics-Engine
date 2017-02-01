@@ -6,13 +6,30 @@ This file has functions for clipping.
 
 void clip_one(renRenderer *ren, double unif[], texTexture *tex[], double a[],
         double b[], double c[], int clip_vert) {
+
+  //call doViewPort for each vertex
   // test
+  doViewPort(a);
+  doViewPort(b);
+  doViewPort(c);
 
 }
 
 void clip_two(renRenderer *ren, double unif[], texTexture *tex[], double a[],
         double b[], double c[], int clip_vert1, int clip_vert2) {
+
+
+  //call doViewPort for each vertex
   // test
+
+  doViewPort(a);
+  doViewPort(b);
+  doViewPort(c);
+
+  //second triangle made
+  doViewPort(e);
+  doViewPort(f);
+  doViewPort(g);
 
 }
 
@@ -49,6 +66,10 @@ void hiddenClipRender(renRenderer *ren, double unif[], texTexture *tex[], double
   if (a_clip == 1 && b_clip == 1 && c_clip == 1) {
     return;
   } else if (a_clip == 0 && b_clip == 0 && c_clip == 0) {
+    //call doViewPort for each vertex
+    doViewPort(a);
+    doViewPort(b);
+    doViewPort(c);
     triRender(ren, unif, tex, a, b, c);
   } else {
     if (a_clip == 1 && b_clip == 0 && c_clip == 0) {
@@ -65,9 +86,19 @@ void hiddenClipRender(renRenderer *ren, double unif[], texTexture *tex[], double
       clip_one(ren, unif, tex, a, b, c, 3);
     }
   }
-
   /// skip this if it dont work ///
   //triRender(ren, unif, tex, a, b, c);
+}
+
+void doViewPort(double vert[]) {
+  double scaleVec[renVARYDIMBOUND];
+
+  vecScale(ren->attrDim, 1.0/vert[renVARYW], vert, scaleVec);
+  mat441Multiply(ren->viewport, scaleVec, vert);
+
+  //maybe
+  //vert[renVARYS] = a[renVARYS];
+  //vert[renVARYT] = a[renVARYT];
 }
 
 void clipRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
@@ -75,36 +106,15 @@ void clipRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
   // Do the normalisation of the triangle by reassigning triangle coodinate
   // values and attributes
 
-  double scaleVec[renVARYDIMBOUND];
-
-  double aTrans[renVARYDIMBOUND];
-  double bTrans[renVARYDIMBOUND];
-  double cTrans[renVARYDIMBOUND];
-
-  vecScale(ren->attrDim, 1.0/a[renVARYW], a, scaleVec);
-  mat441Multiply(ren->viewport, scaleVec, aTrans);
-  aTrans[renVARYS] = a[renVARYS];
-  aTrans[renVARYT] = a[renVARYT];
-
-  vecScale(ren->attrDim, 1.0/b[renVARYW], b, scaleVec);
-  mat441Multiply(ren->viewport, scaleVec, bTrans);
-  bTrans[renVARYS] = b[renVARYS];
-  bTrans[renVARYT] = b[renVARYT];
-
-  vecScale(ren->attrDim, 1.0/c[renVARYW], c, scaleVec);
-  mat441Multiply(ren->viewport, scaleVec, cTrans);
-  cTrans[renVARYS] = c[renVARYS];
-  cTrans[renVARYT] = c[renVARYT];
-
-  if (aTrans[0] <= bTrans[0] && aTrans[0] <= cTrans[0]) {
-    hiddenClipRender(ren, unif, tex, aTrans, bTrans, cTrans);
+  if (a[0] <= b[0] && a[0] <= c[0]) {
+    hiddenClipRender(ren, unif, tex, a, b, c);
   }
 
-  else if (bTrans[0] <= aTrans[0] && bTrans[0] <= cTrans[0]) {
-    hiddenClipRender(ren, unif, tex, bTrans, cTrans, aTrans);
+  else if (b[0] <= a[0] && b[0] <= c[0]) {
+    hiddenClipRender(ren, unif, tex, b, c, a);
   }
 
-  else if (cTrans[0] <= bTrans[0] && cTrans[0] <= aTrans[0]) {
-    hiddenClipRender(ren, unif, tex, cTrans, aTrans, bTrans);
+  else if (c[0] <= b[0] && c[0] <= a[0]) {
+    hiddenClipRender(ren, unif, tex, c, a, b);
   }
 }
