@@ -25,7 +25,7 @@ for different triangle shapes
 and situations.
 */
 
-void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
+void hiddenRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
         double b[], double c[]) {
 
   //do shiftIsDown
@@ -154,7 +154,7 @@ void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
 }
 
 
-void hiddenRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
+void triRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
         double b[], double c[]) {
       // Do the normalisation of the triangle by reassigning triangle coodinate
       // values and attributes

@@ -224,7 +224,7 @@ void mat44InverseIsometry(double rot[3][3], double trans[3],
 		}
 	}
 	isom[0][3] = (-1*rot[0][0]*trans[0]) - (rot[1][0]*trans[1]) - (rot[2][0]*trans[2]);
-	isom[1][3] = (-1*rot[0][1]*trans[0]) - (rot[1][1]*trans[1]) - (rot[2][2]*trans[2]);
+	isom[1][3] = (-1*rot[0][1]*trans[0]) - (rot[1][1]*trans[1]) - (rot[2][1]*trans[2]);
 	isom[2][3] = (-1*rot[0][2]*trans[0]) - (rot[1][2]*trans[1]) - (rot[2][2]*trans[2]);
 	isom[3][0] = 0.0;
 	isom[3][1] = 0.0;

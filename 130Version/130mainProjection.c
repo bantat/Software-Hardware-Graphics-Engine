@@ -12,7 +12,7 @@ Run the script like so  clang 130mainProjection.c 000pixel.o -lglfw -framework O
 #include "000pixel.h"
 
 #include "100vector.c"
-#include "130matrix.c"
+#include "131matrix.c"
 #include "040texture.c"
 #include "110depth.c"
 
@@ -62,7 +62,7 @@ double x_val = 0.0;
 
 //double cam[2] = {M_PI/2,-1*M_PI/2};
 //double cam[2] = {M_PI/2,0.0};
-double cam[2] = {M_PI/2,0.0};
+double cam[2] = {0.0,0.0};
 
 double target[3] = {0.0, 0.0, 0.0};
 ///////////////////////1.0,1.6

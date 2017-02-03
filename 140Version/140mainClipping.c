@@ -12,7 +12,7 @@ Run the script like so  clang 140mainClipping.c 000pixel.o -lglfw -framework Ope
 #include "000pixel.h"
 
 #include "100vector.c"
-#include "130matrix.c"
+#include "131matrix.c"
 #include "040texture.c"
 #include "110depth.c"
 
@@ -21,6 +21,8 @@ Run the script like so  clang 140mainClipping.c 000pixel.o -lglfw -framework Ope
 #define GLFW_KEY_LEFT 263
 #define GLFW_KEY_DOWN 264
 #define GLFW_KEY_UP 265
+#define GLFW_KEY_KP_ADD 334
+#define GLFW_KEY_KP_SUBTRACT 333
 
 #define renVARYDIMBOUND 16
 #define renVERTNUMBOUND 300
@@ -63,7 +65,7 @@ double x_val = 0.0;
 
 //double cam[2] = {M_PI/2,-1*M_PI/2};
 //double cam[2] = {M_PI/2,0.0};
-double cam[2] = {M_PI/2,0.0};
+double cam[3] = {0.0,0.0,100.0};
 
 double target[3] = {0.0, 0.0, 0.0};
 ///////////////////////1.0,1.6
@@ -192,6 +194,14 @@ void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
     } else {
       cam[1] = cam[1] + 0.05;
     }
+  } else if (button == GLFW_KEY_KP_ADD) {
+    cam[2] = cam[2] + 5.0;
+  } else if (button == GLFW_KEY_KP_SUBTRACT) {
+    if (cam[2] - 5.0 < 5.0) {
+      return;
+    } else {
+      cam[2] = cam[2] - 5.0;
+    }
   }
 }
 
@@ -205,7 +215,7 @@ void draw() {
 
 void handleRotation() {
 
-  renLookAt(&ren, target, 10.0, cam[0], cam[1]);
+  renLookAt(&ren, target, cam[2], cam[0], cam[1]);
 
 }
 
@@ -214,6 +224,7 @@ void handleTimeStep(double oldTime, double newTime) {
     printf("handleTimeStep: %f frames/sec\n", 1.0 / (newTime - oldTime));
     //printf("[%f, %f]\n", cam[0], cam[1]);
     handleRotation();
+    printf("cam: %f\n", cam[2]);
     draw();
 }
 
@@ -253,10 +264,10 @@ int main(void) {
     pixSetKeyUpHandler(handleKeyUp);
 
     /////////////////////////left , right, bottom, top,base, lid
-    meshInitializeBox(&mesh0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+    meshInitializeBox(&mesh0, -10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
     sceneInitialize(&scen0,&ren,unif,tex,&mesh0,NULL,NULL);
 
-    renLookAt(&ren, target, 10.0, cam[0], cam[1]);
+    renLookAt(&ren, target, cam[2], cam[0], cam[1]);
     //renSetFrustum(&ren, renORTHOGRAPHIC, M_PI/6.0, 10.0, 10.0);
     renSetFrustum(&ren, renPERSPECTIVE, M_PI/6.0, 10.0, 10.0);
     //printf("pi is: %f\n",M_PI);

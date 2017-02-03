@@ -46,6 +46,14 @@ void mat22Columns(double col0[2], double col1[2], double m[2][2]) {
 
 /*** 3 x 3 Matrices ***/
 
+void mat33Transpose(double m[3][3],double m_T[3][3]) {
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			m_T[i][j] = m[j][i];
+		}
+	}
+}
+
 /* Multiplies the 3x3 matrix m by the 3x3 matrix n. */
 void mat333Multiply(double m[3][3], double n[3][3], double mTimesN[3][3]) {
 
@@ -218,14 +226,18 @@ produced by mat44Isometry on the same inputs. */
 void mat44InverseIsometry(double rot[3][3], double trans[3],
         double isom[4][4]) {
 
+	double rot_T[3][3];
+	mat33Transpose(rot, rot_T);
+
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
-			isom[i][j] = rot[j][i];
+			isom[i][j] = rot_T[i][j];
 		}
 	}
-	isom[0][3] = (-1*rot[0][0]*trans[0]) - (rot[1][0]*trans[1]) - (rot[2][0]*trans[2]);
-	isom[1][3] = (-1*rot[0][1]*trans[0]) - (rot[1][1]*trans[1]) - (rot[2][2]*trans[2]);
-	isom[2][3] = (-1*rot[0][2]*trans[0]) - (rot[1][2]*trans[1]) - (rot[2][2]*trans[2]);
+
+	isom[0][3] = (-1*rot_T[0][0]*trans[0]) - (rot_T[1][0]*trans[1]) - (rot_T[2][0]*trans[2]);
+	isom[1][3] = (-1*rot_T[0][1]*trans[0]) - (rot_T[1][1]*trans[1]) - (rot_T[2][1]*trans[2]);
+	isom[2][3] = (-1*rot_T[0][2]*trans[0]) - (rot_T[1][2]*trans[1]) - (rot_T[2][2]*trans[2]);
 	isom[3][0] = 0.0;
 	isom[3][1] = 0.0;
 	isom[3][2] = 0.0;
