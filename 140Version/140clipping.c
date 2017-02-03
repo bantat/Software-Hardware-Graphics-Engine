@@ -4,21 +4,16 @@
 This file has functions for clipping.
 */
 
-void doViewPort(renRenderer *ren, double vert[]) {
-  double scaleVec[renVARYDIMBOUND];
-  double test[renVARYDIMBOUND];
-    //printf("******\n rendering1... [%f,%f,%f,%f]\n",vert[0],vert[1],vert[2],vert[3]);
-  vecScale(ren->varyDim, 1.0/vert[renVARYW], vert, scaleVec);
-//printf("rendering2... [%f,%f,%f,%f]\n",scaleVec[0],scaleVec[1],scaleVec[2],scaleVec[3]);
-  mat441Multiply(ren->viewport, scaleVec, vert);
-  printf("rendering2... [%f,%f,%f,%f]\n",vert[0],vert[1],vert[2],vert[3]);
-}
 
 void clip_one(renRenderer *ren, double unif[], texTexture *tex[], double a[],
         double b[], double c[], int clip_vert) {
 
   //call doViewPort for each vertex
   double sub_vec[renVARYDIMBOUND], add_vec[renVARYDIMBOUND], t;
+  double scaleVec[renVARYDIMBOUND];
+  double view_a[renVARYDIMBOUND], view_b[renVARYDIMBOUND], view_c[renVARYDIMBOUND];
+  double view_L[renVARYDIMBOUND], view_R[renVARYDIMBOUND];
+
   if (clip_vert == 1) {
     t = (a[3]-a[2])/(a[3]-a[2]+b[2]-b[3]);
     double new_aL[renVARYDIMBOUND];
@@ -32,13 +27,30 @@ void clip_one(renRenderer *ren, double unif[], texTexture *tex[], double a[],
     vecScale(ren->varyDim, t, sub_vec, add_vec);
     vecAdd(ren->varyDim, a, add_vec, new_aR);
 
-    doViewPort(ren, new_aL);
-    doViewPort(ren, new_aR);
-    doViewPort(ren, b);
-    doViewPort(ren, c);
+    // doViewPort(ren, new_aL);
+    // doViewPort(ren, new_aR);
+    // doViewPort(ren, b);
+    // doViewPort(ren, c);
 
-    triRender(ren, unif, tex, new_aL, b, new_aR);
-    triRender(ren, unif, tex, new_aR, b, c);
+    vecScale(ren->varyDim, 1.0/new_aL[renVARYW], new_aL, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_L);
+    view_L[renVARYS] = new_aL[renVARYS];
+    view_L[renVARYT] = new_aL[renVARYT];
+    vecScale(ren->varyDim, 1.0/b[renVARYW], b, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_b);
+    view_b[renVARYS] = b[renVARYS];
+    view_b[renVARYT] = b[renVARYT];
+    vecScale(ren->varyDim, 1.0/new_aR[renVARYW], new_aR, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_R);
+    view_R[renVARYS] = new_aR[renVARYS];
+    view_R[renVARYT] = new_aR[renVARYT];
+    vecScale(ren->varyDim, 1.0/c[renVARYW], c, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_c);
+    view_c[renVARYS] = c[renVARYS];
+    view_c[renVARYT] = c[renVARYT];
+
+    triRender(ren, unif, tex, view_L, view_b, view_R);
+    triRender(ren, unif, tex, view_R, view_b, view_c);
   } else if (clip_vert == 2) {
     t = (b[3]-b[2])/(b[3]-b[2]+c[2]-c[3]);
     double new_bL[renVARYDIMBOUND];
@@ -52,13 +64,30 @@ void clip_one(renRenderer *ren, double unif[], texTexture *tex[], double a[],
     vecScale(ren->varyDim, t, sub_vec, add_vec);
     vecAdd(ren->varyDim, b, add_vec, new_bR);
 
-    doViewPort(ren, new_bL);
-    doViewPort(ren, new_bR);
-    doViewPort(ren, a);
-    doViewPort(ren, c);
+    // doViewPort(ren, new_bL);
+    // doViewPort(ren, new_bR);
+    // doViewPort(ren, a);
+    // doViewPort(ren, c);
 
-    triRender(ren, unif, tex, new_bL, c, new_bR);
-    triRender(ren, unif, tex, new_bR, c, a);
+    vecScale(ren->varyDim, 1.0/new_bL[renVARYW], new_bL, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_L);
+    view_L[renVARYS] = new_bL[renVARYS];
+    view_L[renVARYT] = new_bL[renVARYT];
+    vecScale(ren->varyDim, 1.0/a[renVARYW], a, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_a);
+    view_a[renVARYS] = a[renVARYS];
+    view_a[renVARYT] = a[renVARYT];
+    vecScale(ren->varyDim, 1.0/new_bR[renVARYW], new_bR, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_R);
+    view_R[renVARYS] = new_bR[renVARYS];
+    view_R[renVARYT] = new_bR[renVARYT];
+    vecScale(ren->varyDim, 1.0/c[renVARYW], c, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_c);
+    view_c[renVARYS] = c[renVARYS];
+    view_c[renVARYT] = c[renVARYT];
+
+    triRender(ren, unif, tex, view_L, view_c, view_R);
+    triRender(ren, unif, tex, view_R, view_c, view_a);
   } else if (clip_vert == 3) {
     t = (c[3]-c[2])/(c[3]-c[2]+a[2]-a[3]);
     double new_cL[renVARYDIMBOUND];
@@ -72,10 +101,27 @@ void clip_one(renRenderer *ren, double unif[], texTexture *tex[], double a[],
     vecScale(ren->varyDim, t, sub_vec, add_vec);
     vecAdd(ren->varyDim, c, add_vec, new_cR);
 
-    doViewPort(ren, new_cL);
-    doViewPort(ren, new_cR);
-    doViewPort(ren, a);
-    doViewPort(ren, b);
+    // doViewPort(ren, new_cL);
+    // doViewPort(ren, new_cR);
+    // doViewPort(ren, a);
+    // doViewPort(ren, b);
+
+    vecScale(ren->varyDim, 1.0/new_cL[renVARYW], new_cL, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_L);
+    view_L[renVARYS] = new_cL[renVARYS];
+    view_L[renVARYT] = new_cL[renVARYT];
+    vecScale(ren->varyDim, 1.0/b[renVARYW], b, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_b);
+    view_b[renVARYS] = b[renVARYS];
+    view_b[renVARYT] = b[renVARYT];
+    vecScale(ren->varyDim, 1.0/new_cR[renVARYW], new_cR, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_R);
+    view_R[renVARYS] = new_cR[renVARYS];
+    view_R[renVARYT] = new_cR[renVARYT];
+    vecScale(ren->varyDim, 1.0/a[renVARYW], a, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_a);
+    view_a[renVARYS] = a[renVARYS];
+    view_a[renVARYT] = a[renVARYT];
 
     triRender(ren, unif, tex, new_cL, a, new_cR);
     triRender(ren, unif, tex, new_cR, a, b);
@@ -85,6 +131,8 @@ void clip_one(renRenderer *ren, double unif[], texTexture *tex[], double a[],
 void clip_two(renRenderer *ren, double unif[], texTexture *tex[], double a[],
         double b[], double c[], int clip_vert1, int clip_vert2) {
   double sub_vec[renVARYDIMBOUND], add_vec[renVARYDIMBOUND], t;
+  double scaleVec[renVARYDIMBOUND];
+  double view_a[renVARYDIMBOUND], view_b[renVARYDIMBOUND], view_c[renVARYDIMBOUND];
 
   if (clip_vert1 == 1 && clip_vert2 == 2) {
     t = (a[3]-a[2])/(a[3]-a[2]+c[2]-c[3]);
@@ -99,11 +147,25 @@ void clip_two(renRenderer *ren, double unif[], texTexture *tex[], double a[],
     vecScale(ren->varyDim, t, sub_vec, add_vec);
     vecAdd(ren->varyDim, b, add_vec, new_b);
 
-    doViewPort(ren, new_a);
-    doViewPort(ren, new_b);
-    doViewPort(ren, c);
+    // doViewPort(ren, new_a);
+    // doViewPort(ren, new_b);
+    // doViewPort(ren, c);
 
-    triRender(ren, unif, tex, new_a, new_b, c);
+    vecScale(ren->varyDim, 1.0/new_a[renVARYW], new_a, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_a);
+    vecScale(ren->varyDim, 1.0/new_b[renVARYW], new_b, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_b);
+    vecScale(ren->varyDim, 1.0/c[renVARYW], c, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_c);
+
+    view_a[renVARYS] = new_a[renVARYS];
+    view_a[renVARYT] = new_a[renVARYT];
+    view_b[renVARYS] = new_b[renVARYS];
+    view_b[renVARYT] = new_b[renVARYT];
+    view_c[renVARYS] = c[renVARYS];
+    view_c[renVARYT] = c[renVARYT];
+
+    triRender(ren, unif, tex, view_a, view_b, view_c);
   }
   else if (clip_vert1 == 1 && clip_vert2 == 3) {
 
@@ -119,11 +181,25 @@ void clip_two(renRenderer *ren, double unif[], texTexture *tex[], double a[],
     vecScale(ren->varyDim, t, sub_vec, add_vec);
     vecAdd(ren->varyDim, c, add_vec, new_c);
 
-    doViewPort(ren, new_a);
-    doViewPort(ren, new_c);
-    doViewPort(ren, b);
+    // doViewPort(ren, new_a);
+    // doViewPort(ren, new_c);
+    // doViewPort(ren, b);
 
-    triRender(ren, unif, tex, new_a, b, new_c);
+    vecScale(ren->varyDim, 1.0/new_a[renVARYW], new_a, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_a);
+    vecScale(ren->varyDim, 1.0/b[renVARYW], b, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_b);
+    vecScale(ren->varyDim, 1.0/new_c[renVARYW], new_c, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_c);
+
+    view_a[renVARYS] = new_a[renVARYS];
+    view_a[renVARYT] = new_a[renVARYT];
+    view_b[renVARYS] = b[renVARYS];
+    view_b[renVARYT] = b[renVARYT];
+    view_c[renVARYS] = new_c[renVARYS];
+    view_c[renVARYT] = new_c[renVARYT];
+
+    triRender(ren, unif, tex, view_a, view_b, view_c);
 
   }
   else if (clip_vert1 == 2 && clip_vert2 == 3) {
@@ -140,11 +216,25 @@ void clip_two(renRenderer *ren, double unif[], texTexture *tex[], double a[],
     vecScale(ren->varyDim, t, sub_vec, add_vec);
     vecAdd(ren->varyDim, c, add_vec, new_c);
 
-    doViewPort(ren, a);
-    doViewPort(ren, new_c);
-    doViewPort(ren, new_b);
+    // doViewPort(ren, a);
+    // doViewPort(ren, new_c);
+    // doViewPort(ren, new_b);
 
-    triRender(ren, unif, tex, a, new_b, new_c);
+    vecScale(ren->varyDim, 1.0/a[renVARYW], a, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_a);
+    vecScale(ren->varyDim, 1.0/new_b[renVARYW], new_b, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_b);
+    vecScale(ren->varyDim, 1.0/new_c[renVARYW], new_c, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_c);
+
+    view_a[renVARYS] = a[renVARYS];
+    view_a[renVARYT] = a[renVARYT];
+    view_b[renVARYS] = new_b[renVARYS];
+    view_b[renVARYT] = new_b[renVARYT];
+    view_c[renVARYS] = new_c[renVARYS];
+    view_c[renVARYT] = new_c[renVARYT];
+
+    triRender(ren, unif, tex, view_a, view_b, view_c);
 
   }
 }
@@ -166,6 +256,7 @@ void clipRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
   //doViewPort(ren, a);
   //doViewPort(ren, b);
   //doViewPort(ren, c);
+  /*
   double scaleVec[renVARYDIMBOUND];
   double view_a[renVARYDIMBOUND], view_b[renVARYDIMBOUND], view_c[renVARYDIMBOUND];
 
@@ -184,9 +275,9 @@ void clipRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
   view_c[renVARYT] = c[renVARYT];
 
   triRender(ren,unif,tex,view_a,view_b,view_c);
-
+  */
   /// skip this if it don't work ///
-/*
+
   int a_clip = 0;
   int b_clip = 0;
   int c_clip = 0;
@@ -201,12 +292,26 @@ void clipRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
     return;
   } else if (a_clip == 0 && b_clip == 0 && c_clip == 0) {
     //call doViewPort for each vertex
-    printf("not clipped\n");
-    doViewPort(ren, a);
-    doViewPort(ren, b);
-    doViewPort(ren, c);
-    printf("rendering... [%f,%f,%f] [%f,%f,%f] [%f,%f,%f]\n",a[0],a[1],a[2],b[0],b[1],b[2],c[0],c[1],c[2]);
-    triRender(ren, unif, tex, a, b, c);
+    //printf("not clipped\n");
+    double scaleVec[renVARYDIMBOUND];
+    double view_a[renVARYDIMBOUND], view_b[renVARYDIMBOUND], view_c[renVARYDIMBOUND];
+
+    vecScale(ren->varyDim, 1.0/a[renVARYW], a, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_a);
+    vecScale(ren->varyDim, 1.0/b[renVARYW], b, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_b);
+    vecScale(ren->varyDim, 1.0/c[renVARYW], c, scaleVec);
+    mat441Multiply(ren->viewport, scaleVec, view_c);
+
+    view_a[renVARYS] = a[renVARYS];
+    view_a[renVARYT] = a[renVARYT];
+    view_b[renVARYS] = b[renVARYS];
+    view_b[renVARYT] = b[renVARYT];
+    view_c[renVARYS] = c[renVARYS];
+    view_c[renVARYT] = c[renVARYT];
+
+    //printf("rendering... [%f,%f,%f] [%f,%f,%f] [%f,%f,%f]\n",a[0],a[1],a[2],b[0],b[1],b[2],c[0],c[1],c[2]);
+    triRender(ren, unif, tex, view_a, view_b, view_c);
   } else {
     if (a_clip == 1 && b_clip == 0 && c_clip == 0) {
       printf("1\n");
@@ -228,5 +333,4 @@ void clipRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
       clip_one(ren, unif, tex, a, b, c, 3);
     }
   }
-  */
 }

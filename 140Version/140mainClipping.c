@@ -224,7 +224,7 @@ void handleTimeStep(double oldTime, double newTime) {
     printf("handleTimeStep: %f frames/sec\n", 1.0 / (newTime - oldTime));
     //printf("[%f, %f]\n", cam[0], cam[1]);
     handleRotation();
-    printf("cam: %f\n", cam[2]);
+    //printf("cam: %f\n", cam[2]);
     draw();
 }
 
