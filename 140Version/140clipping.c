@@ -288,7 +288,7 @@ void clipRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
 
 
   if (a_clip == 1 && b_clip == 1 && c_clip == 1) {
-    printf("clipped triangle\n");
+    //printf("clipped triangle\n");
     return;
   } else if (a_clip == 0 && b_clip == 0 && c_clip == 0) {
     //call doViewPort for each vertex
@@ -314,22 +314,22 @@ void clipRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
     triRender(ren, unif, tex, view_a, view_b, view_c);
   } else {
     if (a_clip == 1 && b_clip == 0 && c_clip == 0) {
-      printf("1\n");
+      //printf("1\n");
       clip_one(ren, unif, tex, a, b, c, 1);
     } else if (a_clip == 1 && b_clip == 1 && c_clip == 0) {
-      printf("2\n");
+      //printf("2\n");
       clip_two(ren, unif, tex, a, b, c, 1, 2);
     } else if (a_clip == 1 && b_clip == 0 && c_clip == 1) {
-      printf("3\n");
+      //printf("3\n");
       clip_two(ren, unif, tex, a, b, c, 1, 3);
     } else if (a_clip == 0 && b_clip == 1 && c_clip == 0) {
-      printf("4\n");
+      //printf("4\n");
       clip_one(ren, unif, tex, a, b, c, 2);
     } else if (a_clip == 0 && b_clip == 1 && c_clip == 1) {
-      printf("5\n");
+      //printf("5\n");
       clip_two(ren, unif, tex, a, b, c, 2, 3);
     } else if (a_clip == 0 && b_clip == 0 && c_clip == 1) {
-      printf("6\n");
+      //printf("6\n");
       clip_one(ren, unif, tex, a, b, c, 3);
     }
   }
