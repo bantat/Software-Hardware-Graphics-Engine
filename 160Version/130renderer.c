@@ -47,7 +47,6 @@ void renLookAt(renRenderer *ren, double target[3], double rho, double phi,
     vecScale(3, rho, z, ren->cameraTranslation);
     vecAdd(3, target, ren->cameraTranslation, ren->cameraTranslation);
 
-    mat33Print(ren->cameraRotation);
 }
 
 /* Sets the camera's rotation and translation, in a manner suitable for first-
