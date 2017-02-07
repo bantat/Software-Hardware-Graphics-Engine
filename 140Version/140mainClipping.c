@@ -23,6 +23,8 @@ Run the script like so  clang 140mainClipping.c 000pixel.o -lglfw -framework Ope
 #define GLFW_KEY_UP 265
 #define GLFW_KEY_KP_ADD 334
 #define GLFW_KEY_KP_SUBTRACT 333
+#define GLFW_KEY_W 87
+#define GLFW_KEY_S 83
 
 #define renVARYDIMBOUND 16
 #define renVERTNUMBOUND 300
@@ -76,6 +78,13 @@ double unif[38] = {0.0,0.0,0.0,0.0,0.0,0.0,     1.0,0.0,0.0,0.0,
                                                                  	0.0,0.0,0.0,0.0,
                                                                  	0.0,0.0,0.0,0.0,
                                                                  	0.0,0.0,0.0,0.0};
+double unif2[38] = {0.0,0.0,0.0,0.0,0.0,-30.0, 1.0,0.0,0.0,0.0,
+                                              0.0,1.0,0.0,0.0,
+                                              0.0,0.0,1.0,0.0,
+                                              0.0,0.0,0.0,1.0, 0.0,0.0,0.0,0.0,
+                                                               0.0,0.0,0.0,0.0,
+                                                               0.0,0.0,0.0,0.0,
+                                                               0.0,0.0,0.0,0.0};
 
 /* Writes the vary vector, based on the other parameters. */
 void transformVertex(renRenderer *ren, double unif[], double attr[],
@@ -194,9 +203,9 @@ void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
     } else {
       cam[1] = cam[1] + 0.05;
     }
-  } else if (button == GLFW_KEY_KP_ADD) {
+  } else if (button == GLFW_KEY_KP_ADD || button == GLFW_KEY_W ) {
     cam[2] = cam[2] + 5.0;
-  } else if (button == GLFW_KEY_KP_SUBTRACT) {
+  } else if (button == GLFW_KEY_KP_SUBTRACT || button == GLFW_KEY_S ) {
     if (cam[2] - 5.0 < 5.0) {
       return;
     } else {
@@ -243,10 +252,11 @@ int main(void) {
 
     texTexture texture0, texture1, texture2, texture3;
     texInitializeFile(&texture0, "box.jpg");
-
+    texInitializeFile(&texture1, "beachball.jpg");
 
     depthInitialize(&dep,512,512);
     tex[0] = &texture0;
+    tex[1] = &texture1;
 
     ren.attrDim = 8;
     ren.varyDim = 6;
@@ -265,7 +275,13 @@ int main(void) {
 
     /////////////////////////left , right, bottom, top,base, lid
     meshInitializeBox(&mesh0, -10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
-    sceneInitialize(&scen0,&ren,unif,tex,&mesh0,NULL,NULL);
+    meshInitializeSphere(&mesh1, 5, 20, 20);
+
+    sceneInitialize(&scen0, &ren, unif, tex, &mesh0,NULL,NULL);
+    sceneInitialize(&scen1, &ren, unif, tex, &mesh1,NULL,NULL);
+    sceneSetTexture(&scen1,&ren,0,&texture1);
+    sceneSetUniform(&scen1,&ren,unif2);
+    sceneAddChild(&scen0,&scen1);
 
     renLookAt(&ren, target, cam[2], cam[0], cam[1]);
     //renSetFrustum(&ren, renORTHOGRAPHIC, M_PI/6.0, 10.0, 10.0);
@@ -279,8 +295,8 @@ int main(void) {
     texDestroy(tex[0]);
     meshDestroy(&mesh0);
     depthDestroy(&dep);
-    //texDestroy(tex[1]);
-    //meshDestroy(&mesh1);
+    texDestroy(tex[1]);
+    meshDestroy(&mesh1);
     sceneDestroyRecursively(&scen0);
 
 

@@ -4,7 +4,6 @@
 This file has functions for clipping.
 */
 
-
 void clip_one(renRenderer *ren, double unif[], texTexture *tex[], double a[],
         double b[], double c[], int clip_vert) {
 
@@ -286,6 +285,7 @@ void clipRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
   if (b[renVARYW] <= 0 || b[renVARYZ] > b[renVARYW]) b_clip = 1;
   if (c[renVARYW] <= 0 || c[renVARYZ] > c[renVARYW]) c_clip = 1;
 
+  printf("[%f, %f, %f, %f]\n",a[0],a[1],a[2],a[3] );
 
   if (a_clip == 1 && b_clip == 1 && c_clip == 1) {
     //printf("clipped triangle\n");
@@ -293,6 +293,7 @@ void clipRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
   } else if (a_clip == 0 && b_clip == 0 && c_clip == 0) {
     //call doViewPort for each vertex
     //printf("not clipped\n");
+
     double scaleVec[renVARYDIMBOUND];
     double view_a[renVARYDIMBOUND], view_b[renVARYDIMBOUND], view_c[renVARYDIMBOUND];
 

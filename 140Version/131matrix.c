@@ -209,8 +209,10 @@ void mat44Isometry(double rot[3][3], double trans[3], double isom[4][4]) {
 
 /* Pretty-prints the given matrix, with one line of text per row of matrix. */
 void mat44Print(double m[4][4]) {
+	printf("**************\n");
 	for (int i = 0; i < 4; i += 1)
 		printf("%f    %f		%f		%f\n", m[i][0], m[i][1], m[i][2], m[i][3]);
+	printf("**************\n");
 }
 
 void mat33Print(double m[3][3]) {
@@ -228,6 +230,9 @@ void mat44InverseIsometry(double rot[3][3], double trans[3],
 
 	double rot_T[3][3];
 	mat33Transpose(rot, rot_T);
+
+	//printf("[%f , %f , %f \n",trans[0], trans[1], trans[2]);
+	//mat33Print(rot);
 
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {

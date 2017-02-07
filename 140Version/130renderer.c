@@ -46,6 +46,8 @@ void renLookAt(renRenderer *ren, double target[3], double rho, double phi,
     mat33BasisRotation(yStd, zStd, y, z, ren->cameraRotation);
     vecScale(3, rho, z, ren->cameraTranslation);
     vecAdd(3, target, ren->cameraTranslation, ren->cameraTranslation);
+
+    mat33Print(ren->cameraRotation);
 }
 
 /* Sets the camera's rotation and translation, in a manner suitable for first-
@@ -72,6 +74,8 @@ void renUpdateViewing(renRenderer *ren) {
   //double I[3][3] = {{1.0, 0.0, 0.0 }, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}};
   //mat33Print((double(*)[3])ren->cameraRotation);
   mat44InverseIsometry(ren->cameraRotation, ren->cameraTranslation, C_Inv_M);
+
+  //mat44Print(C_Inv_M);
 
 
 
