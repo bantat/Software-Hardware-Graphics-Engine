@@ -5,8 +5,8 @@ This file has functions for clipping.
 */
 
 void doViewPort(renRenderer *ren, double ogvert[] , double transVert[]){
-  double scaleVec[renVARYDIMBOUND];
 
+  double scaleVec[renVARYDIMBOUND];
   vecScale(ren->varyDim, 1.0/ogvert[renVARYW], ogvert, scaleVec);
   mat441Multiply(ren->viewport, scaleVec, transVert);
 
@@ -16,8 +16,10 @@ void doViewPort(renRenderer *ren, double ogvert[] , double transVert[]){
 }
 
 void findNewVert(renRenderer *ren, double clipped[], double notClipped[], double finalVec[]){
+
   double sub_vec[renVARYDIMBOUND], add_vec[renVARYDIMBOUND];
   double t = (clipped[3]-clipped[2])/(clipped[3]-clipped[2]+notClipped[2]-notClipped[3]);
+
   vecSubtract(ren->varyDim, notClipped, clipped, sub_vec);
   vecScale(ren->varyDim, t, sub_vec, add_vec);
   vecAdd(ren->varyDim, clipped, add_vec,finalVec);
@@ -35,6 +37,7 @@ void clip_one(renRenderer *ren, double unif[], texTexture *tex[], double a[],
   if (clip_vert == 1) {
 
     double new_aL[renVARYDIMBOUND], new_aR[renVARYDIMBOUND];
+    //void findNewVert(renRenderer *ren, double clipped[], double notClipped[], double finalVec[])
     findNewVert(ren,a,b,new_aL);
     findNewVert(ren,a,c,new_aR);
 
@@ -49,6 +52,7 @@ void clip_one(renRenderer *ren, double unif[], texTexture *tex[], double a[],
   } else if (clip_vert == 2) {
 
     double new_bL[renVARYDIMBOUND], new_bR[renVARYDIMBOUND];
+    //void findNewVert(renRenderer *ren, double clipped[], double notClipped[], double finalVec[])
     findNewVert(ren,b,c,new_bL);
     findNewVert(ren,b,a,new_bR);
 
@@ -63,6 +67,7 @@ void clip_one(renRenderer *ren, double unif[], texTexture *tex[], double a[],
   } else if (clip_vert == 3) {
 
     double new_cL[renVARYDIMBOUND], new_cR[renVARYDIMBOUND];
+    //void findNewVert(renRenderer *ren, double clipped[], double notClipped[], double finalVec[])
     findNewVert(ren,c,a,new_cL);
     findNewVert(ren,c,b,new_cR);
 
@@ -84,6 +89,7 @@ void clip_two(renRenderer *ren, double unif[], texTexture *tex[], double a[],
   if (clip_vert1 == 1 && clip_vert2 == 2) {
 
     double new_a[renVARYDIMBOUND], new_b[renVARYDIMBOUND];
+    //void findNewVert(renRenderer *ren, double clipped[], double notClipped[], double finalVec[])
     findNewVert(ren,a,c,new_a);
     findNewVert(ren,a,b,new_b);
 
@@ -96,6 +102,7 @@ void clip_two(renRenderer *ren, double unif[], texTexture *tex[], double a[],
   else if (clip_vert1 == 1 && clip_vert2 == 3) {
 
     double new_a[renVARYDIMBOUND], new_c[renVARYDIMBOUND];
+    //void findNewVert(renRenderer *ren, double clipped[], double notClipped[], double finalVec[])
     findNewVert(ren,a,b,new_a);
     findNewVert(ren,c,b,new_c);
 
@@ -109,6 +116,7 @@ void clip_two(renRenderer *ren, double unif[], texTexture *tex[], double a[],
   else if (clip_vert1 == 2 && clip_vert2 == 3) {
 
     double new_b[renVARYDIMBOUND], new_c[renVARYDIMBOUND];
+    //void findNewVert(renRenderer *ren, double clipped[], double notClipped[], double finalVec[])
     findNewVert(ren,b,a,new_b);
     findNewVert(ren,c,a,new_c);
 
@@ -153,6 +161,7 @@ void clipRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
 
     double view_a[renVARYDIMBOUND], view_b[renVARYDIMBOUND], view_c[renVARYDIMBOUND];
 
+    //doViewPort(renRenderer *ren, double ogvert[] , double transVert[])
     doViewPort(ren,a,view_a);
     doViewPort(ren,b,view_b);
     doViewPort(ren,c,view_c);

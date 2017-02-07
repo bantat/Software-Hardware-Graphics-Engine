@@ -209,8 +209,10 @@ void mat44Isometry(double rot[3][3], double trans[3], double isom[4][4]) {
 
 /* Pretty-prints the given matrix, with one line of text per row of matrix. */
 void mat44Print(double m[4][4]) {
+	printf("**************\n");
 	for (int i = 0; i < 4; i += 1)
 		printf("%f    %f		%f		%f\n", m[i][0], m[i][1], m[i][2], m[i][3]);
+	printf("**************\n");
 }
 
 void mat33Print(double m[3][3]) {
@@ -229,15 +231,18 @@ void mat44InverseIsometry(double rot[3][3], double trans[3],
 	double rot_T[3][3];
 	mat33Transpose(rot, rot_T);
 
+	//printf("[%f , %f , %f \n",trans[0], trans[1], trans[2]);
+	//mat33Print(rot);
+
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
 			isom[i][j] = rot_T[i][j];
 		}
 	}
 
-	isom[0][3] = (-1*rot_T[0][0]*trans[0]) - (rot_T[1][0]*trans[1]) - (rot_T[2][0]*trans[2]);
-	isom[1][3] = (-1*rot_T[0][1]*trans[0]) - (rot_T[1][1]*trans[1]) - (rot_T[2][1]*trans[2]);
-	isom[2][3] = (-1*rot_T[0][2]*trans[0]) - (rot_T[1][2]*trans[1]) - (rot_T[2][2]*trans[2]);
+	isom[0][3] = (-1*rot[0][0]*trans[0]) - (rot[1][0]*trans[1]) - (rot[2][0]*trans[2]);
+	isom[1][3] = (-1*rot[0][1]*trans[0]) - (rot[1][1]*trans[1]) - (rot[2][1]*trans[2]);
+	isom[2][3] = (-1*rot[0][2]*trans[0]) - (rot[1][2]*trans[1]) - (rot[2][2]*trans[2]);
 	isom[3][0] = 0.0;
 	isom[3][1] = 0.0;
 	isom[3][2] = 0.0;

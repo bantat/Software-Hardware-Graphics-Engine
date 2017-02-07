@@ -12,7 +12,7 @@ Run the script like so  clang 140mainClipping.c 000pixel.o -lglfw -framework Ope
 #include "000pixel.h"
 
 #include "100vector.c"
-#include "131matrix.c"
+#include "130matrix.c"
 #include "040texture.c"
 #include "110depth.c"
 
