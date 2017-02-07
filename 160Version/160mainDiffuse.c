@@ -3,7 +3,8 @@
 @ Date: 01/07/2017
 This files includes the main function that test the 020triangle.c rasterizing
 script.
-Run the script like so  clang 160mainDiffuse.c 000pixel.o -lglfw -framework OpenGL
+Run the script like so  clang 160mainDiffuse.c 000pixel.o -lglfw -framework
+OpenGL
 */
 
 #include <stdio.h>
@@ -27,7 +28,7 @@ Run the script like so  clang 160mainDiffuse.c 000pixel.o -lglfw -framework Open
 #define GLFW_KEY_S 83
 
 #define renVARYDIMBOUND 16
-#define renVERTNUMBOUND 300
+#define renVERTNUMBOUND 1000
 
 #include "130renderer.c"
 
@@ -77,60 +78,53 @@ double x_val = 0.0;
 #define renATTRG 6
 #define renATTRB 7
 
-//double cam[2] = {M_PI/2,-1*M_PI/2};
-//double cam[2] = {M_PI/2,0.0};
-double cam[3] = {0.0,0.0,100.0};
+// double cam[2] = {M_PI/2,-1*M_PI/2};
+// double cam[2] = {M_PI/2,0.0};
+double cam[3] = {0.0, 0.0, 100.0};
 
 double target[3] = {0.0, 0.0, 0.0};
 ///////////////////////1.0,1.6
-double unif[44] = {0.0,0.0,0.0,0.0,0.0,0.0,     1.0,0.0,0.0,0.0,
-                                                0.0,1.0,0.0,0.0,
-                                                0.0,0.0,1.0,0.0,
-                                                0.0,0.0,0.0,1.0, 	0.0,0.0,0.0,0.0,
-                                                                 	0.0,0.0,0.0,0.0,
-                                                                 	0.0,0.0,0.0,0.0,
-                                                                 	0.0,0.0,0.0,0.0,
-                                                                                    25.0, 25.0, 10.0,
-                                                                                    1.0, 1.0, 1.0};
-double unif2[44] = {0.0,0.0,0.0,0.0,0.0,-30.0, 1.0,0.0,0.0,0.0,
-                                              0.0,1.0,0.0,0.0,
-                                              0.0,0.0,1.0,0.0,
-                                              0.0,0.0,0.0,1.0, 0.0,0.0,0.0,0.0,
-                                                               0.0,0.0,0.0,0.0,
-                                                               0.0,0.0,0.0,0.0,
-                                                               0.0,0.0,0.0,0.0,
-                                                                                    25.0, 25.0, 10.0,
-                                                                                    1.0, 1.0, 1.0};
+double unif[44] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  1.0,  0.0,  0.0, 0.0, 0.0,
+                   1.0, 0.0, 0.0, 0.0, 0.0, 1.0,  0.0,  0.0,  0.0, 0.0, 1.0,
+                   0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  0.0,  0.0,  0.0, 0.0, 0.0,
+                   0.0, 0.0, 0.0, 0.0, 0.0, 25.0, 25.0, 10.0, 1.0, 1.0, 1.0};
+double unif2[44] = {0.0, 0.0, 0.0, 0.0, 0.0, -30.0, 1.0,  0.0,  0.0, 0.0, 0.0,
+                    1.0, 0.0, 0.0, 0.0, 0.0, 1.0,   0.0,  0.0,  0.0, 0.0, 1.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0,   0.0,  0.0,  0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 25.0,  25.0, 10.0, 1.0, 1.0, 1.0};
 
 /* Writes the vary vector, based on the other parameters. */
 void transformVertex(renRenderer *ren, double unif[], double attr[],
-        double vary[]) {
-    /* For now, just copy attr to varying. Baby steps. */
-    double attrXYZvec[4] = {attr[renATTRX],attr[renATTRY],attr[renATTRZ],1.0};
+                     double vary[]) {
+  /* For now, just copy attr to varying. Baby steps. */
+  double attrXYZvec[4] = {attr[renATTRX], attr[renATTRY], attr[renATTRZ], 1.0};
 
-    double attrNOPvec[4] = {attr[5], attr[6], attr[7], 0.0};
-    double RtimesXYZvec[4];
-    double RtimesNOPvec[4];
-    double MtimesRvec[4];
+  double attrNOPvec[4] = {attr[5], attr[6], attr[7], 0.0};
+  double RtimesXYZvec[4];
+  double RtimesNOPvec[4];
+  double MtimesRvec[4];
 
-    mat441Multiply((double(*)[4])(&unif[renUNIFISOMETRY]),attrXYZvec,RtimesXYZvec);
-    mat441Multiply((double(*)[4])(&unif[renUNIFISOMETRY]),attrNOPvec,RtimesNOPvec);
-    mat441Multiply((double(*)[4])(&unif[renUNIFVIEWING]),RtimesXYZvec,MtimesRvec);
+  mat441Multiply((double(*)[4])(&unif[renUNIFISOMETRY]), attrXYZvec,
+                 RtimesXYZvec);
+  mat441Multiply((double(*)[4])(&unif[renUNIFISOMETRY]), attrNOPvec,
+                 RtimesNOPvec);
+  mat441Multiply((double(*)[4])(&unif[renUNIFVIEWING]), RtimesXYZvec,
+                 MtimesRvec);
 
-    vary[renVARYX] = MtimesRvec[0];
-    vary[renVARYY] = MtimesRvec[1];
-    vary[renVARYZ] = MtimesRvec[2];
-    vary[renVARYW] = MtimesRvec[3];
-    vary[renVARYS] = attr[renATTRS];
-    vary[renVARYT] = attr[renATTRT];
+  vary[renVARYX] = MtimesRvec[0];
+  vary[renVARYY] = MtimesRvec[1];
+  vary[renVARYZ] = MtimesRvec[2];
+  vary[renVARYW] = MtimesRvec[3];
+  vary[renVARYS] = attr[renATTRS];
+  vary[renVARYT] = attr[renATTRT];
 
-    vary[renVARYWORLDX] = MtimesRvec[0];
-    vary[renVARYWORLDY] = MtimesRvec[1];
-    vary[renVARYWORLDZ] = MtimesRvec[2];
+  vary[renVARYWORLDX] = MtimesRvec[0];
+  vary[renVARYWORLDY] = MtimesRvec[1];
+  vary[renVARYWORLDZ] = MtimesRvec[2];
 
-    vary[renVARYWORLDN] = RtimesNOPvec[0];
-    vary[renVARYWORLDO] = RtimesNOPvec[1];
-    vary[renVARYWORLDP] = RtimesNOPvec[2];
+  vary[renVARYWORLDN] = RtimesNOPvec[0];
+  vary[renVARYWORLDO] = RtimesNOPvec[1];
+  vary[renVARYWORLDP] = RtimesNOPvec[2];
 }
 
 /* If unifParent is NULL, then sets the uniform matrix to the
@@ -143,24 +137,26 @@ void updateUniform(renRenderer *ren, double unif[], double unifParent[]) {
 
   mat44Copy(ren->viewing, (double(*)[4])(&unif[renUNIFVIEWING]));
 
-  vec3Spherical(1.0,unif[renUNIFPHI],unif[renUNIFTHETA],u);
-  mat33AngleAxisRotation(unif[renUNIFRHO],u,rot);
+  vec3Spherical(1.0, unif[renUNIFPHI], unif[renUNIFTHETA], u);
+  mat33AngleAxisRotation(unif[renUNIFRHO], u, rot);
 
   if (unifParent == NULL) {
 
-      /* The nine uniforms for storing the matrix start at index
-      renUNIFISOMETRY. So &unif[renUNIFISOMETRY] is an array containing those
-      nine numbers. We use '(double(*)[3])' to cast it to a 3x3 matrix. */
-      double trans[3] = {unif[renUNIFTRANSX], unif[renUNIFTRANSY], unif[renUNIFTRANSZ]};
-      mat44Isometry(rot, trans, (double(*)[4])(&unif[renUNIFISOMETRY]));
+    /* The nine uniforms for storing the matrix start at index
+    renUNIFISOMETRY. So &unif[renUNIFISOMETRY] is an array containing those
+    nine numbers. We use '(double(*)[3])' to cast it to a 3x3 matrix. */
+    double trans[3] = {unif[renUNIFTRANSX], unif[renUNIFTRANSY],
+                       unif[renUNIFTRANSZ]};
+    mat44Isometry(rot, trans, (double(*)[4])(&unif[renUNIFISOMETRY]));
 
   } else {
 
     double m[4][4];
-    double trans[3] = {unif[renUNIFTRANSX], unif[renUNIFTRANSY], unif[renUNIFTRANSZ]};
+    double trans[3] = {unif[renUNIFTRANSX], unif[renUNIFTRANSY],
+                       unif[renUNIFTRANSZ]};
     mat44Isometry(rot, trans, m);
     mat444Multiply((double(*)[4])(&unifParent[renUNIFISOMETRY]), m,
-        (double(*)[4])(&unif[renUNIFISOMETRY]));
+                   (double(*)[4])(&unif[renUNIFISOMETRY]));
   }
 }
 
@@ -171,10 +167,13 @@ void colorPixel(renRenderer *ren, double unif[], texTexture *tex[],
   texSample(tex[0], vary[renVARYS], vary[renVARYT]);
   double DIFF_INT;
 
-  double light_vec[3] = {unif[renUNIFLIGHTX], unif[renUNIFLIGHTY], unif[renUNIFLIGHTZ]};
-  double world_vec[3] = {vary[renVARYWORLDX], vary[renVARYWORLDY], vary[renVARYWORLDZ]};
+  double light_vec[3] = {unif[renUNIFLIGHTX], unif[renUNIFLIGHTY],
+                         unif[renUNIFLIGHTZ]};
+  double world_vec[3] = {vary[renVARYWORLDX], vary[renVARYWORLDY],
+                         vary[renVARYWORLDZ]};
 
-  double normal[3] = {vary[renVARYWORLDN], vary[renVARYWORLDO], vary[renVARYWORLDP]};
+  double normal[3] = {vary[renVARYWORLDN], vary[renVARYWORLDO],
+                      vary[renVARYWORLDP]};
   double sub_vec[3];
   double light[3];
   double ndotl;
@@ -184,13 +183,12 @@ void colorPixel(renRenderer *ren, double unif[], texTexture *tex[],
   ndotl = vecDot(3, normal, light);
   DIFF_INT = fmax(0.0, ndotl);
 
-  printf("DIFF_INT: %f\n", DIFF_INT);
+  // printf("DIFF_INT: %f\n", DIFF_INT);
 
-  rgbz[0] = /*DIFF_INT * unif[renUNIFLIGHTR] * */tex[0]->sample[renTEXR];
-  rgbz[1] = /*DIFF_INT * unif[renUNIFLIGHTG] * */tex[0]->sample[renTEXG];
-  rgbz[2] = /*DIFF_INT * unif[renUNIFLIGHTB] * */tex[0]->sample[renTEXB];
+  rgbz[0] = DIFF_INT * unif[renUNIFLIGHTR] * tex[0]->sample[renTEXR];
+  rgbz[1] = DIFF_INT * unif[renUNIFLIGHTG] * tex[0]->sample[renTEXG];
+  rgbz[2] = DIFF_INT * unif[renUNIFLIGHTB] * tex[0]->sample[renTEXB];
   rgbz[3] = depthGetZ(ren->depth, vary[renVARYX], vary[renVARYY]);
-
 }
 
 #include "110triangle.c"
@@ -199,7 +197,7 @@ void colorPixel(renRenderer *ren, double unif[], texTexture *tex[],
 #include "090scene.c"
 
 int filter = 0;
-texTexture * tex[3];
+texTexture *tex[3];
 renRenderer ren;
 sceneNode scen0;
 sceneNode scen1;
@@ -208,8 +206,6 @@ meshMesh mesh0;
 meshMesh mesh1;
 meshMesh mesh2;
 depthBuffer dep;
-
-
 
 void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
                  int altOptionIsDown, int superCommandIsDown) {
@@ -236,20 +232,20 @@ void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
     }
 
   } else if (button == GLFW_KEY_LEFT) {
-    if (cam[1] - 0.05 < (-1*M_PI)) {
+    if (cam[1] - 0.05 < (-1 * M_PI)) {
       cam[1] = M_PI - 0.05;
     } else {
       cam[1] = cam[1] - 0.05;
     }
   } else if (button == GLFW_KEY_RIGHT) {
     if (cam[1] + 0.05 > M_PI) {
-      cam[1] = (-1*M_PI) + 0.05;
+      cam[1] = (-1 * M_PI) + 0.05;
     } else {
       cam[1] = cam[1] + 0.05;
     }
-  } else if (button == GLFW_KEY_KP_ADD || button == GLFW_KEY_W ) {
+  } else if (button == GLFW_KEY_KP_ADD || button == GLFW_KEY_W) {
     cam[2] = cam[2] + 5.0;
-  } else if (button == GLFW_KEY_KP_SUBTRACT || button == GLFW_KEY_S ) {
+  } else if (button == GLFW_KEY_KP_SUBTRACT || button == GLFW_KEY_S) {
     if (cam[2] - 5.0 < 5.0) {
       return;
     } else {
@@ -258,27 +254,24 @@ void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
   }
 }
 
-
 void draw() {
   renUpdateViewing(&ren);
-  depthClearZs(&dep,-1000);
-  pixClearRGB(0.0,0.0,0.0);
-  sceneRender(&scen0,&ren,NULL);
+  printf("viewing updated\n");
+  depthClearZs(&dep, -1000);
+  pixClearRGB(0.0, 0.0, 0.0);
+  printf("rendering scene\n");
+  sceneRender(&scen0, &ren, NULL);
 }
 
-void handleRotation() {
-
-  renLookAt(&ren, target, cam[2], cam[0], cam[1]);
-
-}
+void handleRotation() { renLookAt(&ren, target, cam[2], cam[0], cam[1]); }
 
 void handleTimeStep(double oldTime, double newTime) {
   if (floor(newTime) - floor(oldTime) >= 1.0)
     printf("handleTimeStep: %f frames/sec\n", 1.0 / (newTime - oldTime));
-    //printf("[%f, %f]\n", cam[0], cam[1]);
-    handleRotation();
-    //printf("cam: %f\n", cam[2]);
-    draw();
+  // printf("[%f, %f]\n", cam[0], cam[1]);
+  handleRotation();
+  // printf("cam: %f\n", cam[2]);
+  draw();
 }
 
 /*
@@ -298,7 +291,7 @@ int main(void) {
     texInitializeFile(&texture0, "box.jpg");
     texInitializeFile(&texture1, "beachball.jpg");
 
-    depthInitialize(&dep,512,512);
+    depthInitialize(&dep, 512, 512);
     tex[0] = &texture0;
     tex[1] = &texture1;
 
@@ -321,20 +314,21 @@ int main(void) {
     meshInitializeBox(&mesh0, -10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
     meshInitializeSphere(&mesh1, 5, 20, 20);
 
-    sceneInitialize(&scen0, &ren, unif, tex, &mesh0,NULL,NULL);
-    sceneInitialize(&scen1, &ren, unif, tex, &mesh1,NULL,NULL);
-    sceneSetTexture(&scen1,&ren,0,&texture1);
-    sceneSetUniform(&scen1,&ren,unif2);
-    sceneAddChild(&scen0,&scen1);
+    sceneInitialize(&scen0, &ren, unif, tex, &mesh0, NULL, NULL);
+    sceneInitialize(&scen1, &ren, unif, tex, &mesh1, NULL, NULL);
+    sceneSetTexture(&scen1, &ren, 0, &texture1);
+    sceneSetUniform(&scen1, &ren, unif2);
+    sceneAddChild(&scen0, &scen1);
 
     renLookAt(&ren, target, cam[2], cam[0], cam[1]);
-    //renSetFrustum(&ren, renORTHOGRAPHIC, M_PI/6.0, 10.0, 10.0);
-    renSetFrustum(&ren, renPERSPECTIVE, M_PI/6.0, 10.0, 10.0);
-    //printf("pi is: %f\n",M_PI);
+    // renSetFrustum(&ren, renORTHOGRAPHIC, M_PI/6.0, 10.0, 10.0);
+    renSetFrustum(&ren, renPERSPECTIVE, M_PI / 6.0, 10.0, 10.0);
+    // printf("pi is: %f\n",M_PI);
 
     draw();
+    // printf("Scene Drawn.\n");
     pixRun();
-
+    // printf("PixRun\n");
 
     texDestroy(tex[0]);
     meshDestroy(&mesh0);
@@ -342,8 +336,6 @@ int main(void) {
     texDestroy(tex[1]);
     meshDestroy(&mesh1);
     sceneDestroyRecursively(&scen0);
-
-
 
     return 0;
   }
