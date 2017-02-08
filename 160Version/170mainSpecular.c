@@ -4,7 +4,7 @@
 This files includes the main function that test the 020triangle.c rasterizing
 script.
 Run the script like so:
-clang 160mainDiffuse.c 000pixel.o -lglfw -framework OpenGL
+clang 170mainSpecular.c 000pixel.o -lglfw -framework OpenGL
 */
 
 #include <stdio.h>
@@ -67,6 +67,9 @@ clang 160mainDiffuse.c 000pixel.o -lglfw -framework OpenGL
 #define renUNIFLIGHTR 41
 #define renUNIFLIGHTG 42
 #define renUNIFLIGHTB 43
+#define renUNIFCAMWORLDX 44
+#define renUNIFCAMWORLDY 45
+#define renUNIFCAMWORLDZ 46
 
 double x_val = 0.0;
 #define renATTRX 0
@@ -84,14 +87,14 @@ double cam[3] = {0.0, 0.0, 150.0};
 
 double target[3] = {0.0, 0.0, 0.0};
 ///////////////////////1.0,1.6
-double unif[44] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  1.0,  0.0,  0.0, 0.0, 0.0,
+double unif[47] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  1.0,  0.0,  0.0, 0.0, 0.0,
                    1.0, 0.0, 0.0, 0.0, 0.0, 1.0,  0.0,  0.0,  0.0, 0.0, 1.0,
                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  0.0,  0.0,  0.0, 0.0, 0.0,
-                   0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 200.0, 1.0, 1.0, 1.0};
-double unif2[44] = {0.0, 0.0, 0.0, 0.0, 0.0, -30.0, 1.0,  0.0,  0.0, 0.0, 0.0,
+                   0.0, 0.0, 0.0, 0.0, 0.0, 25.0, 40.0, 30.0, 1.0, 1.0, 1.0, 0.0, 0.0, 100.0};
+double unif2[47] = {0.0, 0.0, 0.0, 0.0, 0.0, -30.0, 1.0,  0.0,  0.0, 0.0, 0.0,
                     1.0, 0.0, 0.0, 0.0, 0.0, 1.0,   0.0,  0.0,  0.0, 0.0, 1.0,
                     0.0, 0.0, 0.0, 0.0, 0.0, 0.0,   0.0,  0.0,  0.0, 0.0, 0.0,
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  0.0, 200.0, 1.0, 1.0, 1.0};
+                    0.0, 0.0, 0.0, 0.0, 0.0, 25.0,  40.0, 30.0, 1.0, 1.0, 1.0, 0.0, 0.0, 100.0};
 
 /* Writes the vary vector, based on the other parameters. */
 void transformVertex(renRenderer *ren, double unif[], double attr[],
@@ -132,6 +135,10 @@ rotation-translation M described by the other uniforms. If unifParent is not
 NULL, but instead contains a rotation-translation P, then sets the uniform
 matrix to the matrix product P * M. */
 void updateUniform(renRenderer *ren, double unif[], double unifParent[]) {
+  unif[renUNIFCAMWORLDX] = ren->cameraTranslation[0];
+  unif[renUNIFCAMWORLDY] = ren->cameraTranslation[1];
+  unif[renUNIFCAMWORLDZ] = ren->cameraTranslation[2];
+
   double u[3];
   double rot[3][3];
 
@@ -166,16 +173,25 @@ void colorPixel(renRenderer *ren, double unif[], texTexture *tex[],
                 double vary[], double rgbz[]) {
   texSample(tex[0], vary[renVARYS], vary[renVARYT]);
   double DIFF_INT;
+  double SPEC_INT;
 
   double light_vec[3] = {unif[renUNIFLIGHTX], unif[renUNIFLIGHTY],
                          unif[renUNIFLIGHTZ]};
   vecUnit(3, light_vec, light_vec);
+
   double world_vec[3] = {vary[renVARYWORLDX], vary[renVARYWORLDY],
                          vary[renVARYWORLDZ]};
   vecUnit(3, world_vec, world_vec);
 
+
+  double cam_vec[3] = {unif[renUNIFCAMWORLDX], unif[renUNIFCAMWORLDY],
+                       unif[renUNIFCAMWORLDZ]};
+  vecUnit(3, cam_vec, cam_vec);
+
   double normal[3] = {vary[renVARYWORLDN], vary[renVARYWORLDO],
                       vary[renVARYWORLDP]};
+  vecUnit(3, normal, normal);
+
   double sub_vec[3];
   double light[3];
   double ndotl;
@@ -185,11 +201,21 @@ void colorPixel(renRenderer *ren, double unif[], texTexture *tex[],
   ndotl = vecDot(3, normal, light);
   DIFF_INT = fmax(0.0, ndotl);
 
-  // printf("DIFF_INT: %f\n", DIFF_INT);
+  double reflect[3];
+  double rdotc;
 
-  rgbz[0] = DIFF_INT * unif[renUNIFLIGHTR] * tex[0]->sample[renTEXR];
-  rgbz[1] = DIFF_INT * unif[renUNIFLIGHTG] * tex[0]->sample[renTEXG];
-  rgbz[2] = DIFF_INT * unif[renUNIFLIGHTB] * tex[0]->sample[renTEXB];
+  vecScale(3, 2 * ndotl, normal, sub_vec);
+  vecSubtract(3, sub_vec, light, reflect);
+  vecUnit(3, reflect, reflect);
+  rdotc = vecDot(3, reflect, cam_vec);
+  SPEC_INT = fmax(0.0, rdotc);
+  SPEC_INT = pow(SPEC_INT, 30);
+
+  if (SPEC_INT > 0.0) printf("SPEC_INT: %f\n", SPEC_INT);
+
+  rgbz[0] = (SPEC_INT + DIFF_INT) * unif[renUNIFLIGHTR] * tex[0]->sample[renTEXR];
+  rgbz[1] = (SPEC_INT + DIFF_INT) * unif[renUNIFLIGHTG] * tex[0]->sample[renTEXG];
+  rgbz[2] = (SPEC_INT + DIFF_INT) * unif[renUNIFLIGHTB] * tex[0]->sample[renTEXB];
   rgbz[3] = depthGetZ(ren->depth, vary[renVARYX], vary[renVARYY]);
 }
 
@@ -300,7 +326,7 @@ int main(void) {
     ren.attrDim = 8;
     ren.varyDim = 15;
     ren.texNum = 1;
-    ren.unifDim = 44;
+    ren.unifDim = 47;
     ren.colorPixel = colorPixel;
     ren.transformVertex = transformVertex;
     ren.updateUniform = updateUniform;

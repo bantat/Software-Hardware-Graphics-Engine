@@ -98,7 +98,7 @@ void meshRender(meshMesh *mesh, renRenderer *ren, double unif[],
                            meshGetTransformedVertexPointer(mesh, ren, i));
     for (i = 0; i < mesh->triNum; i += 1) {
       tri = meshGetTrianglePointer(mesh, i);
-      printf("clipping transformed vertices\n");
+      //printf("clipping transformed vertices\n");
       clipRender(ren, unif, tex,
                  meshGetTransformedVertexPointer(mesh, ren, tri[0]),
                  meshGetTransformedVertexPointer(mesh, ren, tri[1]),

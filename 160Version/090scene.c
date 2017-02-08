@@ -68,9 +68,9 @@ void sceneRender(sceneNode *node, renRenderer *ren, double *unifParent) {
   /* Your job is to implement this function!! */
   ren->updateUniform(ren, node->unif, unifParent);
   // printf("%f\n",node->unif[renUNIFRHO]);
-  printf("rendering mesh\n");
+  //printf("rendering mesh\n");
   meshRender(node->mesh, ren, node->unif, node->tex);
-  printf("mesh rendered\n");
+  //printf("mesh rendered\n");
 
   if (node->firstChild != NULL) {
     sceneRender(node->firstChild, ren, node->unif);

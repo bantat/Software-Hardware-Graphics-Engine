@@ -158,7 +158,7 @@ void clipRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
   // printf("[%f, %f, %f, %f]\n",a[0],a[1],a[2],a[3] );
 
   if (a_clip == 1 && b_clip == 1 && c_clip == 1) {
-    printf("clipped triangle\n");
+    //printf("clipped triangle\n");
     return;
   } else if (a_clip == 0 && b_clip == 0 && c_clip == 0) {
 
@@ -170,8 +170,8 @@ void clipRender(renRenderer *ren, double unif[], texTexture *tex[], double a[],
     doViewPort(ren, b, view_b);
     doViewPort(ren, c, view_c);
 
-    printf("No clip, rendering... [%f,%f,%f] [%f,%f,%f] [%f,%f,%f]\n", a[0],
-           a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]);
+    // printf("No clip, rendering... [%f,%f,%f] [%f,%f,%f] [%f,%f,%f]\n", a[0],
+    //        a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]);
     triRender(ren, unif, tex, view_a, view_b, view_c);
   } else {
     if (a_clip == 1 && b_clip == 0 && c_clip == 0) {
