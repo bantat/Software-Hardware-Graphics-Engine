@@ -76,7 +76,7 @@ void sceneRender(sceneNode *node, renRenderer *ren, double *unifParent) {
     sceneRender(node->firstChild, ren, node->unif);
   }
 
-  while (node->nextSibling != NULL) {
+  if (node->nextSibling != NULL) {
     sceneRender(node->nextSibling, ren, node->unif);
   }
 }

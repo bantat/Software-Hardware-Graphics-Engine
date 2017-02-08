@@ -4,7 +4,7 @@
 This files includes the main function that test the 020triangle.c rasterizing
 script.
 Run the script like so:
-clang 170mainSpecular.c 000pixel.o -lglfw -framework OpenGL
+clang 171mainSpecular.c 000pixel.o -lglfw -framework OpenGL
 */
 
 #include <stdio.h>

@@ -80,18 +80,51 @@ double x_val = 0.0;
 
 // double cam[2] = {M_PI/2,-1*M_PI/2};
 // double cam[2] = {M_PI/2,0.0};
-double cam[3] = {0.0, 0.0, 150.0};
+double cam[3] = {0.5, 0.0, 150.0};
 
 double target[3] = {0.0, 0.0, 0.0};
 ///////////////////////1.0,1.6
-double unif[44] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  1.0,  0.0,  0.0, 0.0, 0.0,
-                   1.0, 0.0, 0.0, 0.0, 0.0, 1.0,  0.0,  0.0,  0.0, 0.0, 1.0,
-                   0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  0.0,  0.0,  0.0, 0.0, 0.0,
-                   0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 200.0, 1.0, 1.0, 1.0};
-double unif2[44] = {0.0, 0.0, 0.0, 0.0, 0.0, -30.0, 1.0,  0.0,  0.0, 0.0, 0.0,
-                    1.0, 0.0, 0.0, 0.0, 0.0, 1.0,   0.0,  0.0,  0.0, 0.0, 1.0,
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0,   0.0,  0.0,  0.0, 0.0, 0.0,
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  0.0, 200.0, 1.0, 1.0, 1.0};
+double unif[44] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+
+                    1.0, 0.0, 0.0, 0.0,
+                    0.0, 1.0, 0.0, 0.0,
+                    0.0, 0.0, 1.0, 0.0,
+                    0.0, 0.0, 0.0, 1.0,
+
+                                  0.0, 0.0, 0.0, 0.0,
+                                  0.0, 0.0, 0.0, 0.0,
+                                  0.0, 0.0, 0.0, 0.0,
+                                  0.0, 0.0, 0.0, 0.0,
+
+                                  20.0, 20.0, 0.0, 1.0, 1.0, 1.0};
+
+double unif2[44] = {0.0, 0.0, 0.0, 10.0, 10.0, -10.0,
+
+                      1.0, 0.0, 0.0, 0.0,
+                      0.0, 1.0, 0.0, 0.0,
+                      0.0, 0.0, 1.0, 0.0,
+                      0.0, 0.0, 0.0, 1.0,
+
+                                  0.0, 0.0, 0.0, 0.0,
+                                  0.0, 0.0, 0.0, 0.0,
+                                  0.0, 0.0, 0.0, 0.0,
+                                  0.0, 0.0, 0.0, 0.0,
+
+                                  20.0, 20.0, 0.0, 1.0, 1.0, 1.0};
+
+double unif3[44] = {0.0, 0.0, 0.0, -10.0, 10.0, -10.0,
+
+                      1.0, 0.0, 0.0, 0.0,
+                      0.0, 1.0, 0.0, 0.0,
+                      0.0, 0.0, 1.0, 0.0,
+                      0.0, 0.0, 0.0, 1.0,
+
+                                  0.0, 0.0, 0.0, 0.0,
+                                  0.0, 0.0, 0.0, 0.0,
+                                  0.0, 0.0, 0.0, 0.0,
+                                  0.0, 0.0, 0.0, 0.0,
+
+                                  20.0, 20.0, 0.0, 1.0, 1.0, 1.0};
 
 /* Writes the vary vector, based on the other parameters. */
 void transformVertex(renRenderer *ren, double unif[], double attr[],
@@ -118,9 +151,9 @@ void transformVertex(renRenderer *ren, double unif[], double attr[],
   vary[renVARYS] = attr[renATTRS];
   vary[renVARYT] = attr[renATTRT];
 
-  vary[renVARYWORLDX] = RtimesXYZvec[0];
-  vary[renVARYWORLDY] = RtimesXYZvec[1];
-  vary[renVARYWORLDZ] = RtimesXYZvec[2];
+  vary[renVARYWORLDX] = MtimesRvec[0];
+  vary[renVARYWORLDY] = MtimesRvec[1];
+  vary[renVARYWORLDZ] = MtimesRvec[2];
 
   vary[renVARYWORLDN] = RtimesNOPvec[0];
   vary[renVARYWORLDO] = RtimesNOPvec[1];
@@ -222,13 +255,13 @@ void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
 
   } else if (button == GLFW_KEY_UP) {
     if (cam[0] - 0.05 < 0.0) {
-      cam[0] = M_PI;
+      cam[0] = cam[0] - 0.05;
     } else {
       cam[0] = cam[0] - 0.05;
     }
   } else if (button == GLFW_KEY_DOWN) {
     if (cam[0] + 0.05 > M_PI) {
-      cam[0] = 0.0;
+      cam[0] = -M_PI;
     } else {
       cam[0] = cam[0] + 0.05;
     }
@@ -246,13 +279,10 @@ void handleKeyUp(int button, int shiftIsDown, int controlIsDown,
       cam[1] = cam[1] + 0.05;
     }
   } else if (button == GLFW_KEY_KP_ADD || button == GLFW_KEY_W) {
-    cam[2] = cam[2] + 5.0;
+    cam[2] = cam[2] + 1.0;
   } else if (button == GLFW_KEY_KP_SUBTRACT || button == GLFW_KEY_S) {
-    if (cam[2] - 5.0 < 5.0) {
-      return;
-    } else {
-      cam[2] = cam[2] - 5.0;
-    }
+      cam[2] = cam[2] - 1.0;
+
   }
 }
 
@@ -261,11 +291,14 @@ void draw() {
   //printf("viewing updated\n");
   depthClearZs(&dep, -1000);
   pixClearRGB(0.0, 0.0, 0.0);
-  //printf("rendering scene\n");
   sceneRender(&scen0, &ren, NULL);
+
 }
 
-void handleRotation() { renLookAt(&ren, target, cam[2], cam[0], cam[1]); }
+void handleRotation() {
+  //cam[1] = cam[1] + 0.01;
+  renLookAt(&ren, target, cam[2], cam[0], cam[1]);
+}
 
 void handleTimeStep(double oldTime, double newTime) {
   if (floor(newTime) - floor(oldTime) >= 1.0)
@@ -315,20 +348,27 @@ int main(void) {
     /////////////////////////left , right, bottom, top,base, lid
     meshInitializeBox(&mesh0, -10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
     meshInitializeSphere(&mesh1, 5, 20, 20);
+    meshInitializeSphere(&mesh2, 5, 20, 20);
 
     sceneInitialize(&scen0, &ren, unif, tex, &mesh0, NULL, NULL);
     sceneInitialize(&scen1, &ren, unif, tex, &mesh1, NULL, NULL);
+    sceneInitialize(&scen2, &ren, unif, tex, &mesh2, NULL, NULL);
+
     sceneSetTexture(&scen1, &ren, 0, &texture1);
+    sceneSetTexture(&scen2, &ren, 0, &texture1);
+
     sceneSetUniform(&scen1, &ren, unif2);
+    sceneSetUniform(&scen2, &ren, unif3);
     sceneAddChild(&scen0, &scen1);
+    sceneAddSibling(&scen0, &scen2);
 
     renLookAt(&ren, target, cam[2], cam[0], cam[1]);
     // renSetFrustum(&ren, renORTHOGRAPHIC, M_PI/6.0, 10.0, 10.0);
     renSetFrustum(&ren, renPERSPECTIVE, M_PI / 6.0, 10.0, 10.0);
-    // printf("pi is: %f\n",M_PI);
+    //printf("pi is: %f\n",M_PI);
 
     draw();
-    // printf("Scene Drawn.\n");
+     //printf("Scene Drawn.\n");
     pixRun();
     // printf("PixRun\n");
 
@@ -337,6 +377,7 @@ int main(void) {
     depthDestroy(&dep);
     texDestroy(tex[1]);
     meshDestroy(&mesh1);
+    meshDestroy(&mesh2);
     sceneDestroyRecursively(&scen0);
 
     return 0;
