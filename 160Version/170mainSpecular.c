@@ -4,7 +4,7 @@
 This files includes the main function that test the 020triangle.c rasterizing
 script.
 Run the script like so:
-clang 170mainSpecular.c 000pixel.o -lglfw -framework OpenGL
+clang 171mainSpecular.c 000pixel.o -lglfw -framework OpenGL
 */
 
 #include <stdio.h>
@@ -129,8 +129,8 @@ double unif3[47] = {0.0, 0.0, 0.0, 10.0, -10.0, 10.0,
                                   0.0, 0.0, 0.0, 0.0,
                                   0.0, 0.0, 0.0, 0.0,
 
-                                  20.0, 20.0, 20.0, 1.0, 1.0, 1.0,
-                                  0.0, 0.0, 100.0};
+                                  0.0, 0.0, 200.0, 1.0, 1.0, 1.0,
+                                  0.0, 0.0, 0.0};
 
 /* Writes the vary vector, based on the other parameters. */
 void transformVertex(renRenderer *ren, double unif[], double attr[],
@@ -253,9 +253,9 @@ void colorPixel(renRenderer *ren, double unif[], texTexture *tex[],
 
   //if (SPEC_INT > 0.0) printf("SPEC_INT: %f\n", SPEC_INT);
 
-  rgbz[0] = (SPEC_INT + DIFF_INT + (amb*unif[renUNIFLIGHTR])) * unif[renUNIFLIGHTR] * tex[0]->sample[renTEXR];
-  rgbz[1] = (SPEC_INT + DIFF_INT + (amb*unif[renUNIFLIGHTG])) * unif[renUNIFLIGHTG] * tex[0]->sample[renTEXG];
-  rgbz[2] = (SPEC_INT + DIFF_INT + (amb*unif[renUNIFLIGHTB])) * unif[renUNIFLIGHTB] * tex[0]->sample[renTEXB];
+  rgbz[0] = (SPEC_INT + DIFF_INT) * unif[renUNIFLIGHTR] * tex[0]->sample[renTEXR];
+  rgbz[1] = (SPEC_INT + DIFF_INT) * unif[renUNIFLIGHTG] * tex[0]->sample[renTEXG];
+  rgbz[2] = (SPEC_INT + DIFF_INT) * unif[renUNIFLIGHTB] * tex[0]->sample[renTEXB];
   rgbz[3] = depthGetZ(ren->depth, vary[renVARYX], vary[renVARYY]);
 }
 
