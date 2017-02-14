@@ -110,10 +110,13 @@ void meshGLRender(meshGLMesh *meshGL, GLuint attrNum, GLuint attrDims[],
   GLint offset_num = 0;
 
   for (GLuint i = 0; i < attrNum; i++) {
-    GLuint attrDim = attrDims[i];
     glEnableVertexAttribArray(attrLocs[i]);
+  }
 
-    glBindBuffer(GL_ARRAY_BUFFER, meshGL->buffers[0]);
+  glBindBuffer(GL_ARRAY_BUFFER, meshGL->buffers[0]);
+
+  for (GLuint i = 0; i < attrNum; i++) {
+    GLuint attrDim = attrDims[i];
     glVertexAttribPointer(attrLocs[i], attrDim, GL_DOUBLE, GL_FALSE,
                           meshGL->attrDim * sizeof(GLdouble),
                           BUFFER_OFFSET(offset_num * sizeof(GLdouble)));
