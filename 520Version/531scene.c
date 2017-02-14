@@ -147,45 +147,39 @@ uniform information is analogous, but sceneRender loads it, not meshGLRender. */
 void sceneRender(sceneNode *node, GLdouble parent[4][4], GLint modelingLoc,
 		GLuint unifNum, GLuint unifDims[], GLint unifLocs[],
 		GLuint attrNum, GLuint attrDims[], GLint attrLocs[]) {
+			if (node == NULL) {
+	return;
+}
+else {
 	/* Set the uniform modeling matrix. */
+	GLdouble m[4][4];
+	GLdouble toUniforms[4][4];
+	GLfloat openGL[4][4];
+	mat44Isometry(node->rotation, node->translation, m);
+	mat444Multiply(parent, m, toUniforms);
+	mat44OpenGL(toUniforms, openGL);
+	glUniformMatrix4fv(modelingLoc, 1, GL_FALSE, (GLfloat *)openGL);
 
-
-	GLdouble model[4][4];
-	mat44Isometry(node->rotation, node->translation, model);
-	GLdouble iso[4][4];
-	mat444Multiply(parent, model, iso);
-	GLfloat unif_mat[4][4];
-	mat44OpenGL(iso, unif_mat);
-	glUniformMatrix4fv(modelingLoc, 1, GL_FALSE, (GLfloat *)unif_mat);
-	/* !! */
 	/* Set the other uniforms. The casting from double to float is annoying. */
-	for (GLuint i = 0; i < unifNum; i++) {
-		GLuint unifDim = unifDims[i];
-		if (unifDim == 1) {
-			glUniform1fv(unifLocs[i], 1, (GLfloat *)node->unif);
-		} else if (unifDim == 2) {
-			glUniform2fv(unifLocs[i], 1, (GLfloat *)node->unif);
-		} else if (unifDim == 3) {
-			glUniform3fv(unifLocs[i], 1, (GLfloat *)node->unif);
-		} else if (unifDim == 4) {
-			glUniform4fv(unifLocs[i], 1, (GLfloat *)node->unif);
-		}
-	}
-	/* !! */
+	glUniform2fv(unifLocs[0], 1, (GLfloat *)node->unif);
+
+	printf("locs %d\n",unifLocs[0] );
+	GLfloat temp[2];
+	//vecOpenGL(2,node->unif, temp);
+	//vecPrintD(2,temp);
+
 	/* Render the mesh, the children, and the younger siblings. */
 	meshGLRender(node->meshGL, attrNum, attrDims, attrLocs);
-	printf("mesh rendered\n");
-
-	if (node->firstChild != NULL) {
-		printf("rendering child\n");
-		sceneRender(node->firstChild, iso, modelingLoc, unifNum, unifDims,
-																	unifLocs, attrNum, attrDims, attrLocs);
-  }
-
-  if (node->nextSibling != NULL) {
-		printf("rendering sibling\n");
-    sceneRender(node->nextSibling, parent, modelingLoc, unifNum, unifDims,
-			 														unifLocs, attrNum, attrDims, attrLocs);
-  }
+	fflush(stdout);
+	sceneRender(node->firstChild, toUniforms, modelingLoc, unifNum, unifDims, unifLocs,
+		attrNum, attrDims, attrLocs);
+	sceneRender(node->nextSibling, parent, modelingLoc, unifNum, unifDims, unifLocs,
+		attrNum, attrDims, attrLocs);
+}
+	/* Set the uniform modeling matrix. */
+	/* !! */
+	/* Set the other uniforms. The casting from double to float is annoying. */
+	/* !! */
+	/* Render the mesh, the children, and the younger siblings. */
 	/* !! */
 }
