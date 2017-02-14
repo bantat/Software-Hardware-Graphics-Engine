@@ -61,9 +61,9 @@ void handleKey(GLFWwindow *window, int key, int scancode, int action,
 	}
 }
 
-/* Returns 0 on success, non-zero on failure. Warning: If initialization fails 
-midway through, then does not properly deallocate all resources. But that's 
-okay, because the program terminates almost immediately after this function 
+/* Returns 0 on success, non-zero on failure. Warning: If initialization fails
+midway through, then does not properly deallocate all resources. But that's
+okay, because the program terminates almost immediately after this function
 returns. */
 int initializeScene(void) {
 	/* Initialize meshes. */
@@ -154,7 +154,7 @@ void render(void) {
 	mat44Identity(identity);
 	GLuint unifDims[1] = {2};
 	GLuint attrDims[3] = {3, 2, 3};
-	sceneRender(&rootNode, identity, modelingLoc, 1, unifDims, unifLocs, 3, 
+	sceneRender(&rootNode, identity, modelingLoc, 1, unifDims, unifLocs, 3,
 		attrDims, attrLocs);
 }
 
@@ -171,7 +171,7 @@ int main(void) {
     glfwSetWindowSizeCallback(window, handleResize);
     glfwSetKeyCallback(window, handleKey);
     glfwMakeContextCurrent(window);
-    fprintf(stderr, "main: OpenGL %s, GLSL %s.\n", 
+    fprintf(stderr, "main: OpenGL %s, GLSL %s.\n",
 		glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
     glEnable(GL_DEPTH_TEST);
     glDepthRange(1.0, 0.0);
@@ -183,7 +183,7 @@ int main(void) {
     if (initializeShaderProgram() != 0)
     	return 4;
     GLdouble target[3] = {0.0, 0.0, 0.0};
-	camSetControls(&cam, camPERSPECTIVE, M_PI / 6.0, 10.0, 512.0, 512.0, 10.0, 
+	camSetControls(&cam, camPERSPECTIVE, M_PI / 6.0, 10.0, 512.0, 512.0, 10.0,
 		M_PI / 4.0, M_PI / 4.0, target);
     while (glfwWindowShouldClose(window) == 0) {
         render();
@@ -197,5 +197,3 @@ int main(void) {
     glfwTerminate();
     return 0;
 }
-
-

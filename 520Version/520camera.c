@@ -128,6 +128,8 @@ void camRender(camCamera *cam, GLint viewingLoc) {
 	GLdouble viewing[4][4];
 	GLfloat GLview[4][4];
 
+	///our mat33AngleAxisRotation is broken
+
 	mat44InverseIsometry(cam->rotation, cam->translation, C_Inv_M);
 
 	if (cam->projectionType == camORTHOGRAPHIC) {

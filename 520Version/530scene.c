@@ -148,32 +148,41 @@ void sceneRender(sceneNode *node, GLdouble parent[4][4], GLint modelingLoc,
 		GLuint unifNum, GLuint unifDims[], GLint unifLocs[],
 		GLuint attrNum, GLuint attrDims[], GLint attrLocs[]) {
 	/* Set the uniform modeling matrix. */
-	GLdouble transform[4][4];
-	mat44Isometry(node->rotation, node->translation, transform);
+	GLdouble model[4][4];
+	mat44Isometry(node->rotation, node->translation, model);
 	GLdouble isom[4][4];
-	mat444Multiply(parent, transform, isom);
+	mat444Multiply(parent, model, isom);
 	GLfloat unif_mat[4][4];
 	mat44OpenGL(isom, unif_mat);
-	glUniform4fv(modelingLoc, 1, (GLfloat *)unif_mat);
+	glUniformMatrix4fv(modelingLoc, 1,GL_FALSE, (GLfloat *)unif_mat);
 	/* !! */
 	/* Set the other uniforms. The casting from double to float is annoying. */
+
+	///// Our mat33AngleAxisRotation is sooooo broken
+	
 	for (GLuint i = 0; i < unifNum; i++) {
 		GLuint unifDim = unifDims[i];
 		if (unifDim == 1) {
 			GLfloat values[1];
-			vecOpenGL(1, (GLint *)unifLocs[i], values);
+			vecOpenGL(1,node->unif,values);
 			glUniform1fv(unifLocs[i], 1, (GLfloat *)values);
 		} else if (unifDim == 2) {
-			GLfloat values[2];
-			vecOpenGL(2, (GLint *)unifLocs[i], values);
-			glUniform2fv(unifLocs[i], 1, (GLfloat *)values);
+
+			GLfloat v[2];
+			printf("%f\n", node->unif[0]);
+			vecOpenGL(2,node->unif,v);
+			glUniform2fv(unifLocs[i], 1, (GLfloat *)v);
+
 		} else if (unifDim == 3) {
+
 			GLfloat values[3];
-			vecOpenGL(3, (GLint*)unifLocs[i], values);
+			vecOpenGL(3,node->unif,values);
 			glUniform3fv(unifLocs[i], 1, (GLfloat *)values);
+
 		} else if (unifDim == 4) {
+
 			GLfloat values[4];
-			vecOpenGL(4, (GLint *)unifLocs[i], values);
+			vecOpenGL(4,node->unif,values);
 			glUniform4fv(unifLocs[i], 1, (GLfloat *)values);
 		}
 	}
@@ -182,6 +191,7 @@ void sceneRender(sceneNode *node, GLdouble parent[4][4], GLint modelingLoc,
 	meshGLRender(node->meshGL, attrNum, attrDims, attrLocs);
 
 	if (node->firstChild != NULL) {
+
 		sceneRender(node->firstChild, isom, modelingLoc, unifNum, unifDims,
 																	unifLocs, attrNum, attrDims, attrLocs);
   }

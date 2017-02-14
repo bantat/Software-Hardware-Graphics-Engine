@@ -26,6 +26,13 @@ void vecCopy(int dim, GLdouble v[], GLdouble copy[]) {
 	}
 }
 
+void vecPrintD(int dim,GLfloat v[]){
+	printf("**vector**\n");
+	for (int i=0; i < dim ; i++){
+		printf("[%f]\n",v[i] );
+	}
+}
+
 /* Adds the dim-dimensional vectors v and w. */
 void vecAdd(int dim, GLdouble v[], GLdouble w[], GLdouble vPlusW[]) {
 	for (int i = 0; i < dim; i++) {
