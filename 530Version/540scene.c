@@ -55,12 +55,12 @@ void sceneSetOneUniform(sceneNode *node, int index, double unif) {
 }
 
 /* Copies the unifDim-dimensional vector from unif into the node. */
-void sceneSetTexture(sceneNode *node, texTexture *texList[]) {
-  vecCopy(node->texNum, texList, node->tex);
+void sceneSetTexture(sceneNode *node, texTexture texList[]) {
+  node->tex = &texList;
 }
 
 /* Sets one uniform in the node, based on its index in the unif array. */
-void sceneSetOneTexture(sceneNode *node, int index, texTexture **tex) {
+void sceneSetOneTexture(sceneNode *node, int index, texTexture *tex) {
   node->tex[index] = tex;
 }
 
@@ -181,7 +181,14 @@ void sceneRender(sceneNode *node, GLdouble parent[4][4], GLint modelingLoc,
   }
   /* !! */
   /* Render the mesh, the children, and the younger siblings. */
+
+
+  for (GLuint i = 0; i < node->texNum; i++) {
+    glBindTexture(GL_TEXTURE_2D, node->tex[i]->openGL);
+    glUniform1i(textureLocs[i], i);
+  }
   meshGLRender(node->meshGL, attrNum, attrDims, attrLocs);
+  glBindTexture(GL_TEXTURE_2D, 0);
 
   if (node->firstChild != NULL) {
     sceneRender(node->firstChild, iso, modelingLoc, unifNum, unifDims, unifLocs,
