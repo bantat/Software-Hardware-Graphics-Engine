@@ -17,7 +17,6 @@ void mat22Print(GLdouble m[2][2]) {
 matrix is not invertible, and mInv is untouched. If the determinant is not 0.0,
 then the matrix is invertible, and its inverse is placed into mInv. */
 GLdouble mat22Invert(GLdouble m[2][2], GLdouble mInv[2][2]) {
-  printf("running mat22invert\n");
   GLdouble deter = (m[0][0] * m[1][1]) - (m[0][1] * m[1][0]);
   if (deter == 0.0)
     return deter;
@@ -33,7 +32,6 @@ GLdouble mat22Invert(GLdouble m[2][2], GLdouble mInv[2][2]) {
 /* Multiplies a 2x2 matrix m by a 2-column v, storing the result in mTimesV.
 The output should not */
 void mat221Multiply(GLdouble m[2][2], GLdouble v[2], GLdouble mTimesV[2]) {
-  printf("running mat221mult\n");
   mTimesV[0] = (v[0] * m[0][0]) + (v[1] * m[0][1]);
   mTimesV[1] = (v[0] * m[1][0]) + (v[1] * m[1][1]);
 }
@@ -49,7 +47,6 @@ void mat22Columns(GLdouble col0[2], GLdouble col1[2], GLdouble m[2][2]) {
 /*** 3 x 3 Matrices ***/
 
 void mat33Transpose(GLdouble m[3][3], GLdouble m_T[3][3]) {
-  printf("running mat33trans\n");
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 3; j++) {
       m_T[i][j] = m[j][i];
@@ -60,7 +57,6 @@ void mat33Transpose(GLdouble m[3][3], GLdouble m_T[3][3]) {
 /* Multiplies the 3x3 matrix m by the 3x3 matrix n. */
 void mat333Multiply(GLdouble m[3][3], GLdouble n[3][3],
                     GLdouble mTimesN[3][3]) {
-  printf("running mat333mult\n");
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 3; j++) {
       mTimesN[i][j] = m[i][0] * n[0][j] + m[i][1] * n[1][j] + m[i][2] * n[2][j];
@@ -70,7 +66,6 @@ void mat333Multiply(GLdouble m[3][3], GLdouble n[3][3],
 
 /* Multiplies the 3x3 matrix m by the 3x1 matrix v. */
 void mat331Multiply(GLdouble m[3][3], GLdouble v[3], GLdouble mTimesV[3]) {
-  printf("running mat331mult\n");
   for (int i = 0; i < 3; i++) {
     mTimesV[i] = m[i][0] * v[0] + m[i][1] * v[1] + m[i][2] * v[2];
   }
@@ -82,7 +77,6 @@ theta (in radians, counterclockwise), and then translates by the vector (x, y).
 */
 void mat33Isometry(GLdouble theta, GLdouble x, GLdouble y,
                    GLdouble isom[3][3]) {
-  printf("running mat33isom\n");
   GLdouble s = sin(theta);
   GLdouble c = cos(theta);
 
@@ -102,7 +96,6 @@ rotation matrix for the rotation about that axis through that angle. Based on
 Rodrigues' rotation formula R = I + (sin theta) U + (1 - cos theta) U^2. */
 void mat33AngleAxisRotation(GLdouble theta, GLdouble axis[3],
                             GLdouble rot[3][3]) {
-  printf("running mat33angleaxis\n");
   GLdouble U[3][3];
   GLdouble Usq[3][3];
 
@@ -133,7 +126,6 @@ Given two length-1 3D vectors a, b that are perpendicular to each other. Builds
 the rotation matrix that rotates u to a and v to b. */
 void mat33BasisRotation(GLdouble u[3], GLdouble v[3], GLdouble a[3],
                         GLdouble b[3], GLdouble rot[3][3]) {
-  printf("running mat33basis\n");
   GLdouble R[3][3];
   GLdouble S[3][3];
 
@@ -179,7 +171,6 @@ void mat33BasisRotation(GLdouble u[3], GLdouble v[3], GLdouble a[3],
 }
 
 void mat33Identity(GLdouble m[3][3]) {
-  printf("running mat33identity\n");
   m[0][0] = 1.0;
   m[0][1] = 0.0;
   m[0][2] = 0.0;
@@ -192,7 +183,6 @@ void mat33Identity(GLdouble m[3][3]) {
 }
 
 void mat44Identity(GLdouble m[4][4]) {
-  printf("running mat44identity\n");
   m[0][0] = 1.0;
   m[0][1] = 0.0;
   m[0][2] = 0.0;
@@ -217,7 +207,6 @@ matrices. Second, C matrices are implicitly stored one-row-after-another, while
 OpenGL expects matrices to be stored one-column-after-another. This function
 plows through both of those obstacles. */
 void mat44OpenGL(GLdouble m[4][4], GLfloat openGL[4][4]) {
-  printf("running mat44opengl\n");
   for (int i = 0; i < 4; i += 1)
     for (int j = 0; j < 4; j += 1) openGL[i][j] = m[j][i];
 }
@@ -225,7 +214,6 @@ void mat44OpenGL(GLdouble m[4][4], GLfloat openGL[4][4]) {
 /* Multiplies m by n, placing the answer in mTimesN. */
 void mat444Multiply(GLdouble m[4][4], GLdouble n[4][4],
                     GLdouble mTimesN[4][4]) {
-  printf("running mat444mult\n");
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
       mTimesN[i][j] = m[i][0] * n[0][j] + m[i][1] * n[1][j] +
@@ -236,7 +224,6 @@ void mat444Multiply(GLdouble m[4][4], GLdouble n[4][4],
 
 /* Multiplies m by v, placing the answer in mTimesV. */
 void mat441Multiply(GLdouble m[4][4], GLdouble v[4], GLdouble mTimesV[4]) {
-  printf("running mat441mult\n");
   for (int i = 0; i < 4; i++) {
     mTimesV[i] =
         m[i][0] * v[0] + m[i][1] * v[1] + m[i][2] * v[2] + m[i][3] * v[3];
@@ -246,7 +233,6 @@ void mat441Multiply(GLdouble m[4][4], GLdouble v[4], GLdouble mTimesV[4]) {
 /* Given a rotation and a translation, forms the 4x4 homogeneous matrix
 representing the rotation followed in time by the translation. */
 void mat44Isometry(GLdouble rot[3][3], GLdouble trans[3], GLdouble isom[4][4]) {
-  printf("running mat44isom\n");
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 3; j++) {
       isom[i][j] = rot[i][j];
@@ -281,7 +267,6 @@ That is, the isom produced by this function is the inverse to the isom
 produced by mat44Isometry on the same inputs. */
 void mat44InverseIsometry(GLdouble rot[3][3], GLdouble trans[3],
                           GLdouble isom[4][4]) {
-  printf("running mat44invisom\n");
   GLdouble rot_T[3][3];
   mat33Transpose(rot, rot_T);
 
@@ -304,7 +289,6 @@ void mat44InverseIsometry(GLdouble rot[3][3], GLdouble trans[3],
 }
 
 void mat44Copy(GLdouble input[4][4], GLdouble copy[4][4]) {
-  printf("running mat44copy\n");
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
       copy[i][j] = input[i][j];
@@ -320,8 +304,6 @@ the viewing volume to [-1, 1] x [-1, 1] x [-1, 1]. */
 void mat44Orthographic(GLdouble left, GLdouble right, GLdouble bottom,
                        GLdouble top, GLdouble far, GLdouble near,
                        GLdouble proj[4][4]) {
-  // printf("near: %f, far: %f\n", near, far);
-  printf("running mat44ortho\n");
   proj[0][0] = 2.0 / (right - left);
   proj[0][1] = 0.0;
   proj[0][2] = 0.0;
@@ -344,7 +326,6 @@ void mat44Orthographic(GLdouble left, GLdouble right, GLdouble bottom,
 /* Builds a 4x4 matrix that maps a projected viewing volume
 [-1, 1] x [-1, 1] x [-1, 1] to screen [0, w - 1] x [0, h - 1] x [-1, 1]. */
 void mat44Viewport(GLdouble width, GLdouble height, GLdouble view[4][4]) {
-  printf("running mat44viewport\n");
   view[0][0] = (width - 1.0) / 2.0;
   view[0][1] = 0.0;
   view[0][2] = 0.0;
@@ -371,7 +352,6 @@ volume to [-1, 1] x [-1, 1] x [-1, 1]. */
 void mat44Perspective(GLdouble left, GLdouble right, GLdouble bottom,
                       GLdouble top, GLdouble far, GLdouble near,
                       GLdouble proj[4][4]) {
-  printf("running mat44perspective\n");
   proj[0][0] = (-2.0 * near) / (right - left);
   proj[0][1] = 0.0;
   proj[0][2] = (right + left) / (right - left);
