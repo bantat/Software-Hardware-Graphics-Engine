@@ -184,20 +184,23 @@ void sceneRender(sceneNode *node, GLdouble parent[4][4], GLint modelingLoc,
 
 
   for (GLuint i = 0; i < node->texNum; i++) {
+    printf("Breaking at glBinding in 540scene\n" );
     glBindTexture(GL_TEXTURE_2D, node->tex[i]->openGL);
+    printf("Got here\n" );
     glUniform1i(textureLocs[i], i);
   }
+
   meshGLRender(node->meshGL, attrNum, attrDims, attrLocs);
   glBindTexture(GL_TEXTURE_2D, 0);
 
   if (node->firstChild != NULL) {
     sceneRender(node->firstChild, iso, modelingLoc, unifNum, unifDims, unifLocs,
-                attrNum, attrDims, attrLocs);
+                attrNum, attrDims, attrLocs,textureLocs);
   }
 
   if (node->nextSibling != NULL) {
     sceneRender(node->nextSibling, parent, modelingLoc, unifNum, unifDims,
-                unifLocs, attrNum, attrDims, attrLocs);
+                unifLocs, attrNum, attrDims, attrLocs,textureLocs);
   }
   /* !! */
 }
