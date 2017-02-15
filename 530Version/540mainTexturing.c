@@ -23,11 +23,12 @@ GLuint program;
 GLint attrLocs[3];
 GLint viewingLoc, modelingLoc;
 GLint unifLocs[1];
-GLint textureLoc[2];
+GLint textureLoc, textureBLoc;
 camCamera cam;
 /* Allocate three meshes and three scene graph nodes. */
 meshGLMesh rootMesh, childMesh, siblingMesh;
 sceneNode rootNode, childNode, siblingNode;
+texTexture *tex[2];
 texTexture texture, texture1;
 
 void handleError(int error, const char *description) {
@@ -70,8 +71,9 @@ returns. */
 int initializeScene(void) {
   /* Initialize meshes. */
   meshMesh mesh;
-
+// might not need to do this since its being done in tex render. 
   glActiveTexture(GL_TEXTURE0);
+  glActiveTexture(GL_TEXTURE1);
   glEnable(GL_TEXTURE_2D);
 
   if (texInitializeFile(&texture, "box.jpg",
@@ -83,6 +85,9 @@ int initializeScene(void) {
                         GL_LINEAR,GL_LINEAR,GL_REPEAT,GL_REPEAT) != 0) {
       return 3;
   }
+
+  tex[0] = &texture;
+  tex[1] = &texture1;
 
   if (meshInitializeCapsule(&mesh, 0.5, 2.0, 16, 32) != 0) return 1;
   meshGLInitialize(&rootMesh, &mesh);
@@ -105,9 +110,9 @@ int initializeScene(void) {
   sceneSetTranslation(&siblingNode, trans);
   GLdouble unif[2] = {1.0, 1.0};
 
-  sceneSetTexture(&siblingNode, &texture1);
-  sceneSetTexture(&childNode, &texture);
-  sceneSetTexture(&rootNode, &texture1);
+  sceneSetTexture(&siblingNode,tex);
+  sceneSetTexture(&childNode,tex);
+  sceneSetTexture(&rootNode,tex);
   sceneSetUniform(&siblingNode, unif);
   sceneSetUniform(&childNode, unif);
   sceneSetUniform(&rootNode, unif);
@@ -142,6 +147,7 @@ int initializeShaderProgram(void) {
   GLchar fragmentCode[] =
       "\
     uniform sampler2D texture;\
+    uniform sampler2D texture1;\
 		varying vec4 rgba;\
     varying vec2 st;\
 		void main() {\
@@ -156,8 +162,8 @@ int initializeShaderProgram(void) {
     viewingLoc = glGetUniformLocation(program, "viewing");
     modelingLoc = glGetUniformLocation(program, "modeling");
     unifLocs[0] = glGetUniformLocation(program, "spice");
-		textureLoc[0] = glGetUniformLocation(program, "texture");
-    textureLoc[1] = glGetUniformLocation(program, "texture1");
+		textureLoc = glGetUniformLocation(program, "texture");
+    textureBLoc = glGetUniformLocation(program, "texture1");
   }
   return (program == 0);
 }

@@ -183,15 +183,9 @@ void sceneRender(sceneNode *node, GLdouble parent[4][4], GLint modelingLoc,
   /* Render the mesh, the children, and the younger siblings. */
 
 
-  for (GLuint i = 0; i < node->texNum; i++) {
-    printf("Breaking at glBinding in 540scene\n" );
-    glBindTexture(GL_TEXTURE_2D, node->tex[i]->openGL);
-    printf("Got here\n" );
-    glUniform1i(textureLocs[i], i);
-  }
-
+  //texRender here  
   meshGLRender(node->meshGL, attrNum, attrDims, attrLocs);
-  glBindTexture(GL_TEXTURE_2D, 0);
+  //textUnrender here
 
   if (node->firstChild != NULL) {
     sceneRender(node->firstChild, iso, modelingLoc, unifNum, unifDims, unifLocs,
