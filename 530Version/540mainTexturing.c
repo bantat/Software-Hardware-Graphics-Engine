@@ -71,19 +71,19 @@ returns. */
 int initializeScene(void) {
   /* Initialize meshes. */
   meshMesh mesh;
-// might not need to do this since its being done in tex render. 
+  // might not need to do this since its being done in tex render.
   glActiveTexture(GL_TEXTURE0);
   glActiveTexture(GL_TEXTURE1);
   glEnable(GL_TEXTURE_2D);
 
-  if (texInitializeFile(&texture, "box.jpg",
-                        GL_LINEAR,GL_LINEAR,GL_REPEAT,GL_REPEAT) != 0) {
-      return 3;
+  if (texInitializeFile(&texture, "box.jpg", GL_LINEAR, GL_LINEAR, GL_REPEAT,
+                        GL_REPEAT) != 0) {
+    return 3;
   }
 
-  if (texInitializeFile(&texture1, "beachball.jpg",
-                        GL_LINEAR,GL_LINEAR,GL_REPEAT,GL_REPEAT) != 0) {
-      return 3;
+  if (texInitializeFile(&texture1, "beachball.jpg", GL_LINEAR, GL_LINEAR,
+                        GL_REPEAT, GL_REPEAT) != 0) {
+    return 3;
   }
 
   tex[0] = &texture;
@@ -99,9 +99,11 @@ int initializeScene(void) {
   meshGLInitialize(&siblingMesh, &mesh);
   meshDestroy(&mesh);
   /* Initialize scene graph nodes. */
-  if (sceneInitialize(&siblingNode, 2,1, &siblingMesh, NULL, NULL) != 0) return 4;
-  if (sceneInitialize(&childNode, 2,1, &childMesh, NULL, NULL) != 0) return 5;
-  if (sceneInitialize(&rootNode, 2,1, &rootMesh, &childNode, &siblingNode) != 0)
+  if (sceneInitialize(&siblingNode, 2, 1, &siblingMesh, NULL, NULL) != 0)
+    return 4;
+  if (sceneInitialize(&childNode, 2, 1, &childMesh, NULL, NULL) != 0) return 5;
+  if (sceneInitialize(&rootNode, 2, 1, &rootMesh, &childNode, &siblingNode) !=
+      0)
     return 6;
   /* Customize the uniforms. */
   GLdouble trans[3] = {1.0, 0.0, 0.0};
@@ -110,9 +112,9 @@ int initializeScene(void) {
   sceneSetTranslation(&siblingNode, trans);
   GLdouble unif[2] = {1.0, 1.0};
 
-  sceneSetTexture(&siblingNode,tex);
-  sceneSetTexture(&childNode,tex);
-  sceneSetTexture(&rootNode,tex);
+  sceneSetTexture(&siblingNode, tex);
+  sceneSetTexture(&childNode, tex);
+  sceneSetTexture(&rootNode, tex);
   sceneSetUniform(&siblingNode, unif);
   sceneSetUniform(&childNode, unif);
   sceneSetUniform(&rootNode, unif);
@@ -162,7 +164,7 @@ int initializeShaderProgram(void) {
     viewingLoc = glGetUniformLocation(program, "viewing");
     modelingLoc = glGetUniformLocation(program, "modeling");
     unifLocs[0] = glGetUniformLocation(program, "spice");
-		textureLoc = glGetUniformLocation(program, "texture");
+    textureLoc = glGetUniformLocation(program, "texture");
     textureBLoc = glGetUniformLocation(program, "texture1");
   }
   return (program == 0);
@@ -184,9 +186,9 @@ void render(void) {
   mat44Identity(identity);
   GLuint unifDims[1] = {2};
   GLuint attrDims[3] = {3, 2, 3};
-
+  GLint textureLocs[2] = {textureLoc, textureBLoc};
   sceneRender(&rootNode, identity, modelingLoc, 1, unifDims, unifLocs, 3,
-              attrDims, attrLocs, textureLoc);
+              attrDims, attrLocs, textureLocs);
 }
 
 int main(void) {

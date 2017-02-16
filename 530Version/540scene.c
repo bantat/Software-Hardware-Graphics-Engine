@@ -20,10 +20,11 @@ struct sceneNode {
 to trivial values. The user must remember to call sceneDestroy or
 sceneDestroyRecursively when finished. Returns 0 if no error occurred. */
 int sceneInitialize(sceneNode *node, GLuint unifDim, GLuint texNum,
-        meshGLMesh *mesh, sceneNode *firstChild, sceneNode *nextSibling) {
-  node->unif = (GLdouble *)malloc(unifDim * sizeof(GLdouble) + texNum * sizeof(texTexture *));
-  if (node->unif == NULL)
-      return 1;
+                    meshGLMesh *mesh, sceneNode *firstChild,
+                    sceneNode *nextSibling) {
+  node->unif = (GLdouble *)malloc(unifDim * sizeof(GLdouble) +
+                                  texNum * sizeof(texTexture *));
+  if (node->unif == NULL) return 1;
   node->tex = (texTexture **)&(node->unif[unifDim]);
   mat33Identity(node->rotation);
   vecSet(3, node->translation, 0.0, 0.0, 0.0);
@@ -55,8 +56,8 @@ void sceneSetOneUniform(sceneNode *node, int index, double unif) {
 }
 
 /* Copies the unifDim-dimensional vector from unif into the node. */
-void sceneSetTexture(sceneNode *node, texTexture texList[]) {
-  node->tex = &texList;
+void sceneSetTexture(sceneNode *node, texTexture *texList[]) {
+  node->tex = texList;
 }
 
 /* Sets one uniform in the node, based on its index in the unif array. */
@@ -182,19 +183,54 @@ void sceneRender(sceneNode *node, GLdouble parent[4][4], GLint modelingLoc,
   /* !! */
   /* Render the mesh, the children, and the younger siblings. */
 
-
-  //texRender here  
+  for (GLuint i = 0; i < node->texNum; i++) {
+    if (i == 0) {
+      texRender(node->tex[i], GL_TEXTURE0, i, textureLocs[i]);
+    } else if (i == 1) {
+      texRender(node->tex[i], GL_TEXTURE1, i, textureLocs[i]);
+    } else if (i == 2) {
+      texRender(node->tex[i], GL_TEXTURE2, i, textureLocs[i]);
+    } else if (i == 3) {
+      texRender(node->tex[i], GL_TEXTURE3, i, textureLocs[i]);
+    } else if (i == 4) {
+      texRender(node->tex[i], GL_TEXTURE4, i, textureLocs[i]);
+    } else if (i == 5) {
+      texRender(node->tex[i], GL_TEXTURE5, i, textureLocs[i]);
+    } else if (i == 6) {
+      texRender(node->tex[i], GL_TEXTURE6, i, textureLocs[i]);
+    } else if (i == 7) {
+      texRender(node->tex[i], GL_TEXTURE7, i, textureLocs[i]);
+    }
+  }
   meshGLRender(node->meshGL, attrNum, attrDims, attrLocs);
-  //textUnrender here
+  for (GLuint i = 0; i < node->texNum; i++) {
+    if (i == 0) {
+      texUnrender(node->tex[i], GL_TEXTURE0);
+    } else if (i == 1) {
+      texUnrender(node->tex[i], GL_TEXTURE1);
+    } else if (i == 2) {
+      texUnrender(node->tex[i], GL_TEXTURE2);
+    } else if (i == 3) {
+      texUnrender(node->tex[i], GL_TEXTURE3);
+    } else if (i == 4) {
+      texUnrender(node->tex[i], GL_TEXTURE4);
+    } else if (i == 5) {
+      texUnrender(node->tex[i], GL_TEXTURE5);
+    } else if (i == 6) {
+      texUnrender(node->tex[i], GL_TEXTURE6);
+    } else if (i == 7) {
+      texUnrender(node->tex[i], GL_TEXTURE7);
+    }
+  }
 
   if (node->firstChild != NULL) {
     sceneRender(node->firstChild, iso, modelingLoc, unifNum, unifDims, unifLocs,
-                attrNum, attrDims, attrLocs,textureLocs);
+                attrNum, attrDims, attrLocs, textureLocs);
   }
 
   if (node->nextSibling != NULL) {
     sceneRender(node->nextSibling, parent, modelingLoc, unifNum, unifDims,
-                unifLocs, attrNum, attrDims, attrLocs,textureLocs);
+                unifLocs, attrNum, attrDims, attrLocs, textureLocs);
   }
   /* !! */
 }
