@@ -1,7 +1,7 @@
 
 
 /* On macOS, compile with...
-    clang 540mainTexturing.c -lglfw -framework OpenGL
+    clang 530mainScene.c -lglfw -framework OpenGL
 */
 
 #include <stdio.h>
@@ -15,21 +15,17 @@
 #include "510mesh.c"
 #include "520matrix.c"
 #include "520camera.c"
-#include "540texture.c"
-#include "540scene.c"
+#include "530scene.c"
 
 GLdouble alpha = 0.0;
 GLuint program;
 GLint attrLocs[3];
 GLint viewingLoc, modelingLoc;
 GLint unifLocs[1];
-GLint textureLoc, textureBLoc;
 camCamera cam;
 /* Allocate three meshes and three scene graph nodes. */
 meshGLMesh rootMesh, childMesh, siblingMesh;
 sceneNode rootNode, childNode, siblingNode;
-texTexture *tex[2];
-texTexture texture, texture1;
 
 void handleError(int error, const char *description) {
   fprintf(stderr, "handleError: %d\n%s\n", error, description);
@@ -71,24 +67,6 @@ returns. */
 int initializeScene(void) {
   /* Initialize meshes. */
   meshMesh mesh;
-  // might not need to do this since its being done in tex render.
-  // glActiveTexture(GL_TEXTURE0);
-  // glActiveTexture(GL_TEXTURE1);
-  // glEnable(GL_TEXTURE_2D);
-
-  if (texInitializeFile(&texture, "Checkerboard_pattern.jpg", GL_LINEAR,
-                        GL_LINEAR, GL_REPEAT, GL_REPEAT) != 0) {
-    return 3;
-  }
-
-  if (texInitializeFile(&texture1, "box.jpg", GL_LINEAR, GL_LINEAR, GL_REPEAT,
-                        GL_REPEAT) != 0) {
-    return 3;
-  }
-
-  tex[0] = &texture;
-  tex[1] = &texture1;
-
   if (meshInitializeCapsule(&mesh, 0.5, 2.0, 16, 32) != 0) return 1;
   meshGLInitialize(&rootMesh, &mesh);
   meshDestroy(&mesh);
@@ -99,11 +77,9 @@ int initializeScene(void) {
   meshGLInitialize(&siblingMesh, &mesh);
   meshDestroy(&mesh);
   /* Initialize scene graph nodes. */
-  if (sceneInitialize(&siblingNode, 2, 2, &siblingMesh, NULL, NULL) != 0)
-    return 4;
-  if (sceneInitialize(&childNode, 2, 2, &childMesh, NULL, NULL) != 0) return 5;
-  if (sceneInitialize(&rootNode, 2, 2, &rootMesh, &childNode, &siblingNode) !=
-      0)
+  if (sceneInitialize(&siblingNode, 2, &siblingMesh, NULL, NULL) != 0) return 4;
+  if (sceneInitialize(&childNode, 2, &childMesh, NULL, NULL) != 0) return 5;
+  if (sceneInitialize(&rootNode, 2, &rootMesh, &childNode, &siblingNode) != 0)
     return 6;
   /* Customize the uniforms. */
   GLdouble trans[3] = {1.0, 0.0, 0.0};
@@ -111,10 +87,6 @@ int initializeScene(void) {
   vecSet(3, trans, 0.0, 1.0, 0.0);
   sceneSetTranslation(&siblingNode, trans);
   GLdouble unif[2] = {1.0, 1.0};
-
-  sceneSetTexture(&siblingNode, tex);
-  sceneSetTexture(&childNode, tex);
-  sceneSetTexture(&rootNode, tex);
   sceneSetUniform(&siblingNode, unif);
   sceneSetUniform(&childNode, unif);
   sceneSetUniform(&rootNode, unif);
@@ -135,33 +107,20 @@ int initializeShaderProgram(void) {
 		uniform mat4 viewing;\
 		uniform mat4 modeling;\
 		attribute vec3 position;\
-    attribute vec3 color;\
 		attribute vec2 texCoords;\
 		attribute vec3 normal;\
 		uniform vec2 spice;\
 		varying vec4 rgba;\
-    varying vec2 st;\
 		void main() {\
 			gl_Position = viewing * modeling * vec4(position, 1.0);\
 			rgba = vec4(texCoords, spice) + vec4(normal, 1.0);\
-      st = texCoords;\
 		}";
   GLchar fragmentCode[] =
       "\
-    uniform sampler2D texture;\
-    uniform sampler2D texture1;\
 		varying vec4 rgba;\
-    varying vec2 st;\
 		void main() {\
-    vec4 tex1 = texture2D(texture,st);\
-    if (tex1[0] < 0.2 || tex1[1] < 0.2 || tex1[2] < 0.2) {\
-      gl_FragColor = rgba * tex1;\
-    }\
-    else {\
-      gl_FragColor = rgba * texture2D(texture1, st);\
-    }\
-}\
-";
+			gl_FragColor = rgba;\
+		}";
   program = makeProgram(vertexCode, fragmentCode);
   if (program != 0) {
     glUseProgram(program);
@@ -171,8 +130,6 @@ int initializeShaderProgram(void) {
     viewingLoc = glGetUniformLocation(program, "viewing");
     modelingLoc = glGetUniformLocation(program, "modeling");
     unifLocs[0] = glGetUniformLocation(program, "spice");
-    textureLoc = glGetUniformLocation(program, "texture");
-    textureBLoc = glGetUniformLocation(program, "texture1");
   }
   return (program == 0);
 }
@@ -193,9 +150,8 @@ void render(void) {
   mat44Identity(identity);
   GLuint unifDims[1] = {2};
   GLuint attrDims[3] = {3, 2, 3};
-  GLint textureLocs[2] = {textureLoc, textureBLoc};
   sceneRender(&rootNode, identity, modelingLoc, 1, unifDims, unifLocs, 3,
-              attrDims, attrLocs, textureLocs);
+              attrDims, attrLocs);
 }
 
 int main(void) {
@@ -219,19 +175,14 @@ int main(void) {
   /* Initialize a whole scene, rather than just one mesh. */
   if (initializeScene() != 0) return 3;
   if (initializeShaderProgram() != 0) return 4;
-
   GLdouble target[3] = {0.0, 0.0, 0.0};
   camSetControls(&cam, camPERSPECTIVE, M_PI / 6.0, 10.0, 512.0, 512.0, 10.0,
                  M_PI / 4.0, M_PI / 4.0, target);
   while (glfwWindowShouldClose(window) == 0) {
-
     render();
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
-
-  texDestroy(&texture);
-  texDestroy(&texture1);
   glDeleteProgram(program);
   /* Don't forget to destroy the whole scene. */
   destroyScene();

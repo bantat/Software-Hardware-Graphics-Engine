@@ -29,7 +29,8 @@ camCamera cam;
 meshGLMesh rootMesh, childMesh, siblingMesh;
 sceneNode rootNode, childNode, siblingNode;
 texTexture *tex[2];
-texTexture texture, texture1;
+texTexture *texB[2];
+texTexture texture, texture1, texture2;
 
 void handleError(int error, const char *description) {
   fprintf(stderr, "handleError: %d\n%s\n", error, description);
@@ -86,8 +87,16 @@ int initializeScene(void) {
     return 3;
   }
 
+  if (texInitializeFile(&texture2, "beachball.jpg", GL_LINEAR, GL_LINEAR,
+                        GL_REPEAT, GL_REPEAT) != 0) {
+    return 3;
+  }
+
   tex[0] = &texture;
   tex[1] = &texture1;
+
+  texB[0] = &texture;
+  texB[1] = &texture2;
 
   if (meshInitializeCapsule(&mesh, 0.5, 2.0, 16, 32) != 0) return 1;
   meshGLInitialize(&rootMesh, &mesh);
@@ -115,6 +124,7 @@ int initializeScene(void) {
   sceneSetTexture(&siblingNode, tex);
   sceneSetTexture(&childNode, tex);
   sceneSetTexture(&rootNode, tex);
+  sceneSetOneTexture(&siblingNode, 1, &texture2);
   sceneSetUniform(&siblingNode, unif);
   sceneSetUniform(&childNode, unif);
   sceneSetUniform(&rootNode, unif);
