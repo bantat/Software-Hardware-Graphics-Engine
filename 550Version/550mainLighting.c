@@ -1,4 +1,5 @@
-
+// Tore Banta & Sabastian Mugazambi
+// Computer Graphics - CS 311 - Josh Davis
 
 /* On macOS, compile with...
     clang 550mainLighting.c -lglfw -framework OpenGL
