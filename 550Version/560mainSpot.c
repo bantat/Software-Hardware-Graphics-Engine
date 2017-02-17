@@ -1,4 +1,5 @@
-
+// Tore Banta & Sabastian Mugazambi
+// Computer Graphics - CS 311 - Josh Davis
 
 /* On macOS, compile with...
     clang 560mainSpot.c -lglfw -framework OpenGL
@@ -247,7 +248,7 @@ int main(void) {
   glfwSetErrorCallback(handleError);
   if (glfwInit() == 0) return 1;
   GLFWwindow *window;
-  window = glfwCreateWindow(512, 512, "Scene Graph", NULL, NULL);
+  window = glfwCreateWindow(512, 512, "Spotlight", NULL, NULL);
   if (window == NULL) {
     glfwTerminate();
     return 2;

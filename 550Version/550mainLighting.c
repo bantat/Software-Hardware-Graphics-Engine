@@ -234,7 +234,7 @@ int main(void) {
   glfwSetErrorCallback(handleError);
   if (glfwInit() == 0) return 1;
   GLFWwindow *window;
-  window = glfwCreateWindow(512, 512, "Scene Graph", NULL, NULL);
+  window = glfwCreateWindow(512, 512, "Lighting", NULL, NULL);
   if (window == NULL) {
     glfwTerminate();
     return 2;
