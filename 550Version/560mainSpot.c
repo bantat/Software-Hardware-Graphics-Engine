@@ -1,7 +1,7 @@
 
 
 /* On macOS, compile with...
-    clang 550mainLighting.c -lglfw -framework OpenGL
+    clang 560mainSpot.c -lglfw -framework OpenGL
 */
 
 #include <stdio.h>
@@ -17,14 +17,14 @@
 #include "520camera.c"
 #include "540texture.c"
 #include "540scene.c"
-#include "550light.c"
+#include "560light.c"
 
 GLdouble alpha = 0.0;
 GLuint program;
 GLint attrLocs[3];
 GLint viewingLoc, modelingLoc;
 GLint unifLocs[1];
-GLint lightPosLoc, lightColLoc, lightAttLoc;
+GLint lightPosLoc, lightColLoc, lightAttLoc, cosLoc, dirLoc;
 GLint camPosLoc;
 GLint textureLoc;
 camCamera cam;
@@ -117,13 +117,16 @@ int initializeScene(void) {
   sceneSetUniform(&childNode, unif);
   sceneSetUniform(&rootNode, unif);
 
-  GLdouble transl[3] = {3.0, 3.0, 0.0};
+  GLdouble transl[3] = {3.0, 3.0, 3.0};
   GLdouble rgb[3] = {1.0, 1.0, 1.0};
   GLdouble atten[3] = {1.0, 0.0, 0.0};
 
+  lightSetType(&light, lightSPOT);
   lightSetTranslation(&light, transl);
   lightSetColor(&light, rgb);
   lightSetAttenuation(&light, atten);
+  lightSetSpotAngle(&light, 42.0);
+  lightShineFrom(&light, transl, 0.0, 0.0);
 
   return 0;
 }
@@ -159,6 +162,8 @@ int initializeShaderProgram(void) {
     uniform sampler2D texture0;\
     uniform vec3 specular;\
     uniform vec3 camPos;\
+    uniform float halfCos;\
+    uniform vec3 aim;\
     uniform vec3 lightPos;\
     uniform vec3 lightCol;\
     uniform vec3 lightAtt;\
@@ -170,11 +175,13 @@ int initializeShaderProgram(void) {
         vec3 norDir = normalize(normalDir);\
         vec3 litDir = normalize(lightPos - fragPos);\
         vec3 camDir = normalize(camPos - fragPos);\
+        vec3 aimDir = normalize(aim);\
         vec3 refDir = 2.0 * dot(litDir, norDir) * norDir - litDir;\
         float d = distance(lightPos, fragPos);\
         float a = lightAtt[0] + lightAtt[1] * d + lightAtt[2] * d * d;\
         float diffInt = dot(norDir, litDir) / a;\
         float specInt = dot(refDir, camDir);\
+        float cosGam = dot(aimDir, -1.0 * litDir);\
         if (diffInt <= 0.0 || specInt <= 0.0)\
             specInt = 0.0;\
         float ambInt = 0.1;\
@@ -183,7 +190,11 @@ int initializeShaderProgram(void) {
         vec3 diffLight = diffInt * lightCol * surfCol;\
         float shininess = 64.0;\
         vec3 specLight = pow(specInt / a, shininess) * lightCol * specular;\
-        gl_FragColor = vec4(diffLight + specLight, 1.0);\
+        if (cosGam >= halfCos) {\
+          gl_FragColor = vec4(diffLight + specLight, 1.0);\
+        } else {\
+          gl_FragColor = vec4(0.0);\
+        }\
     }";
   program = makeProgram(vertexCode, fragmentCode);
   if (program != 0) {
@@ -195,6 +206,8 @@ int initializeShaderProgram(void) {
     modelingLoc = glGetUniformLocation(program, "modeling");
     unifLocs[0] = glGetUniformLocation(program, "specular");
     camPosLoc = glGetUniformLocation(program, "camPos");
+    cosLoc = glGetUniformLocation(program, "halfCos");
+    dirLoc = glGetUniformLocation(program, "aim");
     lightPosLoc = glGetUniformLocation(program, "lightPos");
     lightColLoc = glGetUniformLocation(program, "lightCol");
     lightAttLoc = glGetUniformLocation(program, "lightAtt");
@@ -225,7 +238,7 @@ void render(void) {
   GLuint unifDims[1] = {3};
   GLuint attrDims[3] = {3, 2, 3};
   GLint textureLocs[1] = {textureLoc};
-  lightRender(&light, lightPosLoc, lightColLoc, lightAttLoc);
+  lightRender(&light, lightPosLoc, lightColLoc, lightAttLoc, dirLoc, cosLoc);
   sceneRender(&rootNode, identity, modelingLoc, 1, unifDims, unifLocs, 3,
               attrDims, attrLocs, textureLocs);
 }
