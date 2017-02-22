@@ -1,4 +1,5 @@
 
+#define BUFFER_OFFSET(bytes) ((GLubyte *)NULL + (bytes))
 
 /*** Creating and destroying ***/
 
@@ -76,6 +77,7 @@ except through accessor functions. */
 typedef struct meshGLMesh meshGLMesh;
 struct meshGLMesh {
   GLuint triNum, vertNum, attrDim, vaoNum, attrNum;
+  GLuint *attrDims;
   GLuint *vaos;
   GLuint buffers[2];
 };
@@ -84,7 +86,7 @@ struct meshGLMesh {
 an integer between 0 and meshGL->voaNum - 1, inclusive. This function
 initializes the VAO at that index in the meshGL's array of VAOs, so that the
 VAO can render using those locations. */
-void meshGLVAOInitialize(meshGLMesh *meshGL, GLuint index, GLint attrLocs[]){
+void meshGLVAOInitialize(meshGLMesh *meshGL, GLuint index, GLint attrLocs[]) {
   glBindVertexArray(meshGL->vaos[index]);
   /* Make sure the intended shader program is active. (In a serious
   application, we might switch among several shaders rapidly.) Connect our
@@ -92,19 +94,19 @@ void meshGLVAOInitialize(meshGLMesh *meshGL, GLuint index, GLint attrLocs[]){
 
   GLint offset_num = 0;
 
-  for (GLuint i = 0; i < meshGl->attrNum; i++) {
+  for (GLuint i = 0; i < meshGL->attrNum; i++) {
     glEnableVertexAttribArray(attrLocs[i]);
   }
 
   glBindBuffer(GL_ARRAY_BUFFER, meshGL->buffers[0]);
 
   for (GLuint i = 0; i < meshGL->attrNum; i++) {
-    GLuint attrDim = meshGl->attrDims[i];
-    glVertexAttribPointer(attrLocs[i], meshGl->attrDim, GL_DOUBLE, GL_FALSE,
+    GLuint attrDim = meshGL->attrDims[i];
+    glVertexAttribPointer(attrLocs[i], attrDim, GL_DOUBLE, GL_FALSE,
                           meshGL->attrDim * sizeof(GLdouble),
                           BUFFER_OFFSET(offset_num * sizeof(GLdouble)));
 
-    offset_num += meshGL->attrDim;
+    offset_num += attrDim;
   }
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshGL->buffers[1]);
@@ -141,8 +143,6 @@ int meshGLInitialize(meshGLMesh *meshGL, meshMesh *mesh, GLuint attrNum,
         (GLvoid *)(mesh->tri), GL_STATIC_DRAW);
     return 0;
 }
-
-#define BUFFER_OFFSET(bytes) ((GLubyte *)NULL + (bytes))
 
 /* Renders the already-initialized OpenGL mesh. attrDims is an array of length
 attrNum. For each i, its ith entry is the dimension of the ith attribute

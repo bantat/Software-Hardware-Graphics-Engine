@@ -229,12 +229,12 @@ void sceneRender(sceneNode *node, GLdouble parent[4][4], GLint modelingLoc,
 
   if (node->firstChild != NULL) {
     sceneRender(node->firstChild, iso, modelingLoc, unifNum, unifDims, unifLocs,
-                attrNum, attrDims, attrLocs, textureLocs);
+                vaoIndex, textureLocs);
   }
 
   if (node->nextSibling != NULL) {
     sceneRender(node->nextSibling, parent, modelingLoc, unifNum, unifDims,
-                unifLocs, attrNum, attrDims, attrLocs, textureLocs);
+                unifLocs, vaoIndex, textureLocs);
   }
   /* !! */
 }
