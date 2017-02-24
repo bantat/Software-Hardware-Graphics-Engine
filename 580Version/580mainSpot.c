@@ -35,7 +35,7 @@ lightLight light;
 meshGLMesh rootMesh, childMesh, siblingMesh;
 sceneNode rootNode, childNode, siblingNode;
 texTexture *tex[1];
-texTexture texture;
+texTexture texture0;
 
 void handleError(int error, const char *description) {
   fprintf(stderr, "handleError: %d\n%s\n", error, description);
@@ -82,12 +82,12 @@ int initializeScene(void) {
   // glActiveTexture(GL_TEXTURE1);
   // glEnable(GL_TEXTURE_2D);
 
-  if (texInitializeFile(&texture, "box.jpg", GL_LINEAR, GL_LINEAR, GL_REPEAT,
+  if (texInitializeFile(&texture0, "box.jpg", GL_LINEAR, GL_LINEAR, GL_REPEAT,
                         GL_REPEAT) != 0) {
     return 3;
   }
 
-  tex[0] = &texture;
+  tex[0] = &texture0;
   GLuint attrDims[3] = {3, 2, 3};
   GLuint attrNum = 3;
 
@@ -147,8 +147,7 @@ void destroyScene(void) {
 
 /* Returns 0 on success, non-zero on failure. */
 int initializeShaderProgram(void) {
-  GLchar vertexCode[] =
-      "\
+  GLchar vertexCode[] = "\
     #version 140\n\
     uniform mat4 viewing;\
     uniform mat4 modeling;\
@@ -165,10 +164,9 @@ int initializeShaderProgram(void) {
         normalDir = vec3(modeling * vec4(normal, 0.0));\
         st = texCoords;\
     }";
-  GLchar fragmentCode[] =
-      "\
+  GLchar fragmentCode[] = "\
     #version 140\n\
-    uniform texture textureB;\
+    uniform sample2D texture0;\
     uniform vec3 specular;\
     uniform vec3 camPos;\
     uniform float halfCos;\
@@ -181,7 +179,7 @@ int initializeShaderProgram(void) {
     in vec2 st;\
     out vec4 fragColor;\
     void main() {\
-        vec3 surfCol = vec3(texture(textureB, st));\
+        vec3 surfCol = vec3(texture(texture0, st));\
         vec3 norDir = normalize(normalDir);\
         vec3 litDir = normalize(lightPos - fragPos);\
         vec3 camDir = normalize(camPos - fragPos);\
@@ -304,7 +302,7 @@ int main(void) {
     glfwPollEvents();
   }
 
-  texDestroy(&texture);
+  texDestroy(&texture0);
   meshGLDestroy(&rootMesh);
   meshGLDestroy(&childMesh);
   meshGLDestroy(&siblingMesh);
