@@ -265,9 +265,9 @@ int initializeCameraLight(void) {
 	lightSetColor(&light2, vec); //!!
 	vecSet(3, vec, 1.0, 0.0, 0.0);
 	lightSetAttenuation(&light, vec);
-	lightSetAttenuation(&light2, vec);
+	lightSetAttenuation(&light2, vec); //!!
 	lightSetSpotAngle(&light, M_PI / 3.0);
-	lightSetSpotAngle(&light2, M_PI / 3.0);
+	lightSetSpotAngle(&light2, M_PI / 3.0); //!!
 	/* Configure shadow mapping. */
 	if (shadowProgramInitialize(&sdwProg, 3) != 0)
 		return 1;
@@ -384,6 +384,7 @@ int initializeShaderProgram(void) {
 			vec3 specRefl2 = specInt2 * lightCol2 * specular;\
 			fragColor = vec4(diffRefl + specRefl + diffRefl2 + specRefl2, 1.0);\
 		}";
+
 	program = makeProgram(vertexCode, fragmentCode);
 	if (program != 0) {
 		glUseProgram(program);
@@ -447,7 +448,7 @@ void render(void) {
 	shadowRender(&sdwMap, viewingSdwLoc, GL_TEXTURE7, 7, textureSdwLoc);
 	lightRender(&light2, lightPosLoc2, lightColLoc2, lightAttLoc2, lightDirLoc2,
 		lightCosLoc2); //!!
-	shadowRender(&sdwMap2, viewingSdwLoc2, GL_TEXTURE8, 8, textureSdwLoc); //!!
+	shadowRender(&sdwMap2, viewingSdwLoc2, GL_TEXTURE8, 8, textureSdwLoc2); //!!
 	GLuint unifDims[1] = {3};
 	sceneRender(&nodeH, identity, modelingLoc, 1, unifDims, unifLocs, 0,
 		textureLocs);

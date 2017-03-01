@@ -2,7 +2,7 @@
 
 
 /* On macOS, compile with...
-    clang 590mainShadowing.c /usr/local/gl3w/src/gl3w.o -lglfw -framework OpenGL -framework CoreFoundation
+    clang 580mainShadowing.c /usr/local/gl3w/src/gl3w.o -lglfw -framework OpenGL -framework CoreFoundation
 */
 
 #include <stdio.h>
