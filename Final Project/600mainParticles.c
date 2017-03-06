@@ -345,6 +345,23 @@ void render(void) {
 		textureLocs);
 }
 
+// void renderParticle(void) {
+// 	//clear color and depth buffer
+// 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+// 	glLoadIdentity();//load identity matrix
+//
+// 	glTranslatef(0.0f,0.0f,-4.0f);//move forward 4 units
+//
+// 	glColor3f(0.0f,0.0f,1.0f); //blue color
+//
+// 	glPointSize(10.0f);//set point size to 10 pixels
+//
+// 	glBegin(GL_POINTS); //starts drawing of points
+// 		glVertex3f(1.0f,1.0f,0.0f);//upper-right corner
+// 		glVertex3f(-1.0f,-1.0f,0.0f);//lower-left corner
+// 	glEnd();//end drawing of points
+// }
+
 int main(void) {
 	double oldTime;
 	double newTime = getTime();
@@ -380,6 +397,7 @@ int main(void) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+		//glPointSize(2);
     if (initializeShaderProgram() != 0)
     	return 3;
     /* Initialize the shadow mapping before the meshes. Why? */
