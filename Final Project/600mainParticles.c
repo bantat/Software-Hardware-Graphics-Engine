@@ -25,13 +25,16 @@ double getTime(void) {
 #include "590matrix.c"
 #include "520camera.c"
 #include "540texture.c"
+#include "600particle.c"
 #include "580scene.c"
 #include "560light.c"
 
 camCamera cam;
 texTexture texH, texV, texW, texT, texL;
 meshGLMesh meshH, meshV, meshW, meshT, meshL;
+particleGLMesh meshP;
 sceneNode nodeH, nodeV, nodeW, nodeT, nodeL;
+particleNode nodeP;
 /* We need just one shadow program, because all of our meshes have the same
 attribute structure. */
 
@@ -106,6 +109,8 @@ midway through, then does not properly deallocate all resources. But that's
 okay, because the program terminates almost immediately after this function
 returns. */
 int initializeScene(void) {
+
+/*Change change*/
 	if (texInitializeFile(&texH, "snowygrass.jpg", GL_LINEAR, GL_LINEAR,
     		GL_REPEAT, GL_REPEAT) != 0)
     	return 1;
@@ -121,6 +126,8 @@ int initializeScene(void) {
     if (texInitializeFile(&texL, "snowytree.jpg", GL_LINEAR, GL_LINEAR,
     		GL_REPEAT, GL_REPEAT) != 0)
     	return 5;
+/*Change change*/
+
 	GLuint attrDims[3] = {3, 2, 3};
     double zs[12][12] = {
 		{5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 20.0},
@@ -148,13 +155,18 @@ int initializeScene(void) {
 		{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0},
 		{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0},
 		{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0}};
+
+/*Change change*/
 	meshMesh mesh, meshLand;
 	if (meshInitializeLandscape(&meshLand, 12, 12, 5.0, (double *)zs) != 0)
 		return 6;
 	if (meshInitializeDissectedLandscape(&mesh, &meshLand, M_PI / 3.0, 1) != 0)
 		return 7;
+/*Change change*/
+
+
 	/* There are now two VAOs per mesh. */
-	meshGLInitialize(&meshH, &mesh, 3, attrDims, 2);
+	meshGLInitialize(&meshH, &mesh, 3, attrDims, 1);
 	meshGLVAOInitialize(&meshH, 0, attrLocs);
 	meshDestroy(&mesh);
 	if (meshInitializeDissectedLandscape(&mesh, &meshLand, M_PI / 3.0, 0) != 0)
@@ -168,24 +180,31 @@ int initializeScene(void) {
 		vert[3] = (vert[0] * normal[0] + vert[1] * normal[1]) / 20.0;
 		vert[4] = vert[2] / 20.0;
 	}
-	meshGLInitialize(&meshV, &mesh, 3, attrDims, 2);
+	meshGLInitialize(&meshV, &mesh, 3, attrDims, 1);
 	meshGLVAOInitialize(&meshV, 0, attrLocs);
 	meshDestroy(&mesh);
 	if (meshInitializeLandscape(&mesh, 12, 12, 5.0, (double *)ws) != 0)
 		return 9;
-	meshGLInitialize(&meshW, &mesh, 3, attrDims, 2);
+	meshGLInitialize(&meshW, &mesh, 3, attrDims, 1);
 	meshGLVAOInitialize(&meshW, 0, attrLocs);
 	meshDestroy(&mesh);
 	if (meshInitializeCapsule(&mesh, 1.0, 10.0, 1, 8) != 0)
 		return 10;
-	meshGLInitialize(&meshT, &mesh, 3, attrDims, 2);
+	meshGLInitialize(&meshT, &mesh, 3, attrDims, 1);
 	meshGLVAOInitialize(&meshT, 0, attrLocs);
 	meshDestroy(&mesh);
 	if (meshInitializeSphere(&mesh, 5.0, 8, 16) != 0)
 		return 11;
-	meshGLInitialize(&meshL, &mesh, 3, attrDims, 2);
+	meshGLInitialize(&meshL, &mesh, 3, attrDims, 1);
 	meshGLVAOInitialize(&meshL, 0, attrLocs);
+	if (meshInitializeSphere(&mesh, 8.0, 8, 16) != 0)
+		return 11;
+	particleGLInitialize(&meshP, &mesh, 3, attrDims, 1);
+	particleGLVAOInitialize(&meshP, 0, attrLocs);
 	meshDestroy(&mesh);
+	if (particleInitialize(&nodeP, 3, 1, &meshP) != 0) {
+		return 14;
+	}
 	if (sceneInitialize(&nodeW, 3, 1, &meshW, NULL, NULL) != 0)
 		return 14;
 	if (sceneInitialize(&nodeL, 3, 1, &meshL, NULL, NULL) != 0)
@@ -198,6 +217,7 @@ int initializeScene(void) {
 		return 12;
 	GLdouble trans[3] = {40.0, 28.0, 5.0};
 	sceneSetTranslation(&nodeT, trans);
+	particleSetTranslation(&nodeP, trans);
 	vecSet(3, trans, 0.0, 0.0, 7.0);
 	sceneSetTranslation(&nodeL, trans);
 	GLdouble unif[3] = {0.0, 0.0, 0.0};
@@ -205,6 +225,7 @@ int initializeScene(void) {
 	sceneSetUniform(&nodeV, unif);
 	sceneSetUniform(&nodeT, unif);
 	sceneSetUniform(&nodeL, unif);
+	particleSetUniform(&nodeP, unif);
 	vecSet(3, unif, 1.0, 1.0, 1.0);
 	sceneSetUniform(&nodeW, unif);
 	texTexture *tex;
@@ -214,6 +235,7 @@ int initializeScene(void) {
 	sceneSetTexture(&nodeV, &tex);
 	tex = &texW;
 	sceneSetTexture(&nodeW, &tex);
+	particleSetTexture(&nodeP, &tex);
 	tex = &texT;
 	sceneSetTexture(&nodeT, &tex);
 	tex = &texL;
@@ -232,6 +254,7 @@ void destroyScene(void) {
 	meshGLDestroy(&meshW);
 	meshGLDestroy(&meshT);
 	meshGLDestroy(&meshL);
+	particleGLDestroy(&meshP);
 	sceneDestroyRecursively(&nodeH);
 }
 
@@ -343,6 +366,7 @@ void render(void) {
 	GLuint unifDims[1] = {3};
 	sceneRender(&nodeH, identity, modelingLoc, 1, unifDims, unifLocs, 0,
 		textureLocs);
+	particleRender(&nodeP, modelingLoc, 1, unifDims, unifLocs, 0, textureLocs);
 }
 
 // void renderParticle(void) {
@@ -397,14 +421,19 @@ int main(void) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-		//glPointSize(2);
+		glPointSize(2);
+
     if (initializeShaderProgram() != 0)
     	return 3;
     /* Initialize the shadow mapping before the meshes. Why? */
+
+/*Change change*/
 	if (initializeCameraLight() != 0)
 		return 4;
     if (initializeScene() != 0)
     	return 5;
+/*Change change*/
+
     while (glfwWindowShouldClose(window) == 0) {
     	oldTime = newTime;
     	newTime = getTime();
