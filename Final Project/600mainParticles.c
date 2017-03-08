@@ -30,7 +30,7 @@ double getTime(void) {
 #include "560light.c"
 
 camCamera cam;
-texTexture texH, texV, texW, texT, texL;
+texTexture texH, texV, texW, texT, texL, texP;
 meshGLMesh meshH, meshV, meshW, meshT, meshL;
 particleGLMesh meshP;
 sceneNode nodeH, nodeV, nodeW, nodeT, nodeL;
@@ -40,6 +40,8 @@ attribute structure. */
 
 /* We need one shadow map per shadow-casting light. */
 lightLight light;
+
+GLdouble alpha = 0.0;
 
 /* The main shader program has extra hooks for shadowing. */
 GLuint program;
@@ -126,6 +128,9 @@ int initializeScene(void) {
     if (texInitializeFile(&texL, "snowytree.jpg", GL_LINEAR, GL_LINEAR,
     		GL_REPEAT, GL_REPEAT) != 0)
     	return 5;
+		if (texInitializeFile(&texP, "gradient.jpg", GL_LINEAR, GL_LINEAR,
+    		GL_REPEAT, GL_REPEAT) != 0)
+    	return 5;
 /*Change change*/
 
 	GLuint attrDims[3] = {3, 2, 3};
@@ -197,7 +202,7 @@ int initializeScene(void) {
 		return 11;
 	meshGLInitialize(&meshL, &mesh, 3, attrDims, 1);
 	meshGLVAOInitialize(&meshL, 0, attrLocs);
-	if (meshInitializeSphere(&mesh, 8.0, 8, 16) != 0)
+	if (meshInitializeSphere(&mesh, 6.0, 12, 32) != 0)
 		return 11;
 	particleGLInitialize(&meshP, &mesh, 3, attrDims, 1);
 	particleGLVAOInitialize(&meshP, 0, attrLocs);
@@ -217,6 +222,7 @@ int initializeScene(void) {
 		return 12;
 	GLdouble trans[3] = {40.0, 28.0, 5.0};
 	sceneSetTranslation(&nodeT, trans);
+	trans[2] = 12.0;
 	particleSetTranslation(&nodeP, trans);
 	vecSet(3, trans, 0.0, 0.0, 7.0);
 	sceneSetTranslation(&nodeL, trans);
@@ -240,6 +246,8 @@ int initializeScene(void) {
 	sceneSetTexture(&nodeT, &tex);
 	tex = &texL;
 	sceneSetTexture(&nodeL, &tex);
+	tex = &texP;
+	particleSetTexture(&nodeP, &tex);
 	return 0;
 }
 
@@ -263,16 +271,17 @@ midway through, then does not properly deallocate all resources. But that's
 okay, because the program terminates almost immediately after this function
 returns. */
 int initializeCameraLight(void) {
-    GLdouble vec[3] = {30.0, 30.0, 5.0};
+	GLdouble vec[3] = {30.0, 30.0, 5.0};
 	camSetControls(&cam, camPERSPECTIVE, M_PI / 6.0, 10.0, 768.0, 768.0, 100.0,
 		M_PI / 4.0, M_PI / 4.0, vec);
-	lightSetType(&light, lightOMNI);
+	lightSetType(&light, lightSPOT);
 	vecSet(3, vec, 45.0, 30.0, 20.0);
 	lightShineFrom(&light, vec, M_PI * 3.0 / 4.0, M_PI * 3.0 / 4.0);
 	vecSet(3, vec, 1.0, 1.0, 1.0);
 	lightSetColor(&light, vec);
 	vecSet(3, vec, 1.0, 0.0, 0.0);
 	lightSetAttenuation(&light, vec);
+	lightSetSpotAngle(&light, M_PI / 3.0);
 	return 0;
 }
 
@@ -356,6 +365,14 @@ void render(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(program);
 	camRender(&cam, viewingLoc);
+
+	GLdouble rot[3][3], axis[3] = {1.0, 1.0, 1.0};
+  vecUnit(3, axis, axis);
+  alpha += 0.01;
+  mat33AngleAxisRotation(alpha, axis, rot);
+  particleSetRotation(&nodeP, rot);
+  particleSetOneUniform(&nodeP, 0, 0.5 + 0.5 * sin(alpha * 7.0));
+
 	GLfloat vec[3];
 	vecOpenGL(3, cam.translation, vec);
 	glUniform3fv(camPosLoc, 1, vec);
@@ -368,23 +385,6 @@ void render(void) {
 		textureLocs);
 	particleRender(&nodeP, modelingLoc, 1, unifDims, unifLocs, 0, textureLocs);
 }
-
-// void renderParticle(void) {
-// 	//clear color and depth buffer
-// 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-// 	glLoadIdentity();//load identity matrix
-//
-// 	glTranslatef(0.0f,0.0f,-4.0f);//move forward 4 units
-//
-// 	glColor3f(0.0f,0.0f,1.0f); //blue color
-//
-// 	glPointSize(10.0f);//set point size to 10 pixels
-//
-// 	glBegin(GL_POINTS); //starts drawing of points
-// 		glVertex3f(1.0f,1.0f,0.0f);//upper-right corner
-// 		glVertex3f(-1.0f,-1.0f,0.0f);//lower-left corner
-// 	glEnd();//end drawing of points
-// }
 
 int main(void) {
 	double oldTime;
