@@ -252,7 +252,7 @@ struct particleProgram {
   GLint colorLoc;
   GLint textureLoc;
   GLint viewingLoc, modelingLoc;
-  GLint lightPosLoc, lightColLoc, lightAttLoc, lightDirLoc, lightCosLoc;
+  GLint lightPosLoc, lightColLoc, lightAttLoc, lightDirLoc, lightCosLoc, camPosLoc;
 };
 
 

@@ -44,7 +44,7 @@ GLdouble alpha = 0.0;
 
 /* The main shader program has extra hooks for shadowing. */
 GLuint program;
-GLuint particleProgram;
+GLuint ptcProgram;
 GLint viewingLoc, modelingLoc;
 GLint unifLocs[1], textureLocs[1];
 GLint attrLocs[3];
@@ -213,6 +213,7 @@ int initializeScene(void) {
 	if (sceneInitialize(&nodeH, 3, 1, &meshH, &nodeV, NULL) != 0)
 		return 12;
 	GLdouble trans[3] = {40.0, 28.0, 5.0};
+	GLdouble unif[3] = {0.0, 0.0, 0.0};
 	sceneSetTranslation(&nodeT, trans);
 	vecSet(3, trans, 0.0, 0.0, 7.0);
 	sceneSetTranslation(&nodeL, trans);
@@ -275,11 +276,17 @@ int initializeCameraLight(void) {
 	return 0;
 }
 
-void particlesInitialize(void) {
+int particlesInitialize(void) {
 	if (texInitializeFile(&texP, "gradient.jpg", GL_LINEAR, GL_LINEAR,
 			GL_REPEAT, GL_REPEAT) != 0)
 		return 5;
+	meshMesh mesh;
+	GLuint attrDims[3] = {3, 2, 3};
+
+	if (meshInitializeSphere(&mesh, 6.0, 12, 32) != 0)
+		return 11;
 	particleGLInitialize(&meshP, &mesh, 3, attrDims, 1);
+	particleGLVAOInitialize(&meshP, 0, attrLocs);
 	particleGLVAOInitialize(&meshP, 0, ptcProg.attrLocs);
 	meshDestroy(&mesh);
 	if (particleInitialize(&nodeP, 3, 1, &meshP) != 0) {
@@ -290,6 +297,7 @@ void particlesInitialize(void) {
 	particleSetTranslation(&nodeP, trans);
 	GLdouble unif[3] = {0.0, 0.0, 0.0};
 	particleSetUniform(&nodeP, unif);
+	return 0;
 }
 
 /* Returns 0 on success, non-zero on failure. */
