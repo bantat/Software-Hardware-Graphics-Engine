@@ -44,7 +44,6 @@ GLdouble alpha = 0.0;
 
 /* The main shader program has extra hooks for shadowing. */
 GLuint program;
-GLuint ptcProgram;
 GLint viewingLoc, modelingLoc;
 GLint unifLocs[1], textureLocs[1];
 GLint attrLocs[3];
@@ -235,8 +234,6 @@ int initializeScene(void) {
 	sceneSetTexture(&nodeT, &tex);
 	tex = &texL;
 	sceneSetTexture(&nodeL, &tex);
-	tex = &texP;
-	particleSetTexture(&nodeP, &tex);
 	return 0;
 }
 
@@ -286,7 +283,7 @@ int particlesInitialize(void) {
 	if (meshInitializeSphere(&mesh, 6.0, 12, 32) != 0)
 		return 11;
 	particleGLInitialize(&meshP, &mesh, 3, attrDims, 1);
-	particleGLVAOInitialize(&meshP, 0, attrLocs);
+	//particleGLVAOInitialize(&meshP, 0, attrLocs);
 	particleGLVAOInitialize(&meshP, 0, ptcProg.attrLocs);
 	meshDestroy(&mesh);
 	if (particleInitialize(&nodeP, 3, 1, &meshP) != 0) {
@@ -297,6 +294,9 @@ int particlesInitialize(void) {
 	particleSetTranslation(&nodeP, trans);
 	GLdouble unif[3] = {0.0, 0.0, 0.0};
 	particleSetUniform(&nodeP, unif);
+	texTexture *tex;
+	tex = &texP;
+	particleSetTexture(&nodeP, &tex);
 	return 0;
 }
 
@@ -402,7 +402,7 @@ void render(void) {
 	camRender(&cam, ptcProg.viewingLoc);
 	GLint unifLocs[1];
 	unifLocs[0] = ptcProg.colorLoc;
-	particleRender(&nodeP, ptcProg.modelingLoc, 1, unifDims, unifLocs, 0, textureLocs);
+	particleRender(&nodeP, ptcProg.modelingLoc, 1, unifDims, unifLocs, 0, &(ptcProg.textureLoc));
 }
 
 int main(void) {
