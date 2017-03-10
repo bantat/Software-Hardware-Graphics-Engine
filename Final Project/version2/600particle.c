@@ -244,3 +244,100 @@ void particleRender(particleNode *node, GLint modelingLoc,
     }
   }
 }
+
+typedef struct particleProgram particleProgram;
+struct particleProgram {
+	GLuint program;
+	GLint *attrLocs;
+  GLint colorLoc;
+  GLint textureLoc;
+  GLint viewingLoc, modelingLoc;
+  GLint lightPosLoc, lightColLoc, lightAttLoc, lightDirLoc, lightCosLoc;
+};
+
+
+int particleProgramInitialize(particleProgram *prog, GLuint attrNum) {
+	prog->attrLocs = (GLint *)malloc(attrNum * sizeof(GLint));
+	if (prog->attrLocs == NULL) {
+		fprintf(stderr, "particleProgramInitialize: malloc failed.\n");
+		return 1;
+	}
+	/* The vertex shader produces just geometry --- no texture coordinates,
+	lighting information, or any of that. */
+  GLchar vertexCode[] = "\
+		#version 140\n\
+		uniform mat4 viewing;\
+		uniform mat4 modeling;\
+		in vec3 position;\
+		in vec2 texCoords;\
+		in vec3 normal;\
+		out vec3 fragPos;\
+		out vec3 normalDir;\
+		out vec2 st;\
+		void main(void) {\
+			mat4 scaleBias = mat4(\
+				0.5, 0.0, 0.0, 0.0, \
+				0.0, 0.5, 0.0, 0.0, \
+				0.0, 0.0, 0.5, 0.0, \
+				0.5, 0.5, 0.5, 1.0);\
+			vec4 worldPos = modeling * vec4(position, 1.0);\
+			gl_Position = viewing * worldPos;\
+			fragPos = vec3(worldPos);\
+			normalDir = vec3(modeling * vec4(normal, 0.0));\
+			st = texCoords;\
+		}";
+	GLchar fragmentCode[] = "\
+		#version 140\n\
+		uniform sampler2D texture0;\
+		uniform vec3 specular;\
+		uniform vec3 camPos;\
+		uniform vec3 lightPos;\
+		uniform vec3 lightCol;\
+		uniform vec3 lightAtt;\
+		uniform vec3 lightAim;\
+		uniform float lightCos;\
+		in vec3 fragPos;\
+		in vec3 normalDir;\
+		in vec2 st;\
+		out vec4 fragColor;\
+		void main(void) {\
+			vec3 diffuse = vec3(texture(texture0, st));\
+			vec3 litDir = normalize(lightPos - fragPos);\
+			float diffInt, specInt = 0.0;\
+			if (dot(lightAim, -litDir) < lightCos)\
+				diffInt = 0.0;\
+			else\
+				diffInt = 1.0;\
+			vec3 diffRefl = max(0.2, diffInt) * lightCol * diffuse;\
+			vec3 specRefl = specInt * lightCol * specular;\
+			fragColor = vec4(diffRefl + specRefl, 1.0);\
+		}";
+	prog->program = makeProgram(vertexCode, fragmentCode);
+	if (prog->program == 0) {
+		free(prog->attrLocs);
+		return 2;
+	}
+	/* Set up the locations. Only one of the attribute locations is meaningful.
+	The others are harmless dummy locations. */
+	glUseProgram(prog->program);
+	prog->attrLocs[0] = glGetAttribLocation(prog->program, "position");
+	for (int i = 1; i < attrNum; i += 1)
+		prog->attrLocs[i] = -1;
+	prog->viewingLoc = glGetUniformLocation(prog->program, "viewing");
+	prog->modelingLoc = glGetUniformLocation(prog->program, "modeling");
+  prog->textureLoc = glGetUniformLocation(prog->program, "texture0");
+  prog->colorLoc = glGetUniformLocation(prog->program, "specular");
+  prog->camPosLoc = glGetUniformLocation(prog->program, "camPos");
+  prog->lightPosLoc = glGetUniformLocation(prog->program, "lightPos");
+  prog->lightColLoc = glGetUniformLocation(prog->program, "lightCol");
+  prog->lightAttLoc = glGetUniformLocation(prog->program, "lightAtt");
+  prog->lightDirLoc = glGetUniformLocation(prog->program, "lightAim");
+  prog->lightCosLoc = glGetUniformLocation(prog->program, "lightCos");
+	return 0;
+}
+
+/* Deallocates the resources backing the shadow program. */
+void particleProgramDestroy(particleProgram *prog) {
+	free(prog->attrLocs);
+	glDeleteProgram(prog->program);
+}

@@ -35,16 +35,16 @@ meshGLMesh meshH, meshV, meshW, meshT, meshL;
 particleGLMesh meshP;
 sceneNode nodeH, nodeV, nodeW, nodeT, nodeL;
 particleNode nodeP;
-/* We need just one shadow program, because all of our meshes have the same
-attribute structure. */
 
-/* We need one shadow map per shadow-casting light. */
+particleProgram ptcProg;
+
 lightLight light;
 
 GLdouble alpha = 0.0;
 
 /* The main shader program has extra hooks for shadowing. */
 GLuint program;
+GLuint particleProgram;
 GLint viewingLoc, modelingLoc;
 GLint unifLocs[1], textureLocs[1];
 GLint attrLocs[3];
@@ -128,9 +128,7 @@ int initializeScene(void) {
     if (texInitializeFile(&texL, "snowytree.jpg", GL_LINEAR, GL_LINEAR,
     		GL_REPEAT, GL_REPEAT) != 0)
     	return 5;
-		if (texInitializeFile(&texP, "gradient.jpg", GL_LINEAR, GL_LINEAR,
-    		GL_REPEAT, GL_REPEAT) != 0)
-    	return 5;
+
 /*Change change*/
 
 	GLuint attrDims[3] = {3, 2, 3};
@@ -204,12 +202,6 @@ int initializeScene(void) {
 	meshGLVAOInitialize(&meshL, 0, attrLocs);
 	if (meshInitializeSphere(&mesh, 6.0, 12, 32) != 0)
 		return 11;
-	particleGLInitialize(&meshP, &mesh, 3, attrDims, 1);
-	particleGLVAOInitialize(&meshP, 0, attrLocs);
-	meshDestroy(&mesh);
-	if (particleInitialize(&nodeP, 3, 1, &meshP) != 0) {
-		return 14;
-	}
 	if (sceneInitialize(&nodeW, 3, 1, &meshW, NULL, NULL) != 0)
 		return 14;
 	if (sceneInitialize(&nodeL, 3, 1, &meshL, NULL, NULL) != 0)
@@ -222,16 +214,12 @@ int initializeScene(void) {
 		return 12;
 	GLdouble trans[3] = {40.0, 28.0, 5.0};
 	sceneSetTranslation(&nodeT, trans);
-	trans[2] = 12.0;
-	particleSetTranslation(&nodeP, trans);
 	vecSet(3, trans, 0.0, 0.0, 7.0);
 	sceneSetTranslation(&nodeL, trans);
-	GLdouble unif[3] = {0.0, 0.0, 0.0};
 	sceneSetUniform(&nodeH, unif);
 	sceneSetUniform(&nodeV, unif);
 	sceneSetUniform(&nodeT, unif);
 	sceneSetUniform(&nodeL, unif);
-	particleSetUniform(&nodeP, unif);
 	vecSet(3, unif, 1.0, 1.0, 1.0);
 	sceneSetUniform(&nodeW, unif);
 	texTexture *tex;
@@ -282,7 +270,26 @@ int initializeCameraLight(void) {
 	vecSet(3, vec, 1.0, 0.0, 0.0);
 	lightSetAttenuation(&light, vec);
 	lightSetSpotAngle(&light, M_PI / 3.0);
+	if (particleProgramInitialize(&ptcProg, 3) != 0)
+		return 1;
 	return 0;
+}
+
+void particlesInitialize(void) {
+	if (texInitializeFile(&texP, "gradient.jpg", GL_LINEAR, GL_LINEAR,
+			GL_REPEAT, GL_REPEAT) != 0)
+		return 5;
+	particleGLInitialize(&meshP, &mesh, 3, attrDims, 1);
+	particleGLVAOInitialize(&meshP, 0, ptcProg.attrLocs);
+	meshDestroy(&mesh);
+	if (particleInitialize(&nodeP, 3, 1, &meshP) != 0) {
+		return 14;
+	}
+	GLdouble trans[3] = {40.0, 28.0, 5.0};
+	trans[2] = 12.0;
+	particleSetTranslation(&nodeP, trans);
+	GLdouble unif[3] = {0.0, 0.0, 0.0};
+	particleSetUniform(&nodeP, unif);
 }
 
 /* Returns 0 on success, non-zero on failure. */
@@ -383,7 +390,11 @@ void render(void) {
 	GLuint unifDims[1] = {3};
 	sceneRender(&nodeH, identity, modelingLoc, 1, unifDims, unifLocs, 0,
 		textureLocs);
-	particleRender(&nodeP, modelingLoc, 1, unifDims, unifLocs, 0, textureLocs);
+	glUseProgram(ptcProg.program);
+	camRender(&cam, ptcProg.viewingLoc);
+	GLint unifLocs[1];
+	unifLocs[0] = ptcProg.colorLoc;
+	particleRender(&nodeP, ptcProg.modelingLoc, 1, unifDims, unifLocs, 0, textureLocs);
 }
 
 int main(void) {
@@ -430,8 +441,10 @@ int main(void) {
 /*Change change*/
 	if (initializeCameraLight() != 0)
 		return 4;
-    if (initializeScene() != 0)
-    	return 5;
+  if (initializeScene() != 0)
+  	return 5;
+	if (particlesInitialize() != 0)
+		return 5;
 /*Change change*/
 
     while (glfwWindowShouldClose(window) == 0) {
