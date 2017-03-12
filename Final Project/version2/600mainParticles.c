@@ -35,6 +35,7 @@ meshGLMesh meshH, meshV, meshW, meshT, meshL;
 particleGLMesh meshP;
 sceneNode nodeH, nodeV, nodeW, nodeT, nodeL;
 particleNode nodeP;
+partParticle particle;
 
 particleProgram ptcProg;
 
@@ -280,6 +281,7 @@ int particlesInitialize(void) {
 	if (meshInitializeSphere(&mesh, 6.0, 12, 32) != 0)
 		return 11;
 	particleGLInitialize(&meshP, &mesh, 3, attrDims, 1);
+	particleCPUInitialize(&meshP, &particle, &mesh, 3, attrDims);
 	//particleGLVAOInitialize(&meshP, 0, attrLocs);
 	particleGLVAOInitialize(&meshP, 0, ptcProg.attrLocs);
 	meshDestroy(&mesh);
@@ -289,7 +291,7 @@ int particlesInitialize(void) {
 	GLdouble trans[3] = {40.0, 28.0, 5.0};
 	trans[2] = 12.0;
 	particleSetTranslation(&nodeP, trans);
-	GLdouble unif[3] = {1.0, 1.0, 1.0};
+	GLdouble unif[3] = {0.0, 0.0, 1.0};
 	particleSetUniform(&nodeP, unif);
 	return 0;
 }
@@ -380,7 +382,7 @@ void render(void) {
   alpha += 0.01;
   mat33AngleAxisRotation(alpha, axis, rot);
   particleSetRotation(&nodeP, rot);
-  particleSetOneUniform(&nodeP, 0, 0.5 + 0.5 * sin(alpha * 7.0));
+  // particleSetOneUniform(&nodeP, 0, 0.5 + 0.5 * sin(alpha * 7.0));
 
 	GLfloat vec[3];
 	vecOpenGL(3, cam.translation, vec);
@@ -462,6 +464,7 @@ int main(void) {
     /* Deallocate more resources than ever. */
     glDeleteProgram(program);
     destroyScene();
+		particleCPUDestroy(&particle);
 	glfwDestroyWindow(window);
     glfwTerminate();
     return 0;

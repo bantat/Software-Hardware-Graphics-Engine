@@ -10,6 +10,40 @@ struct particleGLMesh {
   GLuint buffers[1];
 };
 
+typedef struct partParticle partParticle;
+struct partParticle {
+  particleGLMesh *meshGL;
+  GLuint vertNum;
+  GLuint attrNum;
+  GLuint *attrDims;
+  GLdouble *vertices;
+  GLdouble *velocities;
+};
+
+/* Feel free to read from this struct's members, but don't write to them except
+through the accessor functions. */
+typedef struct particleNode particleNode;
+struct particleNode {
+  GLdouble rotation[3][3];
+  GLdouble translation[3];
+  GLuint unifDim;
+  GLdouble *unif;
+  particleGLMesh *particleGL;
+  texTexture **tex;
+  GLuint texNum;
+};
+
+
+typedef struct particleProgram particleProgram;
+struct particleProgram {
+	GLuint program;
+	GLint *attrLocs;
+  GLint colorLoc;
+  GLint textureLoc;
+  GLint viewingLoc, modelingLoc;
+  GLint lightPosLoc, lightColLoc, lightAttLoc, lightDirLoc, lightCosLoc, camPosLoc;
+};
+
 /* attrLocs is meshGL->attrNum locations in the active shader program. index is
 an integer between 0 and meshGL->voaNum - 1, inclusive. This function
 initializes the VAO at that index in the meshGL's array of VAOs, so that the
@@ -40,6 +74,38 @@ void particleGLVAOInitialize(particleGLMesh *particleGL, GLuint index, GLint att
   glBindVertexArray(0);
 }
 
+int particleCPUInitialize(particleGLMesh *particleGL, partParticle *particleCPU,
+    meshMesh *mesh, GLuint attrNum, GLuint attrDims[]) {
+  particleCPU->meshGL = particleGL;
+  particleCPU->attrDims = (GLuint *)malloc((attrNum) * sizeof(GLuint));
+  if (particleCPU->attrDims == NULL) {
+      return 1;
+  }
+  for (int i = 0; i < attrNum; i++) {
+      particleCPU->attrDims[i] = attrDims[i];
+  }
+  particleCPU->vertices = (GLdouble *)malloc(mesh->vertNum * mesh->attrDim * sizeof(GLdouble));
+  for (int i = 0; i < (mesh->vertNum * mesh->attrDim); i++) {
+    particleCPU->vertices[i] = mesh->vert[i];
+  }
+  particleCPU->velocities = (GLdouble *)malloc(mesh->vertNum * 3 * sizeof(GLdouble));
+  particleCPU->vertNum = mesh->vertNum;
+  particleCPU->attrNum = attrNum;
+  return 0;
+}
+
+void particleCPUDestroy(partParticle *particleCPU) {
+  free(particleCPU->attrDims);
+  free(particleCPU->vertices);
+  free(particleCPU->velocities);
+}
+
+void particleUpdate(partParticle *particleCPU) {
+  glBindBuffer(GL_ARRAY_BUFFER, particleCPU->meshGL->buffers[0]);
+  glBufferSubData(GL_ARRAY_BUFFER, 0,
+  particleCPU->vertNum * particleCPU->meshGL->attrDim * sizeof(GLdouble), (GLvoid *)particleCPU->vertices);
+}
+
 /* Initializes an OpenGL mesh from a non-OpenGL mesh. vaoNum is the number of
 vertex array objects attached to this mesh storage. Typically vaoNum equals the
 number of distinct shader programs that will need to draw the mesh. Returns 0
@@ -61,7 +127,7 @@ int particleGLInitialize(particleGLMesh *particleGL, meshMesh *mesh, GLuint attr
     glBindBuffer(GL_ARRAY_BUFFER, particleGL->buffers[0]);
     glBufferData(GL_ARRAY_BUFFER,
         particleGL->vertNum * particleGL->attrDim * sizeof(GLdouble),
-        (GLvoid *)(mesh->vert), GL_STATIC_DRAW);
+        (GLvoid *)(mesh->vert), GL_DYNAMIC_DRAW);
     return 0;
 }
 
@@ -84,19 +150,6 @@ void particleGLDestroy(particleGLMesh *particleGL) {
   glDeleteVertexArrays(particleGL->vaoNum, particleGL->vaos);
   free(particleGL->attrDims);
 }
-
-/* Feel free to read from this struct's members, but don't write to them except
-through the accessor functions. */
-typedef struct particleNode particleNode;
-struct particleNode {
-  GLdouble rotation[3][3];
-  GLdouble translation[3];
-  GLuint unifDim;
-  GLdouble *unif;
-  particleGLMesh *particleGL;
-  texTexture **tex;
-  GLuint texNum;
-};
 
 /* Initializes a sceneNode struct. The translation and rotation are initialized
 to trivial values. The user must remember to call sceneDestroy or
@@ -244,16 +297,6 @@ void particleRender(particleNode *node, GLint modelingLoc,
     }
   }
 }
-
-typedef struct particleProgram particleProgram;
-struct particleProgram {
-	GLuint program;
-	GLint *attrLocs;
-  GLint colorLoc;
-  GLint textureLoc;
-  GLint viewingLoc, modelingLoc;
-  GLint lightPosLoc, lightColLoc, lightAttLoc, lightDirLoc, lightCosLoc, camPosLoc;
-};
 
 
 int particleProgramInitialize(particleProgram *prog, GLuint attrNum) {
