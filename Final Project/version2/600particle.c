@@ -15,6 +15,7 @@ struct partParticle {
   particleGLMesh *meshGL;
   GLuint vertNum;
   GLuint attrNum;
+  GLuint attrDim;
   GLuint *attrDims;
   GLdouble *vertices;
   GLdouble *velocities;
@@ -91,6 +92,7 @@ int particleCPUInitialize(particleGLMesh *particleGL, partParticle *particleCPU,
   particleCPU->velocities = (GLdouble *)malloc(mesh->vertNum * 3 * sizeof(GLdouble));
   particleCPU->vertNum = mesh->vertNum;
   particleCPU->attrNum = attrNum;
+  particleCPU->attrDim = mesh->attrDim;
   return 0;
 }
 
@@ -101,9 +103,32 @@ void particleCPUDestroy(partParticle *particleCPU) {
 }
 
 void particleUpdate(partParticle *particleCPU) {
+  GLdouble velo[3];
+  int attrIndex = 0;
+  for (int i = 0; i < particleCPU->vertNum; i++) {
+    velo[0] = particleCPU->velocities[i * 3];
+    velo[1] = particleCPU->velocities[(i * 3) + 1];
+    velo[2] = particleCPU->velocities[(i * 3) + 2];
+    particleCPU->vertices[attrIndex] = particleCPU->vertices[attrIndex] + velo[0];
+    particleCPU->vertices[attrIndex + 1] = particleCPU->vertices[attrIndex + 1] + velo[1];
+    particleCPU->vertices[attrIndex + 2] = particleCPU->vertices[attrIndex + 2] + velo[2];
+    attrIndex += particleCPU->attrDim;
+  }
   glBindBuffer(GL_ARRAY_BUFFER, particleCPU->meshGL->buffers[0]);
   glBufferSubData(GL_ARRAY_BUFFER, 0,
   particleCPU->vertNum * particleCPU->meshGL->attrDim * sizeof(GLdouble), (GLvoid *)particleCPU->vertices);
+}
+
+/* Copies the unifDim-dimensional vector from unif into the node. */
+void particleSetVelocities(partParticle *particleCPU, GLdouble velo[]) {
+  for (int i = 0; i < (3 * particleCPU->vertNum); i++) {
+    particleCPU->velocities[i] = velo[i];
+  }
+}
+
+/* Sets one uniform in the node, based on its index in the unif array. */
+void particleSetOneVelocity(partParticle *particleCPU, int index, GLdouble velo) {
+  particleCPU->velocities[index] = velo;
 }
 
 /* Initializes an OpenGL mesh from a non-OpenGL mesh. vaoNum is the number of

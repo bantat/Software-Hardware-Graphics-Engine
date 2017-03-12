@@ -282,6 +282,18 @@ int particlesInitialize(void) {
 		return 11;
 	particleGLInitialize(&meshP, &mesh, 3, attrDims, 1);
 	particleCPUInitialize(&meshP, &particle, &mesh, 3, attrDims);
+	printf("Before : %u\n", particle.vertNum);
+	GLdouble velocities[particle.vertNum * 3];
+	GLdouble velocity[3] = {0.0, 1.0, 1.0};
+	GLdouble velUnit[3];
+	vecUnit(3, velocity, velUnit);
+	vecScale(3, 0.05, velUnit, velocity);
+	for (int i = 0; i < particle.vertNum; i++) {
+		velocities[(i*3)] = velocity[0];
+		velocities[(i*3)+1] = velocity[1];
+		velocities[(i*3)+2] = velocity[2];
+	}
+	particleSetVelocities(&particle, velocities);
 	//particleGLVAOInitialize(&meshP, 0, attrLocs);
 	particleGLVAOInitialize(&meshP, 0, ptcProg.attrLocs);
 	meshDestroy(&mesh);
@@ -367,6 +379,7 @@ int initializeShaderProgram(void) {
 }
 
 void render(void) {
+	particleUpdate(&particle);
 	GLdouble identity[4][4];
 	mat44Identity(identity);
 	/* Save the viewport transformation. */
