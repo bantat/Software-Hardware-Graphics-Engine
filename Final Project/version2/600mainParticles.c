@@ -292,7 +292,7 @@ int particlesInitialize(void) {
 	GLdouble trans[3] = {40.0, 28.0, 5.0};
 	trans[2] = 12.0;
 	particleSetTranslation(&nodeP, trans);
-	GLdouble unif[3] = {0.0, 0.0, 0.0};
+	GLdouble unif[3] = {1.0, 1.0, 1.0};
 	particleSetUniform(&nodeP, unif);
 	texTexture *tex;
 	tex = &texP;
@@ -402,6 +402,7 @@ void render(void) {
 	camRender(&cam, ptcProg.viewingLoc);
 	GLint unifLocs[1];
 	unifLocs[0] = ptcProg.colorLoc;
+	lightRender(&light, ptcProg.lightPosLoc, ptcProg.lightColLoc, ptcProg.lightAttLoc, ptcProg.lightDirLoc, ptcProg.lightCosLoc);
 	particleRender(&nodeP, ptcProg.modelingLoc, 1, unifDims, unifLocs, 0, &(ptcProg.textureLoc));
 }
 

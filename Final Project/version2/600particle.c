@@ -289,7 +289,7 @@ int particleProgramInitialize(particleProgram *prog, GLuint attrNum) {
 	GLchar fragmentCode[] = "\
 		#version 140\n\
 		uniform sampler2D texture0;\
-		uniform vec3 specular;\
+		uniform vec3 color;\
 		uniform vec3 camPos;\
 		uniform vec3 lightPos;\
 		uniform vec3 lightCol;\
@@ -301,7 +301,7 @@ int particleProgramInitialize(particleProgram *prog, GLuint attrNum) {
 		in vec2 st;\
 		out vec4 fragColor;\
 		void main(void) {\
-			vec3 diffuse = vec3(texture(texture0, st));\
+			vec3 diffuse = vec3(color);\
 			vec3 litDir = normalize(lightPos - fragPos);\
 			float diffInt, specInt = 0.0;\
 			if (dot(lightAim, -litDir) < lightCos)\
@@ -309,8 +309,7 @@ int particleProgramInitialize(particleProgram *prog, GLuint attrNum) {
 			else\
 				diffInt = 1.0;\
 			vec3 diffRefl = max(0.2, diffInt) * lightCol * diffuse;\
-			vec3 specRefl = specInt * lightCol * specular;\
-			fragColor = vec4(diffRefl + specRefl, 1.0);\
+			fragColor = vec4(diffRefl, 1.0);\
 		}";
 	prog->program = makeProgram(vertexCode, fragmentCode);
 	if (prog->program == 0) {
@@ -326,7 +325,7 @@ int particleProgramInitialize(particleProgram *prog, GLuint attrNum) {
 	prog->viewingLoc = glGetUniformLocation(prog->program, "viewing");
 	prog->modelingLoc = glGetUniformLocation(prog->program, "modeling");
   prog->textureLoc = glGetUniformLocation(prog->program, "texture0");
-  prog->colorLoc = glGetUniformLocation(prog->program, "specular");
+  prog->colorLoc = glGetUniformLocation(prog->program, "color");
   prog->camPosLoc = glGetUniformLocation(prog->program, "camPos");
   prog->lightPosLoc = glGetUniformLocation(prog->program, "lightPos");
   prog->lightColLoc = glGetUniformLocation(prog->program, "lightCol");
