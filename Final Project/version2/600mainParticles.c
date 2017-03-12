@@ -274,9 +274,6 @@ int initializeCameraLight(void) {
 }
 
 int particlesInitialize(void) {
-	if (texInitializeFile(&texP, "gradient.jpg", GL_LINEAR, GL_LINEAR,
-			GL_REPEAT, GL_REPEAT) != 0)
-		return 5;
 	meshMesh mesh;
 	GLuint attrDims[3] = {3, 2, 3};
 
@@ -286,7 +283,7 @@ int particlesInitialize(void) {
 	//particleGLVAOInitialize(&meshP, 0, attrLocs);
 	particleGLVAOInitialize(&meshP, 0, ptcProg.attrLocs);
 	meshDestroy(&mesh);
-	if (particleInitialize(&nodeP, 3, 1, &meshP) != 0) {
+	if (particleInitialize(&nodeP, 3, 0, &meshP) != 0) {
 		return 14;
 	}
 	GLdouble trans[3] = {40.0, 28.0, 5.0};
@@ -294,9 +291,6 @@ int particlesInitialize(void) {
 	particleSetTranslation(&nodeP, trans);
 	GLdouble unif[3] = {1.0, 1.0, 1.0};
 	particleSetUniform(&nodeP, unif);
-	texTexture *tex;
-	tex = &texP;
-	particleSetTexture(&nodeP, &tex);
 	return 0;
 }
 

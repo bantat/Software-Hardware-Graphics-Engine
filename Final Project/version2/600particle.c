@@ -288,7 +288,6 @@ int particleProgramInitialize(particleProgram *prog, GLuint attrNum) {
 		}";
 	GLchar fragmentCode[] = "\
 		#version 140\n\
-		uniform sampler2D texture0;\
 		uniform vec3 color;\
 		uniform vec3 camPos;\
 		uniform vec3 lightPos;\
