@@ -200,6 +200,9 @@ int initializeScene(void) {
 		return 11;
 	meshGLInitialize(&meshL, &mesh, 3, attrDims, 1);
 	meshGLVAOInitialize(&meshL, 0, attrLocs);
+
+	//might wanna call particleInitialise here
+
 	if (meshInitializeSphere(&mesh, 6.0, 12, 32) != 0)
 		return 11;
 	if (sceneInitialize(&nodeW, 3, 1, &meshW, NULL, NULL) != 0)
@@ -279,7 +282,7 @@ int particlesInitialize(void) {
 	meshMesh mesh2;
 	GLuint attrDims[3] = {3, 2, 3};
 
-	meshInitializeRainCloud(&mesh2, 40, 40, 40, 5, (3+2+3));
+	meshInitializeRainCloud(&mesh2, 70, 70, 40, 10, (3+2+3));
 
 	// if (meshInitializeSphere(&mesh, 6.0, 12, 32) != 0)
 	// 	return 11;
@@ -303,14 +306,17 @@ int particlesInitialize(void) {
 	//particleGLVAOInitialize(&meshP, 0, attrLocs);
 	particleGLVAOInitialize(&meshP, 0, ptcProg.attrLocs);
 
+	//sceneInitialize(&nodeP, 3, 1, &meshP, NULL, NULL);
+
 	meshDestroy(&mesh);
 	meshDestroy(&mesh2);
 
 	if (particleInitialize(&nodeP, 3, 0, &meshP) != 0) {
 		return 14;
 	}
-	GLdouble trans[3] = {40.0, 28.0, 5.0};
-	trans[2] = 12.0;
+	//GLdouble trans[3] = {40.0, 28.0, 5.0};
+	GLdouble trans[3] = {0.0,0.0,-10.0};
+	//trans[2] = 12.0;
 	particleSetTranslation(&nodeP, trans);
 	GLdouble unif[3] = {0.0, 0.0, 1.0};
 	particleSetUniform(&nodeP, unif);
@@ -416,6 +422,8 @@ void render(void) {
 	GLuint unifDims[1] = {3};
 	sceneRender(&nodeH, identity, modelingLoc, 1, unifDims, unifLocs, 0,
 		textureLocs);
+	// need to do the transformations for the particles too.
+	//sceneRender(&nodeP, identity, modelingLoc, 1, unifDims, unifLocs, 0,textureLocs);
 	//do a scene render with the point transformed
 	glUseProgram(ptcProg.program);
 	camRender(&cam, ptcProg.viewingLoc);
