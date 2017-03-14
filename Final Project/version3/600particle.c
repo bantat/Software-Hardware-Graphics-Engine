@@ -350,6 +350,7 @@ int particleProgramInitialize(particleProgram *prog, GLuint attrNum) {
 				0.5, 0.5, 0.5, 1.0);\
 			vec4 worldPos = modeling * vec4(position, 1.0);\
 			gl_Position = viewing * worldPos;\
+      gl_PointSize = 4;\
 			fragPos = vec3(worldPos);\
 			normalDir = vec3(modeling * vec4(normal, 0.0));\
 			st = texCoords;\
