@@ -336,6 +336,7 @@ int particleProgramInitialize(particleProgram *prog, GLuint attrNum) {
 		#version 140\n\
 		uniform mat4 viewing;\
 		uniform mat4 modeling;\
+    uniform vec3 camPos;\
 		in vec3 position;\
 		in vec2 texCoords;\
 		in vec3 normal;\
@@ -348,8 +349,16 @@ int particleProgramInitialize(particleProgram *prog, GLuint attrNum) {
 				0.0, 0.5, 0.0, 0.0, \
 				0.0, 0.0, 0.5, 0.0, \
 				0.5, 0.5, 0.5, 1.0);\
-			vec4 worldPos = modeling * vec4(position, 1.0);\
-			gl_Position = viewing * worldPos;\
+      vec4 worldPos = modeling * vec4(position, 1.0);\
+      vec4 viewPos = viewing * worldPos;\
+      gl_Position = viewPos;\
+      float p_div;\
+      if (viewPos[3] <= 0.0)\
+        p_div = 0.0;\
+      else\
+        p_div = viewPos[2]/viewPos[3];\
+      float scale_dist = 1.0 - p_div;\
+      gl_PointSize = 80.0 * scale_dist;\
 			fragPos = vec3(worldPos);\
 			normalDir = vec3(modeling * vec4(normal, 0.0));\
 			st = texCoords;\

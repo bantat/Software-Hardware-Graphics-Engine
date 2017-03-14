@@ -468,7 +468,8 @@ int main(void) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-		glPointSize(3);
+		//glPointSize(3);
+		glEnable(GL_PROGRAM_POINT_SIZE);
 		//glEnable(VERTEX_PROGRAM_POINT_SIZE);
 
 		// glPointParameteri(GL_POINT_SIZE_MIN, 1);
