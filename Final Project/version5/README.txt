@@ -76,11 +76,13 @@ At every version stage of the project we edited or added new functions within th
 
 'version1'
 	render existing meshes was points rather than triangles
-	and a soimple gradient texture
+	and a simple gradient texture
 	same shader program
+
 'version2'
 	Add velocity and transformations to the point particles meshes
-	Remove texture and color constantly in the unoforms
+	Remove texture and color constantly in the uniforms
+
 'version3'
 	Create a cloud like mesh of particles at some given height	
 	Add particles to CPU
@@ -89,11 +91,11 @@ At every version stage of the project we edited or added new functions within th
 'version4'
 	Add a texture to the particles
 	Make particles with a downward velocity
-	Add particle attentuation for the particles
-	Add particle mesh moding so that the particles are continuosly animated
+	Add particle attenuation for the particles
+	Add particle mesh modding so that the particles are continuously animated
 
 'Final Version'
-	Randomise velocities at a particle by particle level
+	Randomize velocities at a particle by particle level
 	Scale the particles to a more realistic particle / snow flake size
 	Code clean up and testing
 
