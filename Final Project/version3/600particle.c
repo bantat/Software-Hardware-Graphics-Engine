@@ -353,7 +353,7 @@ int particleProgramInitialize(particleProgram *prog, GLuint attrNum) {
       gl_PointSize = 4;\
 			fragPos = vec3(worldPos);\
 			normalDir = vec3(modeling * vec4(normal, 0.0));\
-			st = gl_PointCoord;\
+			st = st;\
 		}";
 	GLchar fragmentCode[] = "\
 		#version 140\n\

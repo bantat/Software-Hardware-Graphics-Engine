@@ -6,7 +6,7 @@ This files includes the main function  that test the particle effects
 capabilities of the graphics engine.
 
 On macOS, compile with...
-    clang 600mainParticles.c /usr/local/gl3w/src/gl3w.o -lglfw -framework OpenGL -framework CoreFoundation
+    clang 600mainParticles.c /usr/local/gl3w/src/gl3w.o -lglfw -framework OpenGL -framework CoreFoundation && ./a.out
 */
 
 #include <stdio.h>

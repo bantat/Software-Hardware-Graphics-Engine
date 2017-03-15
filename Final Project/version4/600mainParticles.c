@@ -287,7 +287,7 @@ int particlesInitialize(void) {
 	meshMesh mesh2;
 	GLuint attrDims[3] = {3, 2, 3};
 
-	meshInitializeRainCloud(&mesh2, 60, 60, 100, 5, (3+2+3));
+	meshInitializeRainCloud(&mesh2, 60, 60, 100, 12, (3+2+3));
 
 	// if (meshInitializeSphere(&mesh, 6.0, 12, 32) != 0)
 	// 	return 11;
