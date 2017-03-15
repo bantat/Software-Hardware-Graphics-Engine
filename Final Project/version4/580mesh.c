@@ -612,9 +612,10 @@ int meshInitializeRainCloud(meshMesh *mesh, GLuint length, GLuint width,
   GLuint *verts = (GLuint*)malloc(4 * length * width * height * sizeof(GLuint));
   int runner = 0;
   GLuint addedVerts = 0;
+  //range_rand(1,density)
 
   for (int i = (GLuint) range_rand(1,density); i < length; i+= (GLuint) range_rand(1,density)) {
-    for (int j = (GLuint) range_rand(1,density); j < width; j+= (GLuint) range_rand(1,density)) {
+    for (int j = (GLuint) range_rand(1,density); j < width; j++) {
       for(int k = (GLuint) range_rand(1,density); k < height; k+= (GLuint) range_rand(1,density)){
         verts[runner] = i;
         verts[runner + 1 ] = j;

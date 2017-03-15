@@ -353,10 +353,11 @@ int particleProgramInitialize(particleProgram *prog, GLuint attrNum) {
       gl_PointSize = 4;\
 			fragPos = vec3(worldPos);\
 			normalDir = vec3(modeling * vec4(normal, 0.0));\
-			st = texCoords;\
+			st = gl_PointCoord;\
 		}";
 	GLchar fragmentCode[] = "\
 		#version 140\n\
+    uniform sampler2D texture0;\
 		uniform vec3 color;\
 		uniform vec3 camPos;\
 		uniform vec3 lightPos;\
@@ -377,7 +378,7 @@ int particleProgramInitialize(particleProgram *prog, GLuint attrNum) {
 			else\
 				diffInt = 1.0;\
 			vec3 diffRefl = max(0.2, diffInt) * lightCol * diffuse;\
-			fragColor = vec4(diffRefl, 1.0);\
+			fragColor = vec4(diffuse, 1.0);\
 		}";
 	prog->program = makeProgram(vertexCode, fragmentCode);
 	if (prog->program == 0) {

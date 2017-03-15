@@ -230,7 +230,6 @@ int initializeScene(void) {
 	sceneSetTexture(&nodeV, &tex);
 	tex = &texW;
 	sceneSetTexture(&nodeW, &tex);
-	particleSetTexture(&nodeP, &tex);
 	tex = &texT;
 	sceneSetTexture(&nodeT, &tex);
 	tex = &texL;
@@ -314,6 +313,9 @@ int particlesInitialize(void) {
 	particleSetTranslation(&nodeP, trans);
 	GLdouble unif[3] = {0.0, 0.0, 1.0};
 	particleSetUniform(&nodeP, unif);
+	texTexture *tex;
+	tex = &texP;
+	particleSetTexture(&nodeP, &tex);
 	return 0;
 }
 

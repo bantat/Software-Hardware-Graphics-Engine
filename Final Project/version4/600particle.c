@@ -112,6 +112,26 @@ void particleUpdate(partParticle *particleCPU) {
     particleCPU->vertices[attrIndex] = particleCPU->vertices[attrIndex] + velo[0];
     particleCPU->vertices[attrIndex + 1] = particleCPU->vertices[attrIndex + 1] + velo[1];
     particleCPU->vertices[attrIndex + 2] = particleCPU->vertices[attrIndex + 2] + velo[2];
+    if (particleCPU->vertices[attrIndex + 2] <= 0.0) {
+      particleCPU->vertices[attrIndex + 2] = particleCPU->vertices[attrIndex + 2] + 100.0;
+    }
+    //printf("%f\n",particleCPU->vertices[attrIndex + 1]);
+    if (particleCPU->vertices[attrIndex + 1] >= 60) {
+      particleCPU->vertices[attrIndex + 1] = particleCPU->vertices[attrIndex + 1] - 60;
+    }
+
+    if (particleCPU->vertices[attrIndex] >= 60) {
+      particleCPU->vertices[attrIndex] = particleCPU->vertices[attrIndex] - 60;
+    }
+
+    if (particleCPU->vertices[attrIndex + 1] <= 0) {
+      particleCPU->vertices[attrIndex + 1] = particleCPU->vertices[attrIndex + 1] + 60;
+    }
+
+    if (particleCPU->vertices[attrIndex] <= 0) {
+      particleCPU->vertices[attrIndex] = particleCPU->vertices[attrIndex] + 60;
+    }
+
     attrIndex += particleCPU->attrDim;
   }
   glBindBuffer(GL_ARRAY_BUFFER, particleCPU->meshGL->buffers[0]);
@@ -365,6 +385,7 @@ int particleProgramInitialize(particleProgram *prog, GLuint attrNum) {
 		}";
 	GLchar fragmentCode[] = "\
 		#version 140\n\
+    uniform sampler2D texture0;\
 		uniform vec3 color;\
 		uniform vec3 camPos;\
 		uniform vec3 lightPos;\
@@ -377,7 +398,7 @@ int particleProgramInitialize(particleProgram *prog, GLuint attrNum) {
 		in vec2 st;\
 		out vec4 fragColor;\
 		void main(void) {\
-			vec3 diffuse = vec3(color);\
+			vec3 diffuse = vec3(texture(texture0, gl_PointCoord));\
 			vec3 litDir = normalize(lightPos - fragPos);\
 			float diffInt, specInt = 0.0;\
 			if (dot(lightAim, -litDir) < lightCos)\
@@ -385,7 +406,10 @@ int particleProgramInitialize(particleProgram *prog, GLuint attrNum) {
 			else\
 				diffInt = 1.0;\
 			vec3 diffRefl = max(0.2, diffInt) * lightCol * diffuse;\
-			fragColor = vec4(diffRefl, 1.0);\
+      if (diffuse[0] > 0.1 && diffuse[1] > 0.1 && diffuse[2] > 0.1)\
+        fragColor = vec4(diffRefl, 1.0);\
+      else\
+        fragColor = vec4(1.0,1.0,1.0,0.0);\
 		}";
 	prog->program = makeProgram(vertexCode, fragmentCode);
 	if (prog->program == 0) {

@@ -42,6 +42,7 @@ particleProgram ptcProg;
 lightLight light;
 
 GLdouble alpha = 0.0;
+GLdouble snow = 0.0;
 
 /* The main shader program has extra hooks for shadowing. */
 GLuint program;
@@ -126,6 +127,9 @@ int initializeScene(void) {
     		GL_REPEAT, GL_REPEAT) != 0)
     	return 4;
     if (texInitializeFile(&texL, "snowytree.jpg", GL_LINEAR, GL_LINEAR,
+    		GL_REPEAT, GL_REPEAT) != 0)
+    	return 5;
+		if (texInitializeFile(&texP, "snowflake.png", GL_LINEAR, GL_LINEAR,
     		GL_REPEAT, GL_REPEAT) != 0)
     	return 5;
 
@@ -220,6 +224,8 @@ int initializeScene(void) {
 	sceneSetTranslation(&nodeT, trans);
 	vecSet(3, trans, 0.0, 0.0, 7.0);
 	sceneSetTranslation(&nodeL, trans);
+	//vecSet(3, trans, 0.0, 0.0, 10.0);
+	//sceneSetTranslation(&nodeH, trans);
 	sceneSetUniform(&nodeH, unif);
 	sceneSetUniform(&nodeV, unif);
 	sceneSetUniform(&nodeT, unif);
@@ -233,7 +239,6 @@ int initializeScene(void) {
 	sceneSetTexture(&nodeV, &tex);
 	tex = &texW;
 	sceneSetTexture(&nodeW, &tex);
-	particleSetTexture(&nodeP, &tex);
 	tex = &texT;
 	sceneSetTexture(&nodeT, &tex);
 	tex = &texL;
@@ -282,7 +287,7 @@ int particlesInitialize(void) {
 	meshMesh mesh2;
 	GLuint attrDims[3] = {3, 2, 3};
 
-	meshInitializeRainCloud(&mesh2, 70, 70, 40, 10, (3+2+3));
+	meshInitializeRainCloud(&mesh2, 60, 60, 100, 5, (3+2+3));
 
 	// if (meshInitializeSphere(&mesh, 6.0, 12, 32) != 0)
 	// 	return 11;
@@ -290,13 +295,11 @@ int particlesInitialize(void) {
 	particleGLInitialize(&meshP, &mesh2, 3, attrDims, 1);
 	particleCPUInitialize(&meshP, &particle, &mesh2, 3, attrDims);
 
-	printf("Before : %u\n", particle.vertNum);
-
 	GLdouble velocities[particle.vertNum * 3];
-	GLdouble velocity[3] = {0.0, 0.0, 0.0};
+	GLdouble velocity[3] = {0.0, 2.0, -3.0};
 	GLdouble velUnit[3];
 	vecUnit(3, velocity, velUnit);
-	vecScale(3, 0.00, velUnit, velocity);
+	vecScale(3, 0.05, velUnit, velocity);
 	for (int i = 0; i < particle.vertNum; i++) {
 		velocities[(i*3)] = velocity[0];
 		velocities[(i*3)+1] = velocity[1];
@@ -311,15 +314,18 @@ int particlesInitialize(void) {
 	meshDestroy(&mesh);
 	meshDestroy(&mesh2);
 
-	if (particleInitialize(&nodeP, 3, 0, &meshP) != 0) {
+	if (particleInitialize(&nodeP, 3, 1, &meshP) != 0) {
 		return 14;
 	}
 	//GLdouble trans[3] = {40.0, 28.0, 5.0};
-	GLdouble trans[3] = {0.0,0.0,-10.0};
+	GLdouble trans[3] = {0.0,0.0,0.0};
 	//trans[2] = 12.0;
 	particleSetTranslation(&nodeP, trans);
 	GLdouble unif[3] = {0.0, 0.0, 1.0};
 	particleSetUniform(&nodeP, unif);
+	texTexture *tex;
+	tex = &texP;
+	particleSetTexture(&nodeP, &tex);
 	return 0;
 }
 
@@ -468,6 +474,8 @@ int main(void) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		//glPointSize(3);
 		glEnable(GL_PROGRAM_POINT_SIZE);
 		//glEnable(VERTEX_PROGRAM_POINT_SIZE);
