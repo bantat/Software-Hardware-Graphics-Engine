@@ -378,7 +378,7 @@ int particleProgramInitialize(particleProgram *prog, GLuint attrNum) {
       else\
         p_div = viewPos[2]/viewPos[3];\
       float scale_dist = 1.0 - p_div;\
-      gl_PointSize = 80.0 * scale_dist;\
+      gl_PointSize = 40.0 * scale_dist;\
 			fragPos = vec3(worldPos);\
 			normalDir = vec3(modeling * vec4(normal, 0.0));\
 			st = texCoords;\

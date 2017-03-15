@@ -287,7 +287,7 @@ int particlesInitialize(void) {
 	meshMesh mesh2;
 	GLuint attrDims[3] = {3, 2, 3};
 
-	meshInitializeRainCloud(&mesh2, 60, 60, 100, 5, (3+2+3));
+	meshInitializeRainCloud(&mesh2, 60, 60, 100, 10, (3+2+3));
 
 	// if (meshInitializeSphere(&mesh, 6.0, 12, 32) != 0)
 	// 	return 11;
@@ -296,11 +296,28 @@ int particlesInitialize(void) {
 	particleCPUInitialize(&meshP, &particle, &mesh2, 3, attrDims);
 
 	GLdouble velocities[particle.vertNum * 3];
-	GLdouble velocity[3] = {0.0, 2.0, -3.0};
+
+	GLdouble velocity[3];
 	GLdouble velUnit[3];
-	vecUnit(3, velocity, velUnit);
-	vecScale(3, 0.05, velUnit, velocity);
 	for (int i = 0; i < particle.vertNum; i++) {
+		velocity[2] = -2.0;
+		int random = rand() % 100;
+		if (random % 2 == 0) {
+			velocity[0] = (GLdouble) (rand() % 100) / 100;
+		}
+		else {
+			velocity[0] = (GLdouble) -(rand() % 100) / 100;
+		}
+		random = rand() % 100;
+		if (random % 2 == 0) {
+			velocity[1] = (GLdouble) (rand() % 100) / 100;
+		}
+		else {
+			velocity[1] = (GLdouble) -(rand() % 100) / 100;
+		}
+		printf("velocity: %f, %f", velocity[0], velocity[1]);
+		vecUnit(3, velocity, velUnit);
+		vecScale(3, 0.05, velUnit, velocity);
 		velocities[(i*3)] = velocity[0];
 		velocities[(i*3)+1] = velocity[1];
 		velocities[(i*3)+2] = velocity[2];
