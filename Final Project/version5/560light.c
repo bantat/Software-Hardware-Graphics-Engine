@@ -1,11 +1,13 @@
-
-
+/*
+@ Author:  Sabastian Mugazambi & Tore Banta
+@ Date: 03/14/2017
+*/
 
 #define lightOMNI 0
 #define lightSPOT 1
 #define lightDIRECTIONAL 2
 
-/* Feel free to read from this struct's members, but don't write to them, 
+/* Feel free to read from this struct's members, but don't write to them,
 except through accessor functions. */
 typedef struct lightLight lightLight;
 struct lightLight {
@@ -37,8 +39,8 @@ void lightSetColor(lightLight *light, GLdouble rgb[3]) {
 	vecCopy(3, rgb, light->color);
 }
 
-/* Sets the light's attenuation coefficients. The light intensity at distance d 
-from the light is 1 / (a0 + a1 d + a2 d^2) times whatever it would be 
+/* Sets the light's attenuation coefficients. The light intensity at distance d
+from the light is 1 / (a0 + a1 d + a2 d^2) times whatever it would be
 unattenuated. So, to deactivate attenuation, use values 1.0, 0.0, 0.0. */
 void lightSetAttenuation(lightLight *light, GLdouble atten[3]) {
 	vecCopy(3, atten, light->attenuation);
@@ -49,11 +51,11 @@ void lightSetSpotAngle(lightLight *light, GLdouble fullAngle) {
 	light->spotAngle = fullAngle;
 }
 
-/* Sets the light's rotation and translation. The light is positioned at the 
-world coordinates position. From that position, the light shines in the 
-direction described by the spherical coordinates phi and theta (as in 
+/* Sets the light's rotation and translation. The light is positioned at the
+world coordinates position. From that position, the light shines in the
+direction described by the spherical coordinates phi and theta (as in
 vec3Spherical). */
-void lightShineFrom(lightLight *light, GLdouble position[3], GLdouble phi, 
+void lightShineFrom(lightLight *light, GLdouble position[3], GLdouble phi,
 		GLdouble theta) {
 	GLdouble negZ[3], y[3];
 	GLdouble yStd[3] = {0.0, 1.0, 0.0}, negZStd[3] = {0.0, 0.0, -1.0};
@@ -67,10 +69,10 @@ void lightShineFrom(lightLight *light, GLdouble position[3], GLdouble phi,
 
 /*** OpenGL ***/
 
-/* The '...Loc' arguments are shader locations. This function loads those 
-locations with the light's settings. cosLoc gets the cosine of half of the 
+/* The '...Loc' arguments are shader locations. This function loads those
+locations with the light's settings. cosLoc gets the cosine of half of the
 spot light angle. */
-void lightRender(lightLight *light, GLint positionLoc, GLint colorLoc, 
+void lightRender(lightLight *light, GLint positionLoc, GLint colorLoc,
 		GLint attenLoc, GLint dirLoc, GLint cosLoc) {
 	GLfloat vec[3];
 	vecOpenGL(3, light->color, vec);
@@ -92,5 +94,3 @@ void lightRender(lightLight *light, GLint positionLoc, GLint colorLoc,
 		glUniform1fv(cosLoc, 1, vec);
 	}
 }
-
-

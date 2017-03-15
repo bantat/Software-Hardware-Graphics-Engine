@@ -1,7 +1,11 @@
 
+/*
+@ Author:  Sabastian Mugazambi & Tore Banta
+@ Date: 03/14/2017
+This files includes the main function  that test the particle effects
+capabilities of the graphics engine.
 
-
-/* On macOS, compile with...
+On macOS, compile with...
     clang 600mainParticles.c /usr/local/gl3w/src/gl3w.o -lglfw -framework OpenGL -framework CoreFoundation
 */
 
@@ -68,7 +72,7 @@ void handleKey(GLFWwindow *window, int key, int scancode, int action,
 	int altOptionIsDown = mods & GLFW_MOD_ALT;
 	int superCommandIsDown = mods & GLFW_MOD_SUPER;
 	if (action == GLFW_PRESS && key == GLFW_KEY_L) {
-		camSwitchProjectionType(&cam);
+		//camSwitchProjectionType(&cam);
 	} else if (action == GLFW_PRESS || action == GLFW_REPEAT) {
 		if (key == GLFW_KEY_O)
 			camAddTheta(&cam, -0.1);
@@ -282,23 +286,23 @@ int initializeCameraLight(void) {
 	return 0;
 }
 
+/* Returns 0 on success, non-zero on failure. Warning: If initialization fails
+midway through, then does not properly deallocate all resources. But that's
+okay, because the program terminates almost immediately after this function
+returns. */
 int particlesInitialize(void) {
 	meshMesh mesh;
 	meshMesh mesh2;
 	GLuint attrDims[3] = {3, 2, 3};
 
-	meshInitializeRainCloud(&mesh2, 60, 60, 100, 10, (3+2+3));
-
-	// if (meshInitializeSphere(&mesh, 6.0, 12, 32) != 0)
-	// 	return 11;
-
+	meshInitializeRainCloud(&mesh2, 60, 60, 100, 12, (3+2+3));
 	particleGLInitialize(&meshP, &mesh2, 3, attrDims, 1);
 	particleCPUInitialize(&meshP, &particle, &mesh2, 3, attrDims);
 
 	GLdouble velocities[particle.vertNum * 3];
-
 	GLdouble velocity[3];
 	GLdouble velUnit[3];
+
 	for (int i = 0; i < particle.vertNum; i++) {
 		velocity[2] = -2.0;
 		int random = rand() % 100;
@@ -315,19 +319,16 @@ int particlesInitialize(void) {
 		else {
 			velocity[1] = (GLdouble) -(rand() % 100) / 100;
 		}
-		printf("velocity: %f, %f", velocity[0], velocity[1]);
+		//printf("velocity: %f, %f", velocity[0], velocity[1]);
 		vecUnit(3, velocity, velUnit);
 		vecScale(3, 0.05, velUnit, velocity);
 		velocities[(i*3)] = velocity[0];
 		velocities[(i*3)+1] = velocity[1];
 		velocities[(i*3)+2] = velocity[2];
 	}
+
 	particleSetVelocities(&particle, velocities);
-	//particleGLVAOInitialize(&meshP, 0, attrLocs);
 	particleGLVAOInitialize(&meshP, 0, ptcProg.attrLocs);
-
-	//sceneInitialize(&nodeP, 3, 1, &meshP, NULL, NULL);
-
 	meshDestroy(&mesh);
 	meshDestroy(&mesh2);
 
@@ -336,7 +337,6 @@ int particlesInitialize(void) {
 	}
 	//GLdouble trans[3] = {40.0, 28.0, 5.0};
 	GLdouble trans[3] = {0.0,0.0,0.0};
-	//trans[2] = 12.0;
 	particleSetTranslation(&nodeP, trans);
 	GLdouble unif[3] = {0.0, 0.0, 1.0};
 	particleSetUniform(&nodeP, unif);
@@ -428,16 +428,10 @@ void render(void) {
 	glUseProgram(program);
 	camRender(&cam, viewingLoc);
 
-	// GLdouble rot[3][3], axis[3] = {1.0, 1.0, 1.0};
-  // vecUnit(3, axis, axis);
-  // alpha += 0.01;
-  // mat33AngleAxisRotation(alpha, axis, rot);
-  // particleSetRotation(&nodeP, rot);
-  // particleSetOneUniform(&nodeP, 0, 0.5 + 0.5 * sin(alpha * 7.0));
-
 	GLfloat vec[3];
 	vecOpenGL(3, cam.translation, vec);
 	glUniform3fv(camPosLoc, 1, vec);
+
 	/* For each light, we have to connect it to the shader program, as always.
 	For each shadow-casting light, we must also connect its shadow map. */
 	lightRender(&light, lightPosLoc, lightColLoc, lightAttLoc, lightDirLoc,
@@ -445,9 +439,6 @@ void render(void) {
 	GLuint unifDims[1] = {3};
 	sceneRender(&nodeH, identity, modelingLoc, 1, unifDims, unifLocs, 0,
 		textureLocs);
-	// need to do the transformations for the particles too.
-	//sceneRender(&nodeP, identity, modelingLoc, 1, unifDims, unifLocs, 0,textureLocs);
-	//do a scene render with the point transformed
 	glUseProgram(ptcProg.program);
 	camRender(&cam, ptcProg.viewingLoc);
 	GLint unifLocs[1];
@@ -486,34 +477,22 @@ int main(void) {
     }
     fprintf(stderr, "main: OpenGL %s, GLSL %s.\n",
 		glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
-	/* We no longer do glDepthRange(1.0, 0.0). Instead we have changed our
-	projection matrices. */
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		//glPointSize(3);
-		glEnable(GL_PROGRAM_POINT_SIZE);
-		//glEnable(VERTEX_PROGRAM_POINT_SIZE);
-
-		// glPointParameteri(GL_POINT_SIZE_MIN, 1);
-		// glPointParameteri(GL_POINT_SIZE_MAX, 5);
-		// GLuint att[3] = {0,1,0};
-		// glPointParameteriv(GL_POINT_DISTANCE_ATTENUATION, att);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Blending screen buffer based on Alpha channel values
+		glEnable(GL_PROGRAM_POINT_SIZE); // Enable shader modification of gl_PointSize
 
     if (initializeShaderProgram() != 0)
     	return 3;
-    /* Initialize the shadow mapping before the meshes. Why? */
 
-/*Change change*/
 	if (initializeCameraLight() != 0)
 		return 4;
   if (initializeScene() != 0)
   	return 5;
 	if (particlesInitialize() != 0)
 		return 5;
-/*Change change*/
 
     while (glfwWindowShouldClose(window) == 0) {
     	oldTime = newTime;

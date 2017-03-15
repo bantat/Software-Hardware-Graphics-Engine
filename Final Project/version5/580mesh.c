@@ -1,3 +1,9 @@
+/*
+@ Author:  Sabastian Mugazambi & Tore Banta
+@ Date: 03/14/2017
+
+*/
+
 
 #define BUFFER_OFFSET(bytes) ((GLubyte *)NULL + (bytes))
 GLuint RAN_MAX = 1;
@@ -597,6 +603,9 @@ int meshInitializeDissectedLandscape(meshMesh *mesh, meshMesh *land,
   return error;
 }
 
+/* Random number generator takes a max and min and returns a randomly picked
+number in that range */
+
 int range_rand(int min_num, int max_num) {
     if(min_num >= max_num) {
         fprintf(stderr, "min_num is greater or equal than max_num!\n");
@@ -604,6 +613,10 @@ int range_rand(int min_num, int max_num) {
     return min_num + (rand() % (max_num - min_num));
 }
 
+/* Builds a mesh for particles given the dimansions of the mesh and the density
+of the particles. Notice that the larger the density the more spacing between
+particles and the lower the density the more crowded they are. (Counter intuitive).
+The height determines where the snow cloud or rain cloud actually starts*/
 int meshInitializeRainCloud(meshMesh *mesh, GLuint length, GLuint width,
                               GLuint height, GLuint density, GLuint attrDim) {
 
@@ -626,12 +639,8 @@ int meshInitializeRainCloud(meshMesh *mesh, GLuint length, GLuint width,
     }
   }
 
-
-
-
   //meshPointInitialize(mesh, addedVerts, attrDim);
   meshInitialize(mesh, 3 * addedVerts, addedVerts, attrDim);
-
 
   int vertRun = 0;
   for(int i = 0; i < addedVerts; i++) {

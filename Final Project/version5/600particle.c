@@ -1,3 +1,14 @@
+
+/*
+@ Author:  Sabastian Mugazambi & Tore Banta
+@ Date: 03/14/2017
+This files includes the structs and method calls to the particle struct and
+handles all things particle.
+
+On macOS, compile with...
+    included in mainParticle.c
+*/
+
 #define BUFFER_OFFSET(bytes) ((GLubyte *)NULL + (bytes))
 
 /* Feel free to read from this struct's members, but don't write to them,
@@ -343,7 +354,7 @@ void particleRender(particleNode *node, GLint modelingLoc,
   }
 }
 
-
+/* Returns 0 on success, non-zero on failure. */
 int particleProgramInitialize(particleProgram *prog, GLuint attrNum) {
 	prog->attrLocs = (GLint *)malloc(attrNum * sizeof(GLint));
 	if (prog->attrLocs == NULL) {
