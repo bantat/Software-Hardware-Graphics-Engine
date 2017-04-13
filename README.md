@@ -8,4 +8,5 @@ Version 5**: Hardware accelerated, GPU driven. Built using OpenGL/GL3W
 Final Project: Basic particle system implementation and example, project documentation included
 
 Compile commands included at head of mainTitle.c files
+
 Designed and implemented using partial code base provided by Josh Davis
